@@ -1,11 +1,11 @@
 {
   "name": "extensions-official",
   "version": "1.0.0",
-  "repositoryName": "xOnlyFadi's H-Extensions (0.6)",
-  "description": "xOnlyFadi's H-Extensions for 0.6!",
+  "repositoryName": "xOnlyFadi's Extensions (0.6)",
+  "description": "xOnlyFadi's Extensions for 0.6!",
   "main": "index.js",
-  "GITHUB_REPOSITORY": "https://github.com/xOnlyFadi/h-extensions",
-  "baseURL": "https://xonlyfadi.github.io/h-extensions/",
+  "GITHUB_REPOSITORY": "https://github.com/xOnlyFadi/xonlyfadi-extensions",
+  "baseURL": "https://xonlyfadi.github.io/xonlyfadi-extensions/",
   "scripts": {
     "bundle": "paperback bundle",
     "serve": "paperback serve",
