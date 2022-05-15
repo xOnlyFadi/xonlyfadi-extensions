@@ -13,6 +13,7 @@ import {
     LanguageCode,
     Request,
     Response,
+    TagType
 } from "paperback-extensions-common"
 
 import {Parser} from "./MangaFreakParser";
@@ -28,6 +29,12 @@ export const MangaFreakInfo: SourceInfo = {
     websiteBaseURL: MangaFreak_Base,
     contentRating: ContentRating.EVERYONE,
     language: LanguageCode.ENGLISH,
+    sourceTags: [
+        {
+            text: "Cloudflare",
+            type: TagType.RED
+        }
+    ]
 }
 
 export abstract class MangaFreak extends Source {
