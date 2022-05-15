@@ -569,7 +569,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
             });
         });
     }
-    constructSearchRequest(page, query) {
+    constructSearchRequest(_page, query) {
         var _a, _b, _c;
         if (!this.isEmpty(query === null || query === void 0 ? void 0 : query.title)) {
             if (((_a = query.includedTags) === null || _a === void 0 ? void 0 : _a.length) === 0) {
@@ -754,10 +754,10 @@ class Parser {
         });
     }
     parseChapterDetails($, mangaId, chapterId) {
-        var _a, _b;
+        var _a;
         let pages = [];
         for (let obj of $("img#gohere").toArray()) {
-            let page = (_b = (_a = $(obj).attr('src')) !== null && _a !== void 0 ? _a : $(obj).attr('data-src')) !== null && _b !== void 0 ? _b : '';
+            let page = (_a = this.getImageSrc($(obj))) !== null && _a !== void 0 ? _a : '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`);
             }
