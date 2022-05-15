@@ -40,8 +40,6 @@ export const MangaFreakInfo: SourceInfo = {
 export abstract class MangaFreak extends Source {
     private readonly parser: Parser = new Parser();
 
-    chapterDetailsSelector: string = "div.item img.owl-lazy"
-
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
         requestTimeout: 30000,
