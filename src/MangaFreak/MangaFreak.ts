@@ -194,7 +194,7 @@ export abstract class MangaFreak extends Source {
         })
     }
 
-    constructSearchRequest(page: number, query: SearchRequest): any {
+    constructSearchRequest(_page: number, query: SearchRequest): any {
         if (!this.isEmpty(query?.title)){
         if(query.includedTags?.length === 0){
             return createRequestObject({

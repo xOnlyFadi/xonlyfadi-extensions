@@ -65,7 +65,7 @@ export class Parser {
         let pages: string[] = []
 
         for (let obj of $("img#gohere").toArray()) {
-            let page = $(obj).attr('src') ?? $(obj).attr('data-src') ?? '';
+            let page = this.getImageSrc($(obj)) ?? '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`)
             }
