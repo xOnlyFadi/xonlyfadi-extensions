@@ -401,12 +401,6 @@ exports.MangaFreakInfo = {
     websiteBaseURL: MangaFreak_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     language: paperback_extensions_common_1.LanguageCode.ENGLISH,
-    sourceTags: [
-        {
-            text: "Notifications",
-            type: paperback_extensions_common_1.TagType.GREEN
-        },
-    ]
 };
 class MangaFreak extends paperback_extensions_common_1.Source {
     constructor() {
