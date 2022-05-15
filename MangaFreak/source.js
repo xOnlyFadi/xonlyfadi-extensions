@@ -401,12 +401,17 @@ exports.MangaFreakInfo = {
     websiteBaseURL: MangaFreak_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     language: paperback_extensions_common_1.LanguageCode.ENGLISH,
+    sourceTags: [
+        {
+            text: "Cloudflare",
+            type: paperback_extensions_common_1.TagType.RED
+        }
+    ]
 };
 class MangaFreak extends paperback_extensions_common_1.Source {
     constructor() {
         super(...arguments);
         this.parser = new MangaFreakParser_1.Parser();
-        this.chapterDetailsSelector = "div.item img.owl-lazy";
         this.requestManager = createRequestManager({
             requestsPerSecond: 3,
             requestTimeout: 30000,
