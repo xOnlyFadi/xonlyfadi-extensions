@@ -7,7 +7,6 @@ import {
     HomeSection,
     SearchRequest,
     SourceInfo,
-    TagType,
     MangaStatus,
     ContentRating,
     TagSection,
@@ -29,12 +28,6 @@ export const MangaFreakInfo: SourceInfo = {
     websiteBaseURL: MangaFreak_Base,
     contentRating: ContentRating.EVERYONE,
     language: LanguageCode.ENGLISH,
-    sourceTags: [
-        {
-            text: "Notifications",
-            type: TagType.GREEN
-        },
-    ]
 }
 
 export abstract class MangaFreak extends Source {
