@@ -42,7 +42,7 @@ export abstract class MangaFreak extends Source {
 
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
-        requestTimeout: 30000,
+        requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
 
