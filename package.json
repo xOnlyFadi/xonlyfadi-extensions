@@ -1,9 +1,10 @@
 {
-  "name": "xonlyfadi-extensions",
+  "name": "extensions-official",
   "version": "1.0.0",
   "repositoryName": "xOnlyFadi's Extensions (0.6)",
   "description": "xOnlyFadi's Extensions for 0.6!",
   "main": "index.js",
+  "homepage": "https://xonlyfadi.github.io/xonlyfadi-extensions/",
   "GITHUB_REPOSITORY": "https://github.com/xOnlyFadi/xonlyfadi-extensions",
   "baseURL": "https://xonlyfadi.github.io/xonlyfadi-extensions/",
   "scripts": {
@@ -13,14 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Paperback-iOS/extensions-official.git"
+    "url": "git+https://github.com/xOnlyFadi/xonlyfadi-extensions.git"
   },
   "author": "Paperback Community",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Paperback-iOS/extensions-official/issues"
+    "url": "https://github.com/xOnlyFadi/xonlyfadi-extensions/issues"
   },
-  "homepage": "https://github.com/Paperback-iOS/extensions-official#readme",
   "devDependencies": {
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
