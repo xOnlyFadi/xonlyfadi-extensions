@@ -2412,7 +2412,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '1.0.4',
+    version: '1.0.5',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -2663,13 +2663,12 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
     const pages = [];
     const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi);
     for (const match of imageMatches) {
-        var url = match[1];
+        var url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g');
         if (url.startsWith('https')) {
             pages.push(url);
         }
         else {
             const containsS0 = url.includes('=s0');
-            url = url.replace(/_x236/g, 'd').replace(/_x945/g, 'g');
             url = url.slice(0, containsS0 ? -3 : -6);
             url = url.slice(4, 22) + url.slice(25);
             url = url.slice(0, -6) + url.slice(-2);
