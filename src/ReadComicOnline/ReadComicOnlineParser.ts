@@ -10,8 +10,6 @@ import {
     TagSection
 } from 'paperback-extensions-common'
 
-import entities = require('entities')
-
 const RCO_DOMAIN = 'https://readcomiconline.li'
 
 export const parseMangaDetails = ($: CheerioStatic, mangaId: string): Manga => {
@@ -353,7 +351,9 @@ export const parseSearch = ($: CheerioStatic, cheerio: any): MangaTile[] => {
 }
 
 const decodeHTMLEntity = (str: string): string => {
-    return entities.decodeHTML(str)
+    return str.replace(/&#(\d+);/g, function (_match, dec) {
+        return String.fromCharCode(dec);
+    })
 }
 
 export const isLastPage = ($: CheerioStatic): boolean => {
