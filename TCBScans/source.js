@@ -426,15 +426,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
     getMangaShareUrl(mangaId) {
         return `${TCBScans_Base}/mangas/${mangaId}`;
     }
-    getCloudflareBypassRequest() {
-        return createRequestObject({
-            url: `${TCBScans_Base}/Genre/All/1`,
-            method: 'GET',
-            headers: {
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1',
-            }
-        });
-    }
     getHomePageSections(sectionCallback) {
         return __awaiter(this, void 0, void 0, function* () {
             let options = createRequestObject({
@@ -443,7 +434,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
             });
             let response = yield this.requestManager.schedule(options, 1);
             const $ = this.cheerio.load(response.data);
-            this.CloudFlareError(response.status);
             return this.parser.parseHomeSections($, sectionCallback, this);
         });
     }
@@ -454,7 +444,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 method: 'GET',
             });
             let response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
             let $ = this.cheerio.load(response.data);
             return this.parser.parseMangaDetails($, mangaId, this);
         });
@@ -466,7 +455,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 method: 'GET'
             });
             let response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
             let $ = this.cheerio.load(response.data);
             return this.parser.parseChapters($, mangaId, this);
         });
@@ -478,7 +466,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 method: 'GET'
             });
             let response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
             let $ = this.cheerio.load(response.data);
             return this.parser.parseChapterDetails($, mangaId, chapterId);
         });
@@ -500,11 +487,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
         query = query.replace(/ /g, "+");
         query = query.replace(/%20/g, "+");
         return query;
-    }
-    CloudFlareError(status) {
-        if (status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > TCBScans and press Cloudflare Bypass or press the Cloud image on the right');
-        }
     }
 }
 exports.TCBScans = TCBScans;
