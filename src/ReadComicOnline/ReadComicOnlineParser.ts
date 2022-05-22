@@ -257,7 +257,7 @@ export const parseHomeSections = ($: CheerioStatic, sectionCallback: (section: H
 
 }
 
-export const parseViewMore = ($: CheerioStatic, cheerio: any): MangaTile[] => {
+export const parseViewMore = ($: CheerioStatic, _cheerio: any): MangaTile[] => {
     const comics: MangaTile[] = []
     const collectedIds: string[] = []
 
@@ -299,7 +299,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     return tagSections
 }
 
-export const parseSearch = ($: CheerioStatic, cheerio: any): MangaTile[] => {
+export const parseSearch = ($: CheerioStatic, _cheerio: any): MangaTile[] => {
     const comics: MangaTile[] = []
     const collectedIds: string[] = []
 
