@@ -2813,7 +2813,7 @@ const parseHomeSections = ($, sectionCallback) => {
     sectionCallback(TopMonthSection);
 };
 exports.parseHomeSections = parseHomeSections;
-const parseViewMore = ($, cheerio) => {
+const parseViewMore = ($, _cheerio) => {
     var _a, _b, _c, _d, _e;
     const comics = [];
     const collectedIds = [];
@@ -2853,7 +2853,7 @@ const parseTags = ($) => {
     return tagSections;
 };
 exports.parseTags = parseTags;
-const parseSearch = ($, cheerio) => {
+const parseSearch = ($, _cheerio) => {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     const comics = [];
     const collectedIds = [];
