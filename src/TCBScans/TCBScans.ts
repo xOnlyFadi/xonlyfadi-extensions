@@ -55,15 +55,6 @@ export abstract class TCBScans extends Source {
     override getMangaShareUrl(mangaId: string): string {
         return `${TCBScans_Base}/mangas/${mangaId}`
     }
-    override getCloudflareBypassRequest() {
-            return createRequestObject({
-            url: `${TCBScans_Base}/Genre/All/1`,
-            method: 'GET',
-            headers: {
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1',
-            }
-        });
-    }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         let options = createRequestObject({
@@ -72,7 +63,6 @@ export abstract class TCBScans extends Source {
         });
         let response = await this.requestManager.schedule(options, 1);
         const $ = this.cheerio.load(response.data);
-        this.CloudFlareError(response.status)
         return this.parser.parseHomeSections($,sectionCallback, this)
     }
 
@@ -82,7 +72,6 @@ export abstract class TCBScans extends Source {
             method: 'GET',
         });
         let response = await this.requestManager.schedule(options, 1);
-        this.CloudFlareError(response.status)
         let $ = this.cheerio.load(response.data);
         return this.parser.parseMangaDetails($, mangaId,this);
     }
@@ -93,7 +82,6 @@ export abstract class TCBScans extends Source {
             method: 'GET'
         });
         let response = await this.requestManager.schedule(options, 1);
-        this.CloudFlareError(response.status)
         let $ = this.cheerio.load(response.data);
         return this.parser.parseChapters($, mangaId, this);
     }
@@ -104,7 +92,6 @@ export abstract class TCBScans extends Source {
             method: 'GET'
         });
         let response = await this.requestManager.schedule(options, 1);
-        this.CloudFlareError(response.status)
         let $ = this.cheerio.load(response.data);
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
@@ -126,10 +113,5 @@ export abstract class TCBScans extends Source {
         query = query.replace(/%20/g, "+");
         return query;
         
-    }
-    CloudFlareError(status: any) {
-        if(status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > TCBScans and press Cloudflare Bypass or press the Cloud image on the right')
-        }
     }
 }
