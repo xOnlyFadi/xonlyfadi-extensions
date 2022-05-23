@@ -21,7 +21,7 @@ export const TCBScansInfo: SourceInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
@@ -97,7 +97,9 @@ export abstract class TCBScans extends Source {
     }
 
     async getSearchResults(_query: SearchRequest, _metadata: any): Promise<PagedResults> {
-      throw Error("Search Does Not Exist on TCB Scans")
+        return createPagedResults({
+            results: [],
+        })
     }
 
     normalizeSearchQuery(query: any) {
