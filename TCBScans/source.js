@@ -396,7 +396,7 @@ exports.TCBScansInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -472,7 +472,9 @@ class TCBScans extends paperback_extensions_common_1.Source {
     }
     getSearchResults(_query, _metadata) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw Error("Search Does Not Exist on TCB Scans");
+            return createPagedResults({
+                results: [],
+            });
         });
     }
     normalizeSearchQuery(query) {
