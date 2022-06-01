@@ -28,7 +28,7 @@ import {
 const RCO_DOMAIN = 'https://readcomiconline.li'
 
 export const ReadComicOnlineInfo: SourceInfo = {
-    version: '1.0.5',
+    version: '1.0.6',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',

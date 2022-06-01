@@ -91,14 +91,15 @@ export const parseChapterDetails = (data: any, mangaId: string, chapterId: strin
         if (url.startsWith('https')) {
             pages.push(url);
         } else {
+            var sliced = url.slice(url.indexOf('?'))
             const containsS0 = url.includes('=s0');
-            url = url.slice(0, containsS0 ? -3 : -6);
+            url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'));
             url = url.slice(4, 22) + url.slice(25);  
             url = url.slice(0, -6) + url.slice(-2);
             url = Buffer.from(url, 'base64').toString('utf-8');
             url = url.slice(0, 13) + url.slice(17);
-            url = url.slice(0, -2) + (containsS0 ? '=s0' : '=s1600');
-        pages.push(`https://2.bp.blogspot.com/${url}`);
+            url = url.slice(0, -2) +  (containsS0 ? '=s0' : '=s1600');
+        pages.push(`https://2.bp.blogspot.com/${url+sliced}`);
         }
     }
     const chapterDetails = createChapterDetails({
@@ -358,44 +359,4 @@ const decodeHTMLEntity = (str: string): string => {
 export const isLastPage = ($: CheerioStatic): boolean => {
     const lastPage = $('.pager').text().includes('Next')
     return !lastPage
-}
-export {};
-
-declare global {
-    interface Number {
-        /**
-         * Calls the specified function block with `this` value as its argument and returns its result
-         * @param block - The function to be executed with `this` as argument
-         * @returns `block`'s result
-         */
-        let<R>(this: Number | null | undefined, block: (it: number) => R): R;
-    }
-    interface String {
-        /**
-         * Calls the specified function block with `this` value as its argument and returns its result
-         * @param block - The function to be executed with `this` as argument
-         * @returns `block`'s result
-         */
-        let<R>(this: String | null | undefined, block: (it: string) => R): R;
-    }
-    interface Boolean {
-        /**
-         * Calls the specified function block with `this` value as its argument and returns its result
-         * @param block - The function to be executed with `this` as argument
-         * @returns `block`'s result
-         */
-        let<R>(this: Boolean | null | undefined, block: (it: boolean) => R): R;
-    }
-}
-
-Number.prototype.let = function(this, block) {
-    return block(this!.valueOf());
-}
-
-String.prototype.let = function(this, block) {
-    return block(this!.valueOf());
-}
-
-Boolean.prototype.let = function(this, block) {
-    return block(this!.valueOf());
 }
