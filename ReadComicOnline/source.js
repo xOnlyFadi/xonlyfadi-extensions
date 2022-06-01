@@ -2412,7 +2412,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '1.0.5',
+    version: '1.0.6',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -2668,14 +2668,15 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
             pages.push(url);
         }
         else {
+            var sliced = url.slice(url.indexOf('?'));
             const containsS0 = url.includes('=s0');
-            url = url.slice(0, containsS0 ? -3 : -6);
+            url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'));
             url = url.slice(4, 22) + url.slice(25);
             url = url.slice(0, -6) + url.slice(-2);
             url = Buffer.from(url, 'base64').toString('utf-8');
             url = url.slice(0, 13) + url.slice(17);
             url = url.slice(0, -2) + (containsS0 ? '=s0' : '=s1600');
-            pages.push(`https://2.bp.blogspot.com/${url}`);
+            pages.push(`https://2.bp.blogspot.com/${url + sliced}`);
         }
     }
     const chapterDetails = createChapterDetails({
@@ -2907,15 +2908,6 @@ const isLastPage = ($) => {
     return !lastPage;
 };
 exports.isLastPage = isLastPage;
-Number.prototype.let = function (block) {
-    return block(this.valueOf());
-};
-String.prototype.let = function (block) {
-    return block(this.valueOf());
-};
-Boolean.prototype.let = function (block) {
-    return block(this.valueOf());
-};
 
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":3,"paperback-extensions-common":8}]},{},[51])(51)
