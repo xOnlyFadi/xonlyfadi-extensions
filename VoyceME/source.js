@@ -9878,7 +9878,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10302,36 +10302,26 @@ class Parser {
         });
     }
     parseChapters(VoyceD, mangaId, _source) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e;
         var data = VoyceD.data.voyce_series[0];
         const chapters = [];
-        let lastNumber = null;
+        let sortingIndex = 0;
         for (const obj of (_a = data === null || data === void 0 ? void 0 : data.chapters) !== null && _a !== void 0 ? _a : []) {
             var url = (_b = `${data === null || data === void 0 ? void 0 : data.slug}/${obj.id}#comic`) !== null && _b !== void 0 ? _b : '';
             var name = (_c = obj.title) !== null && _c !== void 0 ? _c : 'No Chpater Name';
             var release_date = obj.created_at;
-            const match = name.match(this.chapterTitleRegex);
-            let chapNum;
-            if (match && !isNaN(Number(match[1]))) {
-                chapNum = Number(match[1]);
-            }
-            else {
-                if (lastNumber === null) {
-                    chapNum = 0;
-                }
-                else {
-                    chapNum = Number((lastNumber + 0.001).toFixed(3));
-                }
-            }
-            lastNumber = chapNum;
+            const chapNum = Number((_e = (_d = name.match(/\D*(\d*\-?\d*)\D*$/)) === null || _d === void 0 ? void 0 : _d.pop()) === null || _e === void 0 ? void 0 : _e.replace(/-/g, '.'));
             chapters.push(createChapter({
                 id: encodeURI(url),
                 mangaId: mangaId,
                 name: name,
-                chapNum: chapNum !== null && chapNum !== void 0 ? chapNum : 0,
+                chapNum: isNaN(chapNum) ? 0 : chapNum,
                 time: new Date(release_date),
-                langCode: paperback_extensions_common_1.LanguageCode.ENGLISH
+                langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
+                // @ts-ignore
+                sortingIndex
             }));
+            sortingIndex--;
         }
         const key = "name";
         const arrayUniqueByKey = [...new Map(chapters.map(item => [item[key], item])).values()];
