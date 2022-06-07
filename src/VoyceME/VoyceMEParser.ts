@@ -70,31 +70,23 @@ export class Parser {
     parseChapters(VoyceD: VoyceChapterData, mangaId: string, _source: any): Chapter[] {
         var data = VoyceD.data.voyce_series[0]
         const chapters: Chapter[] = [];
-        let lastNumber: number | null = null;
+        let sortingIndex = 0
         for (const obj of data?.chapters ?? []) {
             var url = `${data?.slug}/${obj.id}#comic` ?? '';
             var name = obj.title ?? 'No Chpater Name';
             var release_date = obj.created_at;
-            const match = name.match(this.chapterTitleRegex);
-            let chapNum;
-            if (match && !isNaN(Number(match[1]))) {
-                chapNum = Number(match[1])
-            } else {
-            if (lastNumber === null) {
-                chapNum = 0;
-            } else {
-                chapNum = Number((lastNumber + 0.001).toFixed(3))
-            }
-            }
-            lastNumber = chapNum
+            const chapNum = Number(name.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
             chapters.push(createChapter({
             id: encodeURI(url), 
             mangaId: mangaId,
             name: name, 
-            chapNum: chapNum ?? 0,
+            chapNum: isNaN(chapNum) ? 0 : chapNum,
             time: new Date(release_date),
-            langCode: LanguageCode.ENGLISH
+            langCode: LanguageCode.ENGLISH,
+            // @ts-ignore
+            sortingIndex
         }));
+        sortingIndex--
         }
         const key = "name"
         const arrayUniqueByKey = [...new Map(chapters.map(item =>
