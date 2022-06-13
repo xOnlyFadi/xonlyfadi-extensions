@@ -8,8 +8,8 @@ import {Chapter,
 import {VoyceData,VoyceMangaData,VoyceChapterData} from './VoyceMEHelper'
 import {decodeHTML} from "entities"
 import {convert} from "html-to-text"
+
 export class Parser {
-    private readonly chapterTitleRegex = /Chapter|Episode ([\d.]+)/i
 
     decodeHTMLEntity(str: string): string {
         return str.replace(/&#(\d+);/g, function (_match, dec) {
@@ -21,7 +21,7 @@ export class Parser {
         const items: MangaTile[] = []
         for(const data of VoyceD.data.voyce_series){
         items.push(createMangaTile({
-            id: data.slug.toString() ?? '',
+            id: data.slug ?? '',
             image: encodeURI(`${source.staticURL}${data.thumbnail}`) ?? '',
             title: createIconText({
                 text: data.title  ?? ''
@@ -34,20 +34,20 @@ export class Parser {
     async parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string,source: any): Promise<ChapterDetails> {
         let pages: string[] = []
 
-        var nextData = $("script#__NEXT_DATA__").get(0).children[0].data
-        var nextJson = JSON.parse(nextData)
-        var buildId = nextJson.buildId
+        const nextData = $("script#__NEXT_DATA__").get(0).children[0].data
+        const nextJson = JSON.parse(nextData)
+        const buildId = nextJson.buildId
 
-        var dataResponse = await this.ChapterDetailsApiRequest(buildId,mangaId,chapterId,source)
-
-        var dataJson = JSON.parse(dataResponse)
-        var comic = dataJson.pageProps.series
-        var chapterIdV = chapterId.substringAfterLast('/').substringBeforeFirst('#')
-        var chapter = comic.chapters.map((x: any)=>{
+        const dataResponse = await this.ChapterDetailsApiRequest(buildId,mangaId,chapterId,source)
+    
+        const dataJson = JSON.parse(dataResponse)
+        const comic = dataJson.pageProps.series
+        const chapterIdV = chapterId.substringAfterLast('/').substringBeforeFirst('#')
+        const chapter = comic.chapters.map((x: any)=>{
             if(x.id == chapterIdV) return x
         })
         if(!chapter) throw new Error('Chapter data not found in website.')
-        var info = JSON.parse(JSON.stringify(chapter),(_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v)
+        const info = JSON.parse(JSON.stringify(chapter),(_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v)
         for(const page of info[0].images){
             pages.push(source.staticURL + page.image)
         }
@@ -59,25 +59,28 @@ export class Parser {
         })
     }
     async ChapterDetailsApiRequest(buildId: string,mangaId: string, chapterI: string,source:any): Promise<any> {
-        var chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#')
+        const chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#')
         const options = createRequestObject({
             url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
             method: 'GET'
         });
         let response = await source.requestManager.schedule(options, 1);
+        if(response.status == 500) throw Error('Chapter Does not info doest not exist on the site')
         return response.data
     }
     parseChapters(VoyceD: VoyceChapterData, mangaId: string, _source: any): Chapter[] {
-        var data = VoyceD.data.voyce_series[0]
+        const data = VoyceD.data.voyce_series[0]
         const chapters: Chapter[] = [];
         let sortingIndex = 0
         for (const obj of data?.chapters ?? []) {
-            var url = `${data?.slug}/${obj.id}#comic` ?? '';
-            var name = obj.title ?? 'No Chpater Name';
-            var release_date = obj.created_at;
+            const url = `${data?.slug}/${obj.id}#comic` ?? '';
+            const name = obj.title ?? 'No Chpater Name';
+            const release_date = obj.created_at;
+            if (!url) continue
             const chapNum = Number(name.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
+
             chapters.push(createChapter({
-            id: encodeURI(url), 
+            id: url, 
             mangaId: mangaId,
             name: name, 
             chapNum: isNaN(chapNum) ? 0 : chapNum,
@@ -95,8 +98,8 @@ export class Parser {
     }
 
     parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string, source: any): Manga {
-        var details = VoyceD.data.voyce_series[0]
-        const title = details?.title ?? '';
+        const details = VoyceD.data.voyce_series[0]
+        const title = details?.title.trim() ?? '';
         const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg';
         let desc = details?.description ?? '';
         if (desc == '') desc = `No Decscription provided by the source (MangaFreak)`
@@ -104,6 +107,7 @@ export class Parser {
         let status = details?.status ?? '';
         const arrayTags: Tag[] = []
         for (const obj of details?.genres ?? []) {
+            if(!obj?.genre.title) continue
             arrayTags.push({
                 id: encodeURI(obj?.genre.title.toLocaleLowerCase()) ?? '',
                 label: obj?.genre.title ?? ''
@@ -131,10 +135,10 @@ declare global {
     }
 }
 String.prototype.substringAfterLast = function (character) {
-    var lastIndexOfCharacter = this.lastIndexOf(character);
+    const lastIndexOfCharacter = this.lastIndexOf(character);
     return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
 };
 String.prototype.substringBeforeFirst = function (substring) {
-    var startingIndexOfSubstring = this.indexOf(substring);
+    const startingIndexOfSubstring = this.indexOf(substring);
     return this.substring(0, startingIndexOfSubstring);
 };

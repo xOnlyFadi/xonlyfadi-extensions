@@ -23,7 +23,7 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
@@ -109,9 +109,14 @@ export abstract class VoyceME extends Source {
             sectionCallback(section.section)
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(response => {
-                                const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data
-                    section.section.items = this.parser.parseHomeSections(json_data, this)
-                    sectionCallback(section.section)
+                    let data
+                    try {
+                        data = JSON.parse(response.data)
+                        section.section.items = this.parser.parseHomeSections(data, this)
+                        sectionCallback(section.section)
+                    } catch (e) {
+                        throw new Error(`${e}`)
+                    }
                 }),
             )
 
@@ -120,8 +125,8 @@ export abstract class VoyceME extends Source {
     }
 
     override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
-        let page = metadata?.page ?? 1
-        if (page == -1) return createPagedResults({ results: [], metadata: { page: -1 } })
+        if (metadata?.completed) return metadata
+        const page: number = metadata?.page ?? 1
         let graph
         switch (homepageSectionId) {
             case '1':
@@ -140,14 +145,18 @@ export abstract class VoyceME extends Source {
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data
-        const manga = this.parser.parseHomeSections(json_data, this)
+        let data
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
+        }
+        const manga = this.parser.parseHomeSections(data, this)
+        metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 
-        page++
-        if (manga.length !== this.popularPerPage) page = -1
         return createPagedResults({
             results: manga,
-            metadata: { page: page }
+            metadata
         })
     }
 
@@ -158,8 +167,14 @@ export abstract class VoyceME extends Source {
             data: MangaDetailQuery(mangaId)
         });
         let response = await this.requestManager.schedule(options, 1);
-        const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data
-        return this.parser.parseMangaDetails(json_data, mangaId,this);
+        let data
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
+        }
+        if(!data.data.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
+        return this.parser.parseMangaDetails(data, mangaId,this);
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
@@ -169,8 +184,15 @@ export abstract class VoyceME extends Source {
             data: ChapterDetailQuery(mangaId)
         });
         let response = await this.requestManager.schedule(options, 1);
-        const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data
-        return this.parser.parseChapters(json_data, mangaId, this);
+        let data
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
+        }
+        if(!data.data?.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
+        if (data.data?.manga?.voyce_series[0]?.length == 0) throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`)
+        return this.parser.parseChapters(data, mangaId, this);
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -184,55 +206,41 @@ export abstract class VoyceME extends Source {
     }
 
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
-        let page = metadata?.page ?? 1
-        if (page == -1) return createPagedResults({ results: [], metadata: { page: -1 } })
-        if(!query.title) return createPagedResults({ results: [], metadata: { page: -1 } })
+        if (metadata?.completed) return metadata
+        const page: number = metadata?.page ?? 1
+        if(!query.title) return createPagedResults({ results: [], metadata: undefined })
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: SearchQuery(this.normalizeSearchQuery(query.title) ?? '',page,this)
+            data: SearchQuery(query.title.replace(/%20/g, " ").replace(/_/g," ") ?? '',page,this)
         });
         const response = await this.requestManager.schedule(request, 2)
-        const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data
-        const manga = this.parser.parseHomeSections(json_data, this)
+        let data
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
+        }
+        const manga = this.parser.parseHomeSections(data, this)
 
-        page++
-        if (manga.length !== this.popularPerPage) page = -1
+        metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 
         return createPagedResults({
             results: manga,
-            metadata: { page: page },
+            metadata
         })
-    }
-
-
-
-    normalizeSearchQuery(query: any) {
-        var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g," ");
-        query = query.replace(/%20/g, " ");
-        query = query.replace(/_/g," ");
-        return query;
-        
     }
     
     parseStatus(str: string): MangaStatus {
         let status = MangaStatus.UNKNOWN
         switch (str.toLowerCase()) {
-            case 'ongoing':
-            case 'on-going':
-                status = MangaStatus.ONGOING
-                break
-            case 'completed':
-                status = MangaStatus.COMPLETED
-                break
+        case 'ongoing':
+        case 'on-going':
+            status = MangaStatus.ONGOING
+            break
+        case 'completed':
+            status = MangaStatus.COMPLETED
+            break
         }
         return status
     }
