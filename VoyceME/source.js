@@ -9878,7 +9878,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -9960,9 +9960,15 @@ class VoyceME extends paperback_extensions_common_1.Source {
             for (const section of sections) {
                 sectionCallback(section.section);
                 promises.push(this.requestManager.schedule(section.request, 1).then(response => {
-                    const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data;
-                    section.section.items = this.parser.parseHomeSections(json_data, this);
-                    sectionCallback(section.section);
+                    let data;
+                    try {
+                        data = JSON.parse(response.data);
+                        section.section.items = this.parser.parseHomeSections(data, this);
+                        sectionCallback(section.section);
+                    }
+                    catch (e) {
+                        throw new Error(`${e}`);
+                    }
                 }));
             }
             yield Promise.all(promises);
@@ -9971,9 +9977,9 @@ class VoyceME extends paperback_extensions_common_1.Source {
     getViewMoreItems(homepageSectionId, metadata) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            if (page == -1)
-                return createPagedResults({ results: [], metadata: { page: -1 } });
+            if (metadata === null || metadata === void 0 ? void 0 : metadata.completed)
+                return metadata;
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
             let graph;
             switch (homepageSectionId) {
                 case '1':
@@ -9991,14 +9997,18 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 data: graph
             });
             const response = yield this.requestManager.schedule(request, 1);
-            const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data;
-            const manga = this.parser.parseHomeSections(json_data, this);
-            page++;
-            if (manga.length !== this.popularPerPage)
-                page = -1;
+            let data;
+            try {
+                data = JSON.parse(response.data);
+            }
+            catch (e) {
+                throw new Error(`${e}`);
+            }
+            const manga = this.parser.parseHomeSections(data, this);
+            metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
             return createPagedResults({
                 results: manga,
-                metadata: { page: page }
+                metadata
             });
         });
     }
@@ -10010,11 +10020,20 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 data: (0, VoyceMEGraphQL_1.MangaDetailQuery)(mangaId)
             });
             let response = yield this.requestManager.schedule(options, 1);
-            const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data;
-            return this.parser.parseMangaDetails(json_data, mangaId, this);
+            let data;
+            try {
+                data = JSON.parse(response.data);
+            }
+            catch (e) {
+                throw new Error(`${e}`);
+            }
+            if (!data.data.voyce_series[0])
+                throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`);
+            return this.parser.parseMangaDetails(data, mangaId, this);
         });
     }
     getChapters(mangaId) {
+        var _a, _b, _c, _d;
         return __awaiter(this, void 0, void 0, function* () {
             const options = createRequestObject({
                 url: this.graphqlURL,
@@ -10022,8 +10041,18 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 data: (0, VoyceMEGraphQL_1.ChapterDetailQuery)(mangaId)
             });
             let response = yield this.requestManager.schedule(options, 1);
-            const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data;
-            return this.parser.parseChapters(json_data, mangaId, this);
+            let data;
+            try {
+                data = JSON.parse(response.data);
+            }
+            catch (e) {
+                throw new Error(`${e}`);
+            }
+            if (!((_a = data.data) === null || _a === void 0 ? void 0 : _a.voyce_series[0]))
+                throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`);
+            if (((_d = (_c = (_b = data.data) === null || _b === void 0 ? void 0 : _b.manga) === null || _c === void 0 ? void 0 : _c.voyce_series[0]) === null || _d === void 0 ? void 0 : _d.length) == 0)
+                throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`);
+            return this.parser.parseChapters(data, mangaId, this);
         });
     }
     getChapterDetails(mangaId, chapterId) {
@@ -10040,41 +10069,31 @@ class VoyceME extends paperback_extensions_common_1.Source {
     getSearchResults(query, metadata) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            let page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            if (page == -1)
-                return createPagedResults({ results: [], metadata: { page: -1 } });
+            if (metadata === null || metadata === void 0 ? void 0 : metadata.completed)
+                return metadata;
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
             if (!query.title)
-                return createPagedResults({ results: [], metadata: { page: -1 } });
+                return createPagedResults({ results: [], metadata: undefined });
             const request = createRequestObject({
                 url: this.graphqlURL,
                 method: 'POST',
-                data: (0, VoyceMEGraphQL_1.SearchQuery)((_b = this.normalizeSearchQuery(query.title)) !== null && _b !== void 0 ? _b : '', page, this)
+                data: (0, VoyceMEGraphQL_1.SearchQuery)((_b = query.title.replace(/%20/g, " ").replace(/_/g, " ")) !== null && _b !== void 0 ? _b : '', page, this)
             });
             const response = yield this.requestManager.schedule(request, 2);
-            const json_data = (typeof response.data == 'string') ? JSON.parse(response.data) : response.data;
-            const manga = this.parser.parseHomeSections(json_data, this);
-            page++;
-            if (manga.length !== this.popularPerPage)
-                page = -1;
+            let data;
+            try {
+                data = JSON.parse(response.data);
+            }
+            catch (e) {
+                throw new Error(`${e}`);
+            }
+            const manga = this.parser.parseHomeSections(data, this);
+            metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
             return createPagedResults({
                 results: manga,
-                metadata: { page: page },
+                metadata
             });
         });
-    }
-    normalizeSearchQuery(query) {
-        var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g, " ");
-        query = query.replace(/%20/g, " ");
-        query = query.replace(/_/g, " ");
-        return query;
     }
     parseStatus(str) {
         let status = paperback_extensions_common_1.MangaStatus.UNKNOWN;
@@ -10240,9 +10259,6 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
 class Parser {
-    constructor() {
-        this.chapterTitleRegex = /Chapter|Episode ([\d.]+)/i;
-    }
     decodeHTMLEntity(str) {
         return str.replace(/&#(\d+);/g, function (_match, dec) {
             return String.fromCharCode(dec);
@@ -10253,7 +10269,7 @@ class Parser {
         const items = [];
         for (const data of VoyceD.data.voyce_series) {
             items.push(createMangaTile({
-                id: (_a = data.slug.toString()) !== null && _a !== void 0 ? _a : '',
+                id: (_a = data.slug) !== null && _a !== void 0 ? _a : '',
                 image: (_b = encodeURI(`${source.staticURL}${data.thumbnail}`)) !== null && _b !== void 0 ? _b : '',
                 title: createIconText({
                     text: (_c = data.title) !== null && _c !== void 0 ? _c : ''
@@ -10265,20 +10281,20 @@ class Parser {
     parseChapterDetails($, mangaId, chapterId, source) {
         return __awaiter(this, void 0, void 0, function* () {
             let pages = [];
-            var nextData = $("script#__NEXT_DATA__").get(0).children[0].data;
-            var nextJson = JSON.parse(nextData);
-            var buildId = nextJson.buildId;
-            var dataResponse = yield this.ChapterDetailsApiRequest(buildId, mangaId, chapterId, source);
-            var dataJson = JSON.parse(dataResponse);
-            var comic = dataJson.pageProps.series;
-            var chapterIdV = chapterId.substringAfterLast('/').substringBeforeFirst('#');
-            var chapter = comic.chapters.map((x) => {
+            const nextData = $("script#__NEXT_DATA__").get(0).children[0].data;
+            const nextJson = JSON.parse(nextData);
+            const buildId = nextJson.buildId;
+            const dataResponse = yield this.ChapterDetailsApiRequest(buildId, mangaId, chapterId, source);
+            const dataJson = JSON.parse(dataResponse);
+            const comic = dataJson.pageProps.series;
+            const chapterIdV = chapterId.substringAfterLast('/').substringBeforeFirst('#');
+            const chapter = comic.chapters.map((x) => {
                 if (x.id == chapterIdV)
                     return x;
             });
             if (!chapter)
                 throw new Error('Chapter data not found in website.');
-            var info = JSON.parse(JSON.stringify(chapter), (_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v);
+            const info = JSON.parse(JSON.stringify(chapter), (_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v);
             for (const page of info[0].images) {
                 pages.push(source.staticURL + page.image);
             }
@@ -10292,27 +10308,31 @@ class Parser {
     }
     ChapterDetailsApiRequest(buildId, mangaId, chapterI, source) {
         return __awaiter(this, void 0, void 0, function* () {
-            var chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#');
+            const chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#');
             const options = createRequestObject({
                 url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
                 method: 'GET'
             });
             let response = yield source.requestManager.schedule(options, 1);
+            if (response.status == 500)
+                throw Error('Chapter Does not info doest not exist on the site');
             return response.data;
         });
     }
     parseChapters(VoyceD, mangaId, _source) {
         var _a, _b, _c, _d, _e;
-        var data = VoyceD.data.voyce_series[0];
+        const data = VoyceD.data.voyce_series[0];
         const chapters = [];
         let sortingIndex = 0;
         for (const obj of (_a = data === null || data === void 0 ? void 0 : data.chapters) !== null && _a !== void 0 ? _a : []) {
-            var url = (_b = `${data === null || data === void 0 ? void 0 : data.slug}/${obj.id}#comic`) !== null && _b !== void 0 ? _b : '';
-            var name = (_c = obj.title) !== null && _c !== void 0 ? _c : 'No Chpater Name';
-            var release_date = obj.created_at;
+            const url = (_b = `${data === null || data === void 0 ? void 0 : data.slug}/${obj.id}#comic`) !== null && _b !== void 0 ? _b : '';
+            const name = (_c = obj.title) !== null && _c !== void 0 ? _c : 'No Chpater Name';
+            const release_date = obj.created_at;
+            if (!url)
+                continue;
             const chapNum = Number((_e = (_d = name.match(/\D*(\d*\-?\d*)\D*$/)) === null || _d === void 0 ? void 0 : _d.pop()) === null || _e === void 0 ? void 0 : _e.replace(/-/g, '.'));
             chapters.push(createChapter({
-                id: encodeURI(url),
+                id: url,
                 mangaId: mangaId,
                 name: name,
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
@@ -10329,8 +10349,8 @@ class Parser {
     }
     parseMangaDetails(VoyceD, mangaId, source) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-        var details = VoyceD.data.voyce_series[0];
-        const title = (_a = details === null || details === void 0 ? void 0 : details.title) !== null && _a !== void 0 ? _a : '';
+        const details = VoyceD.data.voyce_series[0];
+        const title = (_a = details === null || details === void 0 ? void 0 : details.title.trim()) !== null && _a !== void 0 ? _a : '';
         const image = (_b = encodeURI(source.staticURL + (details === null || details === void 0 ? void 0 : details.thumbnail))) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
         let desc = (_c = details === null || details === void 0 ? void 0 : details.description) !== null && _c !== void 0 ? _c : '';
         if (desc == '')
@@ -10339,6 +10359,8 @@ class Parser {
         let status = (_f = details === null || details === void 0 ? void 0 : details.status) !== null && _f !== void 0 ? _f : '';
         const arrayTags = [];
         for (const obj of (_g = details === null || details === void 0 ? void 0 : details.genres) !== null && _g !== void 0 ? _g : []) {
+            if (!(obj === null || obj === void 0 ? void 0 : obj.genre.title))
+                continue;
             arrayTags.push({
                 id: (_h = encodeURI(obj === null || obj === void 0 ? void 0 : obj.genre.title.toLocaleLowerCase())) !== null && _h !== void 0 ? _h : '',
                 label: (_j = obj === null || obj === void 0 ? void 0 : obj.genre.title) !== null && _j !== void 0 ? _j : ''
@@ -10358,11 +10380,11 @@ class Parser {
 }
 exports.Parser = Parser;
 String.prototype.substringAfterLast = function (character) {
-    var lastIndexOfCharacter = this.lastIndexOf(character);
+    const lastIndexOfCharacter = this.lastIndexOf(character);
     return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
 };
 String.prototype.substringBeforeFirst = function (substring) {
-    var startingIndexOfSubstring = this.indexOf(substring);
+    const startingIndexOfSubstring = this.indexOf(substring);
     return this.substring(0, startingIndexOfSubstring);
 };
 
