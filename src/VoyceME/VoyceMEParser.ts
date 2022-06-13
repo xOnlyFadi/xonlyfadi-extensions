@@ -20,11 +20,15 @@ export class Parser {
     parseHomeSections(VoyceD: VoyceData, source: any): MangaTile[] {
         const items: MangaTile[] = []
         for(const data of VoyceD.data.voyce_series){
+        const id = data.slug.trim() ?? ''
+        const image = encodeURI(`${source.staticURL}${data.thumbnail}`) ?? ''
+        const title = data.title.trim() ?? ''
+        if(!id || !title) continue
         items.push(createMangaTile({
-            id: data.slug ?? '',
-            image: encodeURI(`${source.staticURL}${data.thumbnail}`) ?? '',
+            id,
+            image,
             title: createIconText({
-                text: data.title  ?? ''
+                text: title
             })
         }))
     }
@@ -107,12 +111,15 @@ export class Parser {
         let status = details?.status ?? '';
         const arrayTags: Tag[] = []
         for (const obj of details?.genres ?? []) {
-            if(!obj?.genre.title) continue
-            arrayTags.push({
-                id: encodeURI(obj?.genre.title.toLocaleLowerCase()) ?? '',
-                label: obj?.genre.title ?? ''
-            })
-        }
+            const id = encodeURI(obj?.genre.title?.toLocaleLowerCase().trim()) ?? ''
+            const title = obj?.genre.title.trim() ?? ''
+            if (!id || !title) continue
+             arrayTags.push({
+                 id: id,
+                 label: title
+             })
+         }
+ 
         const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })];
 
         return createManga({
