@@ -9878,7 +9878,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10268,11 +10268,16 @@ class Parser {
         var _a, _b, _c;
         const items = [];
         for (const data of VoyceD.data.voyce_series) {
+            const id = (_a = data.slug.trim()) !== null && _a !== void 0 ? _a : '';
+            const image = (_b = encodeURI(`${source.staticURL}${data.thumbnail}`)) !== null && _b !== void 0 ? _b : '';
+            const title = (_c = data.title.trim()) !== null && _c !== void 0 ? _c : '';
+            if (!id || !title)
+                continue;
             items.push(createMangaTile({
-                id: (_a = data.slug) !== null && _a !== void 0 ? _a : '',
-                image: (_b = encodeURI(`${source.staticURL}${data.thumbnail}`)) !== null && _b !== void 0 ? _b : '',
+                id,
+                image,
                 title: createIconText({
-                    text: (_c = data.title) !== null && _c !== void 0 ? _c : ''
+                    text: title
                 })
             }));
         }
@@ -10348,7 +10353,7 @@ class Parser {
         return arrayUniqueByKey;
     }
     parseMangaDetails(VoyceD, mangaId, source) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _l;
         const details = VoyceD.data.voyce_series[0];
         const title = (_a = details === null || details === void 0 ? void 0 : details.title.trim()) !== null && _a !== void 0 ? _a : '';
         const image = (_b = encodeURI(source.staticURL + (details === null || details === void 0 ? void 0 : details.thumbnail))) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
@@ -10359,11 +10364,13 @@ class Parser {
         let status = (_f = details === null || details === void 0 ? void 0 : details.status) !== null && _f !== void 0 ? _f : '';
         const arrayTags = [];
         for (const obj of (_g = details === null || details === void 0 ? void 0 : details.genres) !== null && _g !== void 0 ? _g : []) {
-            if (!(obj === null || obj === void 0 ? void 0 : obj.genre.title))
+            const id = (_j = encodeURI((_h = obj === null || obj === void 0 ? void 0 : obj.genre.title) === null || _h === void 0 ? void 0 : _h.toLocaleLowerCase().trim())) !== null && _j !== void 0 ? _j : '';
+            const title = (_l = obj === null || obj === void 0 ? void 0 : obj.genre.title.trim()) !== null && _l !== void 0 ? _l : '';
+            if (!id || !title)
                 continue;
             arrayTags.push({
-                id: (_h = encodeURI(obj === null || obj === void 0 ? void 0 : obj.genre.title.toLocaleLowerCase())) !== null && _h !== void 0 ? _h : '',
-                label: (_j = obj === null || obj === void 0 ? void 0 : obj.genre.title) !== null && _j !== void 0 ? _j : ''
+                id: id,
+                label: title
             });
         }
         const tagSections = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })];
