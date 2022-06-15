@@ -2412,7 +2412,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '1.0.6',
+    version: '1.0.7',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -2437,7 +2437,7 @@ class ReadComicOnline extends paperback_extensions_common_1.Source {
                 interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
                     request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'user-agent': `Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15`,
+                        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
                         'referer': RCO_DOMAIN
                     });
                     return request;
@@ -2579,7 +2579,7 @@ class ReadComicOnline extends paperback_extensions_common_1.Source {
             url: RCO_DOMAIN,
             method: 'GET',
             headers: {
-                'user-agent': `Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15`,
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
             }
         });
     }
@@ -2663,12 +2663,12 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
     const pages = [];
     const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi);
     for (const match of imageMatches) {
-        var url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g');
+        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g');
         if (url.startsWith('https')) {
             pages.push(url);
         }
         else {
-            var sliced = url.slice(url.indexOf('?'));
+            const sliced = url.slice(url.indexOf('?'));
             const containsS0 = url.includes('=s0');
             url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'));
             url = url.slice(4, 22) + url.slice(25);
@@ -2899,7 +2899,7 @@ const parseSearch = ($, _cheerio) => {
 };
 exports.parseSearch = parseSearch;
 const decodeHTMLEntity = (str) => {
-    return str.replace(/&#(\d+);/g, function (_match, dec) {
+    return str.replace(/&#(\d+)/g, (_match, dec) => {
         return String.fromCharCode(dec);
     });
 };

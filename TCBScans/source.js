@@ -390,13 +390,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TCBScans = exports.TCBScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const TCBScansParser_1 = require("./TCBScansParser");
-const TCBScans_Base = "https://onepiecechapters.com";
+const TCBScans_Base = 'https://onepiecechapters.com';
 exports.TCBScansInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -428,11 +428,11 @@ class TCBScans extends paperback_extensions_common_1.Source {
     }
     getHomePageSections(sectionCallback) {
         return __awaiter(this, void 0, void 0, function* () {
-            let options = createRequestObject({
+            const options = createRequestObject({
                 url: `${TCBScans_Base}/projects`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             const $ = this.cheerio.load(response.data);
             return this.parser.parseHomeSections($, sectionCallback, this);
         });
@@ -443,8 +443,8 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 url: `${TCBScans_Base}/mangas/${mangaId}`,
                 method: 'GET',
             });
-            let response = yield this.requestManager.schedule(options, 1);
-            let $ = this.cheerio.load(response.data);
+            const response = yield this.requestManager.schedule(options, 1);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseMangaDetails($, mangaId, this);
         });
     }
@@ -454,8 +454,8 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 url: `${TCBScans_Base}/mangas/${mangaId}`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
-            let $ = this.cheerio.load(response.data);
+            const response = yield this.requestManager.schedule(options, 1);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseChapters($, mangaId, this);
         });
     }
@@ -465,8 +465,8 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 url: `${TCBScans_Base}${chapterId}`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
-            let $ = this.cheerio.load(response.data);
+            const response = yield this.requestManager.schedule(options, 1);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseChapterDetails($, mangaId, chapterId);
         });
     }
@@ -476,19 +476,6 @@ class TCBScans extends paperback_extensions_common_1.Source {
                 results: [],
             });
         });
-    }
-    normalizeSearchQuery(query) {
-        var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g, "+");
-        query = query.replace(/%20/g, "+");
-        return query;
     }
 }
 exports.TCBScans = TCBScans;
@@ -512,7 +499,7 @@ class Parser {
         this.chapterTitleRegex = /Chapter ([\d.]+)/i;
     }
     decodeHTMLEntity(str) {
-        return str.replace(/&#(\d+);/g, function (_match, dec) {
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
             return String.fromCharCode(dec);
         });
     }
@@ -523,9 +510,9 @@ class Parser {
             const projects = [];
             const arrManga = $('.bg-card.border.border-border.rounded.p-3.mb-3').toArray();
             for (const obj of arrManga) {
-                const id = (_b = (_a = $("a.mb-3.text-white.text-lg.font-bold", obj).attr("href")) === null || _a === void 0 ? void 0 : _a.replace(/\/mangas\//gi, "")) !== null && _b !== void 0 ? _b : '';
-                const title = (_c = $("a.mb-3.text-white.text-lg.font-bold", obj).text().trim()) !== null && _c !== void 0 ? _c : '';
-                const image = (_d = $(".w-24.h-24.object-cover.rounded-lg", obj).attr('src')) !== null && _d !== void 0 ? _d : '';
+                const id = (_b = (_a = $('a.mb-3.text-white.text-lg.font-bold', obj).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/mangas\//gi, '')) !== null && _b !== void 0 ? _b : '';
+                const title = (_c = $('a.mb-3.text-white.text-lg.font-bold', obj).text().trim()) !== null && _c !== void 0 ? _c : '';
+                const image = (_d = $('.w-24.h-24.object-cover.rounded-lg', obj).attr('src')) !== null && _d !== void 0 ? _d : '';
                 projects.push(createMangaTile({
                     id,
                     image,
@@ -538,9 +525,9 @@ class Parser {
     }
     parseChapterDetails($, mangaId, chapterId) {
         var _a;
-        let pages = [];
-        for (let obj of $(".flex.flex-col.items-center.justify-center picture img").toArray()) {
-            let page = (_a = $(obj).attr('src')) !== null && _a !== void 0 ? _a : '';
+        const pages = [];
+        for (const obj of $('.flex.flex-col.items-center.justify-center picture img').toArray()) {
+            const page = (_a = $(obj).attr('src')) !== null && _a !== void 0 ? _a : '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`);
             }
@@ -559,8 +546,8 @@ class Parser {
         let lastNumber = null;
         const arrChapters = $('.block.border.border-border.bg-card.mb-3.p-3.rounded').toArray();
         for (const obj of arrChapters) {
-            var url = (_a = $(obj).attr('href')) !== null && _a !== void 0 ? _a : '';
-            var name = (_b = $('.text-lg.font-bold:not(.flex)', obj).text().trim()) !== null && _b !== void 0 ? _b : 'No Chpater Name';
+            const url = (_a = $(obj).attr('href')) !== null && _a !== void 0 ? _a : '';
+            const name = (_b = $('.text-lg.font-bold:not(.flex)', obj).text().trim()) !== null && _b !== void 0 ? _b : 'No Chpater Name';
             const match = name.match(this.chapterTitleRegex);
             let chapNum;
             if (match && !isNaN(Number(match[1]))) {
@@ -587,12 +574,12 @@ class Parser {
     }
     parseMangaDetails($, mangaId, _source) {
         var _a, _b, _c;
-        const descElement = $(".order-1.bg-card.border.border-border.rounded.py-3");
+        const descElement = $('.order-1.bg-card.border.border-border.rounded.py-3');
         const title = (_a = $('.my-3.font-bold.text-3xl', descElement).first().text().trim()) !== null && _a !== void 0 ? _a : '';
         const image = (_b = $('.flex.items-center.justify-center img', descElement).attr('src')) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
-        let desc = (_c = $(".leading-6.my-3", descElement).text().trim()) !== null && _c !== void 0 ? _c : '';
+        let desc = (_c = $('.leading-6.my-3', descElement).text().trim()) !== null && _c !== void 0 ? _c : '';
         if (desc == '')
-            desc = `No Decscription provided by the source (TCB Scans)`;
+            desc = 'No Decscription provided by the source (TCB Scans)';
         return createManga({
             id: mangaId,
             titles: [this.decodeHTMLEntity(title)],

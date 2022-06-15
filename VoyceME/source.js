@@ -9869,16 +9869,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoyceME = exports.VoyceMEInfo = void 0;
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const VoyceMEGraphQL_1 = require("./VoyceMEGraphQL");
 const VoyceMEParser_1 = require("./VoyceMEParser");
-const VoyceME_Base = "http://voyce.me";
+const VoyceME_Base = 'http://voyce.me';
 exports.VoyceMEInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.3',
+    version: '1.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10019,7 +10022,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 method: 'POST',
                 data: (0, VoyceMEGraphQL_1.MangaDetailQuery)(mangaId)
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             let data;
             try {
                 data = JSON.parse(response.data);
@@ -10040,7 +10043,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 method: 'POST',
                 data: (0, VoyceMEGraphQL_1.ChapterDetailQuery)(mangaId)
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             let data;
             try {
                 data = JSON.parse(response.data);
@@ -10061,8 +10064,8 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 url: `${VoyceME_Base}/series/${chapterId}`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
-            let $ = this.cheerio.load(response.data);
+            const response = yield this.requestManager.schedule(options, 1);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseChapterDetails($, mangaId, chapterId, this);
         });
     }
@@ -10077,7 +10080,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
             const request = createRequestObject({
                 url: this.graphqlURL,
                 method: 'POST',
-                data: (0, VoyceMEGraphQL_1.SearchQuery)((_b = query.title.replace(/%20/g, " ").replace(/_/g, " ")) !== null && _b !== void 0 ? _b : '', page, this)
+                data: (0, VoyceMEGraphQL_1.SearchQuery)((_b = query.title.replace(/%20/g, ' ').replace(/_/g, ' ')) !== null && _b !== void 0 ? _b : '', page, this)
             });
             const response = yield this.requestManager.schedule(request, 2);
             let data;
@@ -10132,7 +10135,7 @@ const LatestQuery = (page, source) => ({
             title
         }
     }`,
-    variables: { "offset": (page - 1) * source.popularPerPage, "limit": source.popularPerPage }
+    variables: { 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
 });
 exports.LatestQuery = LatestQuery;
 const popularQuery = (page, source) => ({
@@ -10152,7 +10155,7 @@ const popularQuery = (page, source) => ({
             title
         }
     }`,
-    variables: { "offset": (page - 1) * source.popularPerPage, "limit": source.popularPerPage }
+    variables: { 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
 });
 exports.popularQuery = popularQuery;
 const Top5Query = () => ({
@@ -10192,7 +10195,7 @@ const SearchQuery = (query, page, source) => ({
         title
     }
 }`,
-    variables: { "searchTerm": `%${query}%`, "offset": (page - 1) * source.popularPerPage, "limit": source.popularPerPage }
+    variables: { 'searchTerm': `%${query}%`, 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
 });
 exports.SearchQuery = SearchQuery;
 const MangaDetailQuery = (slug) => ({
@@ -10217,7 +10220,7 @@ const MangaDetailQuery = (slug) => ({
             }
         }
     }`,
-    variables: { "slug": slug }
+    variables: { 'slug': slug }
 });
 exports.MangaDetailQuery = MangaDetailQuery;
 const ChapterDetailQuery = (slug) => ({
@@ -10238,7 +10241,7 @@ const ChapterDetailQuery = (slug) => ({
             }
         }
     }`,
-    variables: { "slug": slug }
+    variables: { 'slug': slug }
 });
 exports.ChapterDetailQuery = ChapterDetailQuery;
 
@@ -10260,7 +10263,7 @@ const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
 class Parser {
     decodeHTMLEntity(str) {
-        return str.replace(/&#(\d+);/g, function (_match, dec) {
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
             return String.fromCharCode(dec);
         });
     }
@@ -10285,8 +10288,8 @@ class Parser {
     }
     parseChapterDetails($, mangaId, chapterId, source) {
         return __awaiter(this, void 0, void 0, function* () {
-            let pages = [];
-            const nextData = $("script#__NEXT_DATA__").get(0).children[0].data;
+            const pages = [];
+            const nextData = $('script#__NEXT_DATA__').get(0).children[0].data;
             const nextJson = JSON.parse(nextData);
             const buildId = nextJson.buildId;
             const dataResponse = yield this.ChapterDetailsApiRequest(buildId, mangaId, chapterId, source);
@@ -10318,7 +10321,7 @@ class Parser {
                 url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
                 method: 'GET'
             });
-            let response = yield source.requestManager.schedule(options, 1);
+            const response = yield source.requestManager.schedule(options, 1);
             if (response.status == 500)
                 throw Error('Chapter Does not info doest not exist on the site');
             return response.data;
@@ -10348,7 +10351,7 @@ class Parser {
             }));
             sortingIndex--;
         }
-        const key = "name";
+        const key = 'name';
         const arrayUniqueByKey = [...new Map(chapters.map(item => [item[key], item])).values()];
         return arrayUniqueByKey;
     }
@@ -10359,9 +10362,9 @@ class Parser {
         const image = (_b = encodeURI(source.staticURL + (details === null || details === void 0 ? void 0 : details.thumbnail))) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
         let desc = (_c = details === null || details === void 0 ? void 0 : details.description) !== null && _c !== void 0 ? _c : '';
         if (desc == '')
-            desc = `No Decscription provided by the source (MangaFreak)`;
-        let author = (_e = (_d = details === null || details === void 0 ? void 0 : details.author) === null || _d === void 0 ? void 0 : _d.username) !== null && _e !== void 0 ? _e : '';
-        let status = (_f = details === null || details === void 0 ? void 0 : details.status) !== null && _f !== void 0 ? _f : '';
+            desc = 'No Decscription provided by the source (MangaFreak)';
+        const author = (_e = (_d = details === null || details === void 0 ? void 0 : details.author) === null || _d === void 0 ? void 0 : _d.username) !== null && _e !== void 0 ? _e : '';
+        const status = (_f = details === null || details === void 0 ? void 0 : details.status) !== null && _f !== void 0 ? _f : '';
         const arrayTags = [];
         for (const obj of (_g = details === null || details === void 0 ? void 0 : details.genres) !== null && _g !== void 0 ? _g : []) {
             const id = (_j = encodeURI((_h = obj === null || obj === void 0 ? void 0 : obj.genre.title) === null || _h === void 0 ? void 0 : _h.toLocaleLowerCase().trim())) !== null && _j !== void 0 ? _j : '';

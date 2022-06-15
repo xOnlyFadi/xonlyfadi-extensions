@@ -390,20 +390,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaFreak = exports.MangaFreakInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MangaFreakParser_1 = require("./MangaFreakParser");
-const MangaFreak_Base = "https://w13.mangafreak.net";
+const MangaFreak_Base = 'https://w13.mangafreak.net';
 exports.MangaFreakInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     language: paperback_extensions_common_1.LanguageCode.ENGLISH,
     sourceTags: [
         {
-            text: "Cloudflare",
+            text: 'Cloudflare',
             type: paperback_extensions_common_1.TagType.RED
         }
     ]
@@ -419,7 +419,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                 interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
                     request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'user-agent': `Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1`,
+                        'user-agent': 'Mozilla/5.0 (iPhone CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1',
                         'referer': MangaFreak_Base
                     });
                     return request;
@@ -438,7 +438,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
             url: `${MangaFreak_Base}/Genre/All/1`,
             method: 'GET',
             headers: {
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1',
+                'user-agent': 'Mozilla/5.0 (iPhone CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1',
             }
         });
     }
@@ -502,12 +502,12 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                 url: `${MangaFreak_Base}/Search`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             this.CloudFlareError(response.status);
-            let $ = this.cheerio.load(response.data);
+            const $ = this.cheerio.load(response.data);
             return [createTagSection({
-                    id: "1",
-                    label: "Genres",
+                    id: '1',
+                    label: 'Genres',
                     tags: this.parser.parseTags($)
                 })];
         });
@@ -518,9 +518,9 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                 url: `${MangaFreak_Base}/Manga/${mangaId}`,
                 method: 'GET',
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             this.CloudFlareError(response.status);
-            let $ = this.cheerio.load(response.data);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseMangaDetails($, mangaId, this);
         });
     }
@@ -530,9 +530,9 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                 url: `${MangaFreak_Base}/Manga/${mangaId}`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             this.CloudFlareError(response.status);
-            let $ = this.cheerio.load(response.data);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseChapters($, mangaId, this);
         });
     }
@@ -542,9 +542,9 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                 url: `${MangaFreak_Base}${chapterId}`,
                 method: 'GET'
             });
-            let response = yield this.requestManager.schedule(options, 1);
+            const response = yield this.requestManager.schedule(options, 1);
             this.CloudFlareError(response.status);
-            let $ = this.cheerio.load(response.data);
+            const $ = this.cheerio.load(response.data);
             return this.parser.parseChapterDetails($, mangaId, chapterId);
         });
     }
@@ -569,32 +569,32 @@ class MangaFreak extends paperback_extensions_common_1.Source {
         });
     }
     constructSearchRequest(_page, query) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e, _f, _g;
         if (!this.isEmpty(query === null || query === void 0 ? void 0 : query.title)) {
             if (((_a = query.includedTags) === null || _a === void 0 ? void 0 : _a.length) === 0) {
                 return createRequestObject({
-                    url: `${MangaFreak_Base}/Search/${this.normalizeSearchQuery(query === null || query === void 0 ? void 0 : query.title)}`,
+                    url: `${MangaFreak_Base}/Search/${(_c = (_b = query === null || query === void 0 ? void 0 : query.title) === null || _b === void 0 ? void 0 : _b.replace(/%20/g, '+').replace(/ /g, '+')) !== null && _c !== void 0 ? _c : ''}`,
                     method: 'GET',
                 });
             }
             else {
-                var url = MangaFreak_Base;
+                let url = MangaFreak_Base;
                 if (!this.isEmpty(query === null || query === void 0 ? void 0 : query.title)) {
-                    url += `/Search/${this.normalizeSearchQuery(query === null || query === void 0 ? void 0 : query.title)}`;
+                    url += `/Search/${(_e = (_d = query === null || query === void 0 ? void 0 : query.title) === null || _d === void 0 ? void 0 : _d.replace(/%20/g, '+').replace(/ /g, '+')) !== null && _e !== void 0 ? _e : ''}`;
                 }
                 url += '/Genre/';
-                var getGenresOrderedKeyList = this.getGenresKeyList();
-                var selectedGenreKey = (_b = query === null || query === void 0 ? void 0 : query.includedTags) === null || _b === void 0 ? void 0 : _b.map((x) => x.id).toString();
-                var selectedGenreKeys = selectedGenreKey === null || selectedGenreKey === void 0 ? void 0 : selectedGenreKey.split(',');
-                for (var genreKeyIndex = 0; genreKeyIndex < getGenresOrderedKeyList.length; genreKeyIndex++) {
-                    if (selectedGenreKeys === null || selectedGenreKeys === void 0 ? void 0 : selectedGenreKeys.includes((_c = getGenresOrderedKeyList[genreKeyIndex]) !== null && _c !== void 0 ? _c : '')) {
+                const getGenresOrderedKeyList = this.getGenresKeyList();
+                const selectedGenreKey = (_f = query === null || query === void 0 ? void 0 : query.includedTags) === null || _f === void 0 ? void 0 : _f.map((x) => x.id).toString();
+                const selectedGenreKeys = selectedGenreKey === null || selectedGenreKey === void 0 ? void 0 : selectedGenreKey.split(',');
+                for (let genreKeyIndex = 0; genreKeyIndex < getGenresOrderedKeyList.length; genreKeyIndex++) {
+                    if (selectedGenreKeys === null || selectedGenreKeys === void 0 ? void 0 : selectedGenreKeys.includes((_g = getGenresOrderedKeyList[genreKeyIndex]) !== null && _g !== void 0 ? _g : '')) {
                         url += '1';
                     }
                     else {
                         url += '0';
                     }
                 }
-                url += "/Status/0/Type/0";
+                url += '/Status/0/Type/0';
                 return createRequestObject({
                     url: url,
                     method: 'GET',
@@ -602,21 +602,8 @@ class MangaFreak extends paperback_extensions_common_1.Source {
             }
         }
         else {
-            throw Error('please search with a title otherwise the search with genres will not work');
+            throw new Error('please search with a title otherwise the search with genres will not work');
         }
-    }
-    normalizeSearchQuery(query) {
-        var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g, "+");
-        query = query.replace(/%20/g, "+");
-        return query;
     }
     parseStatus(str) {
         let status = paperback_extensions_common_1.MangaStatus.UNKNOWN;
@@ -633,52 +620,52 @@ class MangaFreak extends paperback_extensions_common_1.Source {
     }
     getGenresKeyList() {
         return [
-            "Act",
-            "Adult",
-            "Adventure",
-            "Animated",
-            "Comedy",
-            "Demons",
-            "Drama",
-            "Ecchi",
-            "Fantasy",
-            "Gender%20Bender",
-            "Harem",
-            "Ancients",
-            "Horror",
-            "Josei",
-            "Magic",
-            "Manhwa",
-            "Martial%20Arts",
-            "Mature",
-            "Mecha",
-            "Military",
-            "Mystery",
-            "One%20Shot",
-            "Psychological",
-            "Romance",
-            "School%20Life",
-            "Sci%20Fi",
-            "Sci%20Fi%20Shounen",
-            "Sci%20Fim",
-            "Seinen",
-            "Shotacon",
-            "Shoujo",
-            "Shoujo%20Ai",
-            "Shoujoai",
-            "Shounen",
-            "Shounen%20Ai",
-            "Shounenai",
-            "Slice%20Of%20Life",
-            "Smut",
-            "Sports",
-            "Super%20Power",
-            "Superhero",
-            "Supernatural",
-            "Tragedy",
-            "Vampire",
-            "Yaoi",
-            "Yuri"
+            'Act',
+            'Adult',
+            'Adventure',
+            'Animated',
+            'Comedy',
+            'Demons',
+            'Drama',
+            'Ecchi',
+            'Fantasy',
+            'Gender%20Bender',
+            'Harem',
+            'Ancients',
+            'Horror',
+            'Josei',
+            'Magic',
+            'Manhwa',
+            'Martial%20Arts',
+            'Mature',
+            'Mecha',
+            'Military',
+            'Mystery',
+            'One%20Shot',
+            'Psychological',
+            'Romance',
+            'School%20Life',
+            'Sci%20Fi',
+            'Sci%20Fi%20Shounen',
+            'Sci%20Fim',
+            'Seinen',
+            'Shotacon',
+            'Shoujo',
+            'Shoujo%20Ai',
+            'Shoujoai',
+            'Shounen',
+            'Shounen%20Ai',
+            'Shounenai',
+            'Slice%20Of%20Life',
+            'Smut',
+            'Sports',
+            'Super%20Power',
+            'Superhero',
+            'Supernatural',
+            'Tragedy',
+            'Vampire',
+            'Yaoi',
+            'Yuri'
         ];
     }
     CloudFlareError(status) {
@@ -711,7 +698,7 @@ class Parser {
         this.chapterTitleRegex = /Chapter ([\d.]+)/i;
     }
     decodeHTMLEntity(str) {
-        return str.replace(/&#(\d+);/g, function (_match, dec) {
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
             return String.fromCharCode(dec);
         });
     }
@@ -725,10 +712,10 @@ class Parser {
             const arrLatest = $('div.latest_releases_item').toArray();
             const arrPopular = $$('div.ranking_item').toArray();
             for (const obj of arrLatest) {
-                const info = $("a", obj);
-                const id = (_b = (_a = info.attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/manga\//gi, "")) !== null && _b !== void 0 ? _b : '';
+                const info = $('a', obj);
+                const id = (_b = (_a = info.attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/manga\//gi, '')) !== null && _b !== void 0 ? _b : '';
                 const title = (_c = info.text()) !== null && _c !== void 0 ? _c : '';
-                const image = (_d = this.getImageSrc($('img', obj)).replace('mini', 'manga').substringBeforeLast('/') + ".jpg") !== null && _d !== void 0 ? _d : '';
+                const image = (_d = this.getImageSrc($('img', obj)).replace('mini', 'manga').substringBeforeLast('/') + '.jpg') !== null && _d !== void 0 ? _d : '';
                 latest.push(createMangaTile({
                     id,
                     image,
@@ -739,7 +726,7 @@ class Parser {
             sectionCallback(section1);
             for (const obj of arrPopular) {
                 const info = $$('a', obj);
-                const id = (_f = (_e = info.attr("href")) === null || _e === void 0 ? void 0 : _e.replace(/\/manga\//gi, "")) !== null && _f !== void 0 ? _f : '';
+                const id = (_f = (_e = info.attr('href')) === null || _e === void 0 ? void 0 : _e.replace(/\/manga\//gi, '')) !== null && _f !== void 0 ? _f : '';
                 const title = (_g = info.text()) !== null && _g !== void 0 ? _g : '';
                 const image = (_h = this.getImageSrc($$('img', obj))) !== null && _h !== void 0 ? _h : '';
                 popular.push(createMangaTile({
@@ -754,9 +741,9 @@ class Parser {
     }
     parseChapterDetails($, mangaId, chapterId) {
         var _a;
-        let pages = [];
-        for (let obj of $("img#gohere").toArray()) {
-            let page = (_a = this.getImageSrc($(obj))) !== null && _a !== void 0 ? _a : '';
+        const pages = [];
+        for (const obj of $('img#gohere').toArray()) {
+            const page = (_a = this.getImageSrc($(obj))) !== null && _a !== void 0 ? _a : '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`);
             }
@@ -769,20 +756,15 @@ class Parser {
             longStrip: true
         });
     }
-    findTextAndReturnRemainder(target, variable) {
-        var chopFront = target.substring(target.search(variable) + variable.length, target.length);
-        var result = chopFront.substring(0, chopFront.search(";"));
-        return result;
-    }
     parseChapters($, mangaId, _source) {
         var _a, _b;
         const chapters = [];
         let lastNumber = null;
         const arrChapters = $('div.manga_series_list tr:has(a)').toArray();
         for (const obj of arrChapters) {
-            var url = (_a = $("a", obj).attr('href')) !== null && _a !== void 0 ? _a : '';
-            var name = (_b = $('td', obj).eq(0).text().trim()) !== null && _b !== void 0 ? _b : 'No Chpater Name';
-            var release_date = $("td", obj).eq(1).text();
+            const url = (_a = $('a', obj).attr('href')) !== null && _a !== void 0 ? _a : '';
+            const name = (_b = $('td', obj).eq(0).text().trim()) !== null && _b !== void 0 ? _b : 'No Chpater Name';
+            const release_date = $('td', obj).eq(1).text();
             const match = name.match(this.chapterTitleRegex);
             let chapNum;
             if (match && !isNaN(Number(match[1]))) {
@@ -812,12 +794,12 @@ class Parser {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const title = (_a = $('div.manga_series_data h5').first().text().trim()) !== null && _a !== void 0 ? _a : '';
         const image = (_b = this.getImageSrc($('div.manga_series_image img'))) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
-        let desc = (_c = $("div.manga_series_description p").text().trim()) !== null && _c !== void 0 ? _c : '';
+        let desc = (_c = $('div.manga_series_description p').text().trim()) !== null && _c !== void 0 ? _c : '';
         if (desc == '')
-            desc = `No Decscription provided by the source (MangaFreak)`;
-        let author = (_d = $("div.manga_series_data > div").eq(2).text().trim()) !== null && _d !== void 0 ? _d : '';
-        let artist = (_e = $("div.manga_series_data > div").eq(3).text().trim()) !== null && _e !== void 0 ? _e : '';
-        let status = (_f = $("div.manga_series_data > div").eq(1).text().trim()) !== null && _f !== void 0 ? _f : '';
+            desc = 'No Decscription provided by the source (MangaFreak)';
+        const author = (_d = $('div.manga_series_data > div').eq(2).text().trim()) !== null && _d !== void 0 ? _d : '';
+        const artist = (_e = $('div.manga_series_data > div').eq(3).text().trim()) !== null && _e !== void 0 ? _e : '';
+        const status = (_f = $('div.manga_series_data > div').eq(1).text().trim()) !== null && _f !== void 0 ? _f : '';
         const arrayTags = [];
         const genres = $('div.series_sub_genre_list a').toArray();
         for (const obj of genres) {
@@ -840,7 +822,7 @@ class Parser {
     }
     parseTags($) {
         const genres = [];
-        for (const obj of $(".main .select_genre div[id='genrebox'] div").toArray()) {
+        for (const obj of $('.main .select_genre div[id="genrebox"] div').toArray()) {
             genres.push(createTag({
                 id: encodeURI($(obj).text().trim()),
                 label: $(obj).text().trim()
@@ -853,7 +835,7 @@ class Parser {
         const results = [];
         for (const obj of $('div.manga_search_item , div.mangaka_search_item').toArray()) {
             const info = $('h3 a, h5 a', obj);
-            const id = (_b = (_a = info.attr("href")) === null || _a === void 0 ? void 0 : _a.replace(/\/manga\//gi, "")) !== null && _b !== void 0 ? _b : '';
+            const id = (_b = (_a = info.attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/manga\//gi, '')) !== null && _b !== void 0 ? _b : '';
             const title = (_c = info.text()) !== null && _c !== void 0 ? _c : '';
             const image = (_d = this.getImageSrc($('img', obj))) !== null && _d !== void 0 ? _d : '';
             results.push(createMangaTile({
@@ -870,7 +852,7 @@ class Parser {
         if (isPopular) {
             for (const obj of $('div.ranking_item').toArray()) {
                 const info = $('a', obj);
-                const id = (_a = info.attr("href")) !== null && _a !== void 0 ? _a : '';
+                const id = (_a = info.attr('href')) !== null && _a !== void 0 ? _a : '';
                 const title = (_b = info.text()) !== null && _b !== void 0 ? _b : '';
                 const image = (_c = this.getImageSrc($('img', obj))) !== null && _c !== void 0 ? _c : '';
                 if (id) {
@@ -884,10 +866,10 @@ class Parser {
         }
         else {
             for (const obj of $('div.latest_releases_item').toArray()) {
-                const info = $("a", obj);
-                const id = (_e = (_d = info.attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/manga\//gi, "")) !== null && _e !== void 0 ? _e : '';
+                const info = $('a', obj);
+                const id = (_e = (_d = info.attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/manga\//gi, '')) !== null && _e !== void 0 ? _e : '';
                 const title = (_f = info.text()) !== null && _f !== void 0 ? _f : '';
-                const image = (_h = ((_g = this.getImageSrc($('img', obj))) === null || _g === void 0 ? void 0 : _g.replace('mini', 'manga').substringBeforeLast('/')) + ".jpg") !== null && _h !== void 0 ? _h : '';
+                const image = (_h = ((_g = this.getImageSrc($('img', obj))) === null || _g === void 0 ? void 0 : _g.replace('mini', 'manga').substringBeforeLast('/')) + '.jpg') !== null && _h !== void 0 ? _h : '';
                 results.push(createMangaTile({
                     id,
                     image,
@@ -898,7 +880,7 @@ class Parser {
         return results;
     }
     NextPage($) {
-        var nextPage = $('a.next_p');
+        const nextPage = $('a.next_p');
         if (nextPage.contents().length !== 0) {
             return true;
         }
@@ -907,7 +889,7 @@ class Parser {
         }
     }
     encodeText(str) {
-        return str.replace(/&#([0-9]{1,4});/gi, (_, numStr) => {
+        return str.replace(/&#([0-9]{1,4})/gi, (_, numStr) => {
             const num = parseInt(numStr, 10);
             return String.fromCharCode(num);
         });
@@ -935,12 +917,12 @@ class Parser {
 }
 exports.Parser = Parser;
 String.prototype.substringBeforeLast = function (character) {
-    var lastIndexOfCharacter = this.lastIndexOf(character);
+    const lastIndexOfCharacter = this.lastIndexOf(character);
     return this.substring(0, lastIndexOfCharacter);
 };
 String.prototype.substringAfterFirst = function (substring) {
-    var startingIndexOfSubstring = this.indexOf(substring);
-    var endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1;
+    const startingIndexOfSubstring = this.indexOf(substring);
+    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1;
     return this.substring(endIndexOfSubstring + 1, this.length);
 };
 
