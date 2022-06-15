@@ -19,7 +19,7 @@ export const LatestQuery = (page: number, source : any): GraphQLQuery => ({
             title
         }
     }`,
-    variables: {"offset": (page - 1) * source.popularPerPage,"limit":source.popularPerPage}
+    variables: {'offset': (page - 1) * source.popularPerPage,'limit':source.popularPerPage}
 })
 export const popularQuery = (page: number, source : any): GraphQLQuery => ({
     query: `query($limit: Int!, $offset: Int!) {
@@ -38,7 +38,7 @@ export const popularQuery = (page: number, source : any): GraphQLQuery => ({
             title
         }
     }`,
-    variables: {"offset": (page - 1) * source.popularPerPage,"limit":source.popularPerPage}
+    variables: {'offset': (page - 1) * source.popularPerPage,'limit':source.popularPerPage}
 })
 export const Top5Query = (): GraphQLQuery => ({
     query: `query{
@@ -56,10 +56,10 @@ export const Top5Query = (): GraphQLQuery => ({
                   title
         }
       }`,
-      variables: {}
+    variables: {}
 })
 export const SearchQuery = (query:string, page: number, source : any): GraphQLQuery => ({
-   query: `query($searchTerm: String!, $limit: Int, $offset: Int) {
+    query: `query($searchTerm: String!, $limit: Int, $offset: Int) {
     voyce_series(
         where: {
             publish: { _eq: 1 },
@@ -76,7 +76,7 @@ export const SearchQuery = (query:string, page: number, source : any): GraphQLQu
         title
     }
 }`,
-variables: {"searchTerm":`%${query}%`,"offset": (page - 1) * source.popularPerPage,"limit":source.popularPerPage}
+    variables: {'searchTerm':`%${query}%`,'offset': (page - 1) * source.popularPerPage,'limit':source.popularPerPage}
 })
 export const MangaDetailQuery = (slug:string): GraphQLQuery => ({
     query: `query($slug: String!) {
@@ -100,10 +100,10 @@ export const MangaDetailQuery = (slug:string): GraphQLQuery => ({
             }
         }
     }`,
- variables: {"slug":slug}
- })
+    variables: {'slug':slug}
+})
 
- export const ChapterDetailQuery = (slug:string): GraphQLQuery => ({
+export const ChapterDetailQuery = (slug:string): GraphQLQuery => ({
     query: `query($slug: String!) {
         voyce_series(
             where: {
@@ -121,5 +121,5 @@ export const MangaDetailQuery = (slug:string): GraphQLQuery => ({
             }
         }
     }`,
- variables: {"slug":slug}
- })
+    variables: {'slug':slug}
+})

@@ -28,7 +28,7 @@ import {
 const RCO_DOMAIN = 'https://readcomiconline.li'
 
 export const ReadComicOnlineInfo: SourceInfo = {
-    version: '1.0.6',
+    version: '1.0.7',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -54,7 +54,7 @@ export class ReadComicOnline extends Source {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'user-agent': `Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15`,
+                        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
                         'referer': RCO_DOMAIN
                     }
                 }
@@ -204,7 +204,7 @@ export class ReadComicOnline extends Source {
             url: RCO_DOMAIN,
             method: 'GET',
             headers: {
-                'user-agent': `Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15`,
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
             }
         })
     }

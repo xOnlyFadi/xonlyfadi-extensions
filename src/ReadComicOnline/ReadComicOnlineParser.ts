@@ -85,21 +85,21 @@ export const parseChapters = ($: CheerioStatic, mangaId: string): Chapter[] => {
 
 export const parseChapterDetails = (data: any, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-    const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi);
+    const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi)
     for (const match of imageMatches) {
-        var url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g')
+        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g')
         if (url.startsWith('https')) {
-            pages.push(url);
+            pages.push(url)
         } else {
-            var sliced = url.slice(url.indexOf('?'))
-            const containsS0 = url.includes('=s0');
-            url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'));
-            url = url.slice(4, 22) + url.slice(25);  
-            url = url.slice(0, -6) + url.slice(-2);
-            url = Buffer.from(url, 'base64').toString('utf-8');
-            url = url.slice(0, 13) + url.slice(17);
-            url = url.slice(0, -2) +  (containsS0 ? '=s0' : '=s1600');
-        pages.push(`https://2.bp.blogspot.com/${url+sliced}`);
+            const sliced = url.slice(url.indexOf('?'))
+            const containsS0 = url.includes('=s0')
+            url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'))
+            url = url.slice(4, 22) + url.slice(25)  
+            url = url.slice(0, -6) + url.slice(-2)
+            url = Buffer.from(url, 'base64').toString('utf-8')
+            url = url.slice(0, 13) + url.slice(17)
+            url = url.slice(0, -2) +  (containsS0 ? '=s0' : '=s1600')
+            pages.push(`https://2.bp.blogspot.com/${url+sliced}`)
         }
     }
     const chapterDetails = createChapterDetails({
@@ -113,7 +113,7 @@ export const parseChapterDetails = (data: any, mangaId: string, chapterId: strin
 
 export interface UpdatedManga {
     ids: string[],
-    loadMore: boolean;
+    loadMore: boolean
 }
 export const parseHomeSections = ($: CheerioStatic, sectionCallback: (section: HomeSection) => void): void => {
     const latestSection = createHomeSection({ id: 'latest_comic', title: 'Latest Updated Comics', view_more: true })
@@ -326,7 +326,7 @@ export const parseSearch = ($: CheerioStatic, _cheerio: any): MangaTile[] => {
     } else {
 
         //Parse search results page
-    for (const item of $('.list-comic > .item > a:first-child').toArray()) {
+        for (const item of $('.list-comic > .item > a:first-child').toArray()) {
             const title: string = $(item).first().text().trim() ?? ''
             const id: string = $(item).attr('href')?.split('/').pop()?.split('?').shift() ?? ''
             let image: string = $('img',item).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png'
@@ -351,8 +351,8 @@ export const parseSearch = ($: CheerioStatic, _cheerio: any): MangaTile[] => {
 }
 
 const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+);/g, function (_match, dec) {
-        return String.fromCharCode(dec);
+    return str.replace(/&#(\d+)/g, (_match, dec) => {
+        return String.fromCharCode(dec)
     })
 }
 

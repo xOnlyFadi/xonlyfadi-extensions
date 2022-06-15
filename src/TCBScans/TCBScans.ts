@@ -11,17 +11,17 @@ import {
     LanguageCode,
     Request,
     Response,
-} from "paperback-extensions-common"
+} from 'paperback-extensions-common'
 
-import {Parser} from "./TCBScansParser";
-const TCBScans_Base = "https://onepiecechapters.com"
+import {Parser} from './TCBScansParser'
+const TCBScans_Base = 'https://onepiecechapters.com'
 
 export const TCBScansInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
@@ -29,7 +29,7 @@ export const TCBScansInfo: SourceInfo = {
 }
 
 export abstract class TCBScans extends Source {
-    private readonly parser: Parser = new Parser();
+    private readonly parser: Parser = new Parser()
 
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
@@ -57,12 +57,12 @@ export abstract class TCBScans extends Source {
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        let options = createRequestObject({
+        const options = createRequestObject({
             url: `${TCBScans_Base}/projects`,
             method: 'GET'
-        });
-        let response = await this.requestManager.schedule(options, 1);
-        const $ = this.cheerio.load(response.data);
+        })
+        const response = await this.requestManager.schedule(options, 1)
+        const $ = this.cheerio.load(response.data)
         return this.parser.parseHomeSections($,sectionCallback, this)
     }
 
@@ -70,29 +70,29 @@ export abstract class TCBScans extends Source {
         const options = createRequestObject({
             url: `${TCBScans_Base}/mangas/${mangaId}`,
             method: 'GET',
-        });
-        let response = await this.requestManager.schedule(options, 1);
-        let $ = this.cheerio.load(response.data);
-        return this.parser.parseMangaDetails($, mangaId,this);
+        })
+        const response = await this.requestManager.schedule(options, 1)
+        const $ = this.cheerio.load(response.data)
+        return this.parser.parseMangaDetails($, mangaId,this)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const options = createRequestObject({
             url: `${TCBScans_Base}/mangas/${mangaId}`,
             method: 'GET'
-        });
-        let response = await this.requestManager.schedule(options, 1);
-        let $ = this.cheerio.load(response.data);
-        return this.parser.parseChapters($, mangaId, this);
+        })
+        const response = await this.requestManager.schedule(options, 1)
+        const $ = this.cheerio.load(response.data)
+        return this.parser.parseChapters($, mangaId, this)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const options = createRequestObject({
             url: `${TCBScans_Base}${chapterId}`,
             method: 'GET'
-        });
-        let response = await this.requestManager.schedule(options, 1);
-        let $ = this.cheerio.load(response.data);
+        })
+        const response = await this.requestManager.schedule(options, 1)
+        const $ = this.cheerio.load(response.data)
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
@@ -100,20 +100,5 @@ export abstract class TCBScans extends Source {
         return createPagedResults({
             results: [],
         })
-    }
-
-    normalizeSearchQuery(query: any) {
-        var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g,"+");
-        query = query.replace(/%20/g, "+");
-        return query;
-        
     }
 }

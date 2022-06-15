@@ -4,41 +4,43 @@ import {Chapter,
     Manga, 
     MangaTile, 
     Tag,
-    TagSection} from "paperback-extensions-common";
-import {VoyceData,VoyceMangaData,VoyceChapterData} from './VoyceMEHelper'
-import {decodeHTML} from "entities"
-import {convert} from "html-to-text"
+    TagSection} from 'paperback-extensions-common'
+import {VoyceData,
+    VoyceMangaData,
+    VoyceChapterData} from './VoyceMEHelper'
+import {decodeHTML} from 'entities'
+import {convert} from 'html-to-text'
 
 export class Parser {
 
     decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+);/g, function (_match, dec) {
-            return String.fromCharCode(dec);
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
+            return String.fromCharCode(dec)
         })
     }
 
     parseHomeSections(VoyceD: VoyceData, source: any): MangaTile[] {
         const items: MangaTile[] = []
         for(const data of VoyceD.data.voyce_series){
-        const id = data.slug.trim() ?? ''
-        const image = encodeURI(`${source.staticURL}${data.thumbnail}`) ?? ''
-        const title = data.title.trim() ?? ''
-        if(!id || !title) continue
-        items.push(createMangaTile({
-            id,
-            image,
-            title: createIconText({
-                text: title
-            })
-        }))
-    }
+            const id = data.slug.trim() ?? ''
+            const image = encodeURI(`${source.staticURL}${data.thumbnail}`) ?? ''
+            const title = data.title.trim() ?? ''
+            if(!id || !title) continue
+            items.push(createMangaTile({
+                id,
+                image,
+                title: createIconText({
+                    text: title
+                })
+            }))
+        }
         return items
     }
 
     async parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string,source: any): Promise<ChapterDetails> {
-        let pages: string[] = []
+        const pages: string[] = []
 
-        const nextData = $("script#__NEXT_DATA__").get(0).children[0].data
+        const nextData = $('script#__NEXT_DATA__').get(0).children[0].data
         const nextJson = JSON.parse(nextData)
         const buildId = nextJson.buildId
 
@@ -67,60 +69,60 @@ export class Parser {
         const options = createRequestObject({
             url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
             method: 'GET'
-        });
-        let response = await source.requestManager.schedule(options, 1);
+        })
+        const response = await source.requestManager.schedule(options, 1)
         if(response.status == 500) throw Error('Chapter Does not info doest not exist on the site')
         return response.data
     }
     parseChapters(VoyceD: VoyceChapterData, mangaId: string, _source: any): Chapter[] {
         const data = VoyceD.data.voyce_series[0]
-        const chapters: Chapter[] = [];
+        const chapters: Chapter[] = []
         let sortingIndex = 0
         for (const obj of data?.chapters ?? []) {
-            const url = `${data?.slug}/${obj.id}#comic` ?? '';
-            const name = obj.title ?? 'No Chpater Name';
-            const release_date = obj.created_at;
+            const url = `${data?.slug}/${obj.id}#comic` ?? ''
+            const name = obj.title ?? 'No Chpater Name'
+            const release_date = obj.created_at
             if (!url) continue
             const chapNum = Number(name.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
 
             chapters.push(createChapter({
-            id: url, 
-            mangaId: mangaId,
-            name: name, 
-            chapNum: isNaN(chapNum) ? 0 : chapNum,
-            time: new Date(release_date),
-            langCode: LanguageCode.ENGLISH,
-            // @ts-ignore
-            sortingIndex
-        }));
-        sortingIndex--
+                id: url, 
+                mangaId: mangaId,
+                name: name, 
+                chapNum: isNaN(chapNum) ? 0 : chapNum,
+                time: new Date(release_date),
+                langCode: LanguageCode.ENGLISH,
+                // @ts-ignore
+                sortingIndex
+            }))
+            sortingIndex--
         }
-        const key = "name"
+        const key = 'name'
         const arrayUniqueByKey = [...new Map(chapters.map(item =>
-            [item[key], item])).values()];
+            [item[key], item])).values()]
         return arrayUniqueByKey
     }
 
     parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string, source: any): Manga {
         const details = VoyceD.data.voyce_series[0]
-        const title = details?.title.trim() ?? '';
-        const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg';
-        let desc = details?.description ?? '';
-        if (desc == '') desc = `No Decscription provided by the source (MangaFreak)`
-        let author = details?.author?.username ?? '';
-        let status = details?.status ?? '';
+        const title = details?.title.trim() ?? ''
+        const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg'
+        let desc = details?.description ?? ''
+        if (desc == '') desc = 'No Decscription provided by the source (MangaFreak)'
+        const author = details?.author?.username ?? ''
+        const status = details?.status ?? ''
         const arrayTags: Tag[] = []
         for (const obj of details?.genres ?? []) {
             const id = encodeURI(obj?.genre.title?.toLocaleLowerCase().trim()) ?? ''
             const title = obj?.genre.title.trim() ?? ''
             if (!id || !title) continue
-             arrayTags.push({
-                 id: id,
-                 label: title
-             })
-         }
+            arrayTags.push({
+                id: id,
+                label: title
+            })
+        }
  
-        const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })];
+        const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })]
 
         return createManga({
             id: mangaId,
@@ -133,7 +135,7 @@ export class Parser {
         })
     }
 }
-export {};
+export {}
 
 declare global {
     interface String {
@@ -142,10 +144,10 @@ declare global {
     }
 }
 String.prototype.substringAfterLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
-};
+    const lastIndexOfCharacter = this.lastIndexOf(character)
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1) //should be 39
+}
 String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    return this.substring(0, startingIndexOfSubstring);
-};
+    const startingIndexOfSubstring = this.indexOf(substring)
+    return this.substring(0, startingIndexOfSubstring)
+}
