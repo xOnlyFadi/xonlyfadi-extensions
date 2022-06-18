@@ -93,6 +93,7 @@ export abstract class TCBScans extends Source {
         })
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data)
+ 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
