@@ -9881,7 +9881,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10258,6 +10258,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
@@ -10327,7 +10330,7 @@ class Parser {
             return response.data;
         });
     }
-    parseChapters(VoyceD, mangaId, _source) {
+    parseChapters(VoyceD, mangaId, source) {
         var _a, _b, _c, _d, _e;
         const data = VoyceD.data.voyce_series[0];
         const chapters = [];

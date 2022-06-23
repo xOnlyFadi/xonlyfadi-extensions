@@ -396,7 +396,7 @@ exports.TCBScansInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
