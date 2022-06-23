@@ -21,14 +21,14 @@ export const TCBScansInfo: SourceInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
     language: LanguageCode.ENGLISH,
 }
 
-export abstract class TCBScans extends Source {
+export class TCBScans extends Source {
     private readonly parser: Parser = new Parser()
 
     readonly requestManager = createRequestManager({

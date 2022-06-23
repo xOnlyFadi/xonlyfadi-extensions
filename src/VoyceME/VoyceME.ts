@@ -33,14 +33,14 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
     language: LanguageCode.ENGLISH,
 }
 
-export abstract class VoyceME extends Source {
+export class VoyceME extends Source {
     private readonly parser: Parser = new Parser()
     private readonly graphqlURL: string = 'https://graphql.voyce.me/v1/graphql'
     private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net/'

@@ -1,3 +1,6 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Chapter,     
     ChapterDetails,
     LanguageCode, 
@@ -74,7 +77,7 @@ export class Parser {
         if(response.status == 500) throw Error('Chapter Does not info doest not exist on the site')
         return response.data
     }
-    parseChapters(VoyceD: VoyceChapterData, mangaId: string, _source: any): Chapter[] {
+    parseChapters(VoyceD: VoyceChapterData, mangaId: string, source: any): Chapter[] {
         const data = VoyceD.data.voyce_series[0]
         const chapters: Chapter[] = []
         let sortingIndex = 0

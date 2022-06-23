@@ -24,7 +24,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_Base,
     contentRating: ContentRating.EVERYONE,
@@ -37,7 +37,7 @@ export const MangaFreakInfo: SourceInfo = {
     ]
 }
 
-export abstract class MangaFreak extends Source {
+export class MangaFreak extends Source {
     private readonly parser: Parser = new Parser()
 
     readonly requestManager = createRequestManager({
