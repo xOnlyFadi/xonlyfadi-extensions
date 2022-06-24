@@ -400,11 +400,17 @@ exports.TuMangaOnlineInfo = {
     description: 'Extensión que extrae el manga de lectortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     language: paperback_extensions_common_1.LanguageCode.SPANISH,
+    sourceTags: [
+        {
+            text: 'Spanish',
+            type: paperback_extensions_common_1.TagType.GREY
+        }
+    ]
 };
 class TuMangaOnline extends paperback_extensions_common_1.Source {
     constructor() {
@@ -838,9 +844,9 @@ class Parser {
         const title2 = (_b = this.decodeHTMLEntity($('h2.element-subtitle').first().text().trim())) !== null && _b !== void 0 ? _b : '';
         const image = (_c = $('.book-thumbnail').attr('src')) !== null && _c !== void 0 ? _c : 'https://paperback.moe/icons/logo-alt.svg';
         const desc = (_d = this.decodeHTMLEntity($('p.element-description').text().trim())) !== null && _d !== void 0 ? _d : '';
-        const infoauth = $('h5.card-title');
-        const author = (_e = this.decodeHTMLEntity(infoauth.first().text().trim().substringAfterFirst(', '))) !== null && _e !== void 0 ? _e : '';
-        const artist = (_f = this.decodeHTMLEntity(infoauth.last().text().trim().substringAfterFirst(', '))) !== null && _f !== void 0 ? _f : '';
+        const infoAuth = $('h5.card-title');
+        const author = (_e = this.decodeHTMLEntity(infoAuth.first().text().trim().substringAfterFirst(', '))) !== null && _e !== void 0 ? _e : '';
+        const artist = (_f = this.decodeHTMLEntity(infoAuth.last().text().trim().substringAfterFirst(', '))) !== null && _f !== void 0 ? _f : '';
         const status = (_g = this.decodeHTMLEntity($('span.book-status').text().trim())) !== null && _g !== void 0 ? _g : '';
         const arrayTags = [];
         const genreregex = /genders.*?=(\d+)?/i;
