@@ -16,7 +16,8 @@ import {
     Response,
     Section,
     MangaStatus,
-    TagSection
+    TagSection,
+    TagType
 } from 'paperback-extensions-common'
 
 import {
@@ -33,11 +34,17 @@ export const TuMangaOnlineInfo: SourceInfo = {
     description: 'Extensión que extrae el manga de lectortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: ContentRating.EVERYONE,
     language: LanguageCode.SPANISH,
+    sourceTags: [
+        {
+            text: 'Spanish',
+            type: TagType.GREY
+        }
+    ]
 }
 
 export class TuMangaOnline extends Source {

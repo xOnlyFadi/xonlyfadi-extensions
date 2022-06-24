@@ -132,9 +132,9 @@ export class Parser {
         
         const desc = this.decodeHTMLEntity($('p.element-description').text().trim()) ?? ''
         
-        const infoauth = $('h5.card-title')
-        const author = this.decodeHTMLEntity(infoauth.first().text().trim().substringAfterFirst(', ')) ?? ''
-        const artist = this.decodeHTMLEntity(infoauth.last().text().trim().substringAfterFirst(', ')) ?? ''
+        const infoAuth = $('h5.card-title')
+        const author = this.decodeHTMLEntity(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
+        const artist = this.decodeHTMLEntity(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
         
         const status = this.decodeHTMLEntity($('span.book-status').text().trim()) ?? ''
         
