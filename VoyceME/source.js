@@ -9881,7 +9881,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.5',
+    version: '1.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10365,7 +10365,7 @@ class Parser {
         const image = (_b = encodeURI(source.staticURL + (details === null || details === void 0 ? void 0 : details.thumbnail))) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
         let desc = (_c = details === null || details === void 0 ? void 0 : details.description) !== null && _c !== void 0 ? _c : '';
         if (desc == '')
-            desc = 'No Decscription provided by the source (MangaFreak)';
+            desc = 'No Decscription provided by the source (VoyceME)';
         const author = (_e = (_d = details === null || details === void 0 ? void 0 : details.author) === null || _d === void 0 ? void 0 : _d.username) !== null && _e !== void 0 ? _e : '';
         const status = (_f = details === null || details === void 0 ? void 0 : details.status) !== null && _f !== void 0 ? _f : '';
         const arrayTags = [];
