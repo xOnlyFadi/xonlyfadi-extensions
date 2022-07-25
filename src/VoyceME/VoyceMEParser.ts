@@ -111,7 +111,7 @@ export class Parser {
         const title = details?.title.trim() ?? ''
         const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg'
         let desc = details?.description ?? ''
-        if (desc == '') desc = 'No Decscription provided by the source (MangaFreak)'
+        if (desc == '') desc = 'No Decscription provided by the source (VoyceME)'
         const author = details?.author?.username ?? ''
         const status = details?.status ?? ''
         const arrayTags: Tag[] = []

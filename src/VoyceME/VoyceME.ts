@@ -33,7 +33,7 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.5',
+    version: '1.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
