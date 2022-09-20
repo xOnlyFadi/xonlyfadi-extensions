@@ -4,9 +4,6 @@
   "repositoryName": "xOnlyFadi's Extensions (0.6)",
   "description": "xOnlyFadi's Extensions for 0.6!",
   "main": "index.js",
-  "homepage": "https://xonlyfadi.github.io/xonlyfadi-extensions/",
-  "GITHUB_REPOSITORY": "https://github.com/xOnlyFadi/xonlyfadi-extensions",
-  "baseURL": "https://xonlyfadi.github.io/xonlyfadi-extensions/",
   "scripts": {
     "bundle": "paperback bundle",
     "serve": "paperback serve",
