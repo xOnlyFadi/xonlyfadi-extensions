@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - '**'
+      - '!main'
 jobs:
   build:
     name: Bundle and Publish Sources
@@ -34,7 +35,7 @@ jobs:
           path: bundles
 
       - run: npm install
-      - run: npm run bundle
+      - run: npm run bundle -- --folder=${{ steps.extract_branch.outputs.branch }}
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.0
