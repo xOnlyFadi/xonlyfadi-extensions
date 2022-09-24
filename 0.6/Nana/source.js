@@ -399,7 +399,7 @@ exports.NanaInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -528,7 +528,6 @@ class Nana extends paperback_extensions_common_1.Source {
                 }
             ];
             return [
-                createTagSection({ id: '0', label: 'Use comma (,) to separate text', tags: [] }),
                 createTagSection({ id: '1', label: 'Sort Date Added by', tags: arrayTags.map(x => createTag(x)) }),
             ];
         });
