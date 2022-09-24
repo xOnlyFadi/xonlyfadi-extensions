@@ -28,7 +28,7 @@ export const NanaInfo: SourceInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: ContentRating.ADULT,
@@ -200,7 +200,7 @@ export class Nana extends Source {
         const page: number = metadata?.page ?? 1
 
         const request = createRequestObject({
-            url: `${Nana_Base}/?q=${this.SplittedText(query.title ?? '')}${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x: any) => {if(x.id.includes('details.')) {return `%2B%22${encodeURIComponent(x.id.split('.').pop())}%22`} return ''}) ?? '' : ''}&sort=${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x: any) => {if(x.id.includes('search.')) return x.id.split('.').pop()})[0] ?? 'desc': 'desc'}&p=${page}`,
+            url: `${Nana_Base}/?q=${query.title?.replace(/ /g, '+')?.replace(/%20/g, '+') ?? ''}${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x: any) => {if(x.id.includes('details.')) {return `%2B%22${encodeURIComponent(x.id.split('.').pop())}%22`} return ''}) ?? '' : ''}&sort=${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x: any) => {if(x.id.includes('search.')) return x.id.split('.').pop()})[0] ?? 'desc': 'desc'}&p=${page}`,
             method: 'GET'
         })
 
@@ -214,20 +214,5 @@ export class Nana extends Source {
             results: manga,
             metadata
         })
-    }
-
-    SplittedText(query: string): string {
-        let finishedText = ''
-        if(query){
-            if(query.includes(',')){
-                for (const splittext of query.split(',')) {
-                    finishedText += `%2B%22${encodeURIComponent(splittext)}%22`
-                }
-            } else {
-                finishedText = `%2B%22${encodeURIComponent(query)}%22`
-            }
-    
-        }
-        return finishedText
     }
 }
