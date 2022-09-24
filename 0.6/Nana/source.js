@@ -399,7 +399,7 @@ exports.NanaInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.0',
+    version: '1.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -553,14 +553,14 @@ class Nana extends paperback_extensions_common_1.Source {
         });
     }
     getSearchResults(query, metadata) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         return __awaiter(this, void 0, void 0, function* () {
             const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
             const request = createRequestObject({
-                url: `${Nana_Base}/?q=${this.SplittedText((_b = query.title) !== null && _b !== void 0 ? _b : '')}${((_c = query === null || query === void 0 ? void 0 : query.includedTags) === null || _c === void 0 ? void 0 : _c.length) !== 0 ? (_e = (_d = query === null || query === void 0 ? void 0 : query.includedTags) === null || _d === void 0 ? void 0 : _d.map((x) => { if (x.id.includes('details.')) {
+                url: `${Nana_Base}/?q=${(_d = (_c = (_b = query.title) === null || _b === void 0 ? void 0 : _b.replace(/ /g, '+')) === null || _c === void 0 ? void 0 : _c.replace(/%20/g, '+')) !== null && _d !== void 0 ? _d : ''}${((_e = query === null || query === void 0 ? void 0 : query.includedTags) === null || _e === void 0 ? void 0 : _e.length) !== 0 ? (_g = (_f = query === null || query === void 0 ? void 0 : query.includedTags) === null || _f === void 0 ? void 0 : _f.map((x) => { if (x.id.includes('details.')) {
                     return `%2B%22${encodeURIComponent(x.id.split('.').pop())}%22`;
-                } return ''; })) !== null && _e !== void 0 ? _e : '' : ''}&sort=${((_f = query === null || query === void 0 ? void 0 : query.includedTags) === null || _f === void 0 ? void 0 : _f.length) !== 0 ? (_h = (_g = query === null || query === void 0 ? void 0 : query.includedTags) === null || _g === void 0 ? void 0 : _g.map((x) => { if (x.id.includes('search.'))
-                    return x.id.split('.').pop(); })[0]) !== null && _h !== void 0 ? _h : 'desc' : 'desc'}&p=${page}`,
+                } return ''; })) !== null && _g !== void 0 ? _g : '' : ''}&sort=${((_h = query === null || query === void 0 ? void 0 : query.includedTags) === null || _h === void 0 ? void 0 : _h.length) !== 0 ? (_k = (_j = query === null || query === void 0 ? void 0 : query.includedTags) === null || _j === void 0 ? void 0 : _j.map((x) => { if (x.id.includes('search.'))
+                    return x.id.split('.').pop(); })[0]) !== null && _k !== void 0 ? _k : 'desc' : 'desc'}&p=${page}`,
                 method: 'GET'
             });
             const data = yield this.requestManager.schedule(request, 2);
@@ -572,20 +572,6 @@ class Nana extends paperback_extensions_common_1.Source {
                 metadata
             });
         });
-    }
-    SplittedText(query) {
-        let finishedText = '';
-        if (query) {
-            if (query.includes(',')) {
-                for (const splittext of query.split(',')) {
-                    finishedText += `%2B%22${encodeURIComponent(splittext)}%22`;
-                }
-            }
-            else {
-                finishedText = `%2B%22${encodeURIComponent(query)}%22`;
-            }
-        }
-        return finishedText;
     }
 }
 exports.Nana = Nana;
