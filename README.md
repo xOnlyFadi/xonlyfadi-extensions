@@ -1,4 +1,4 @@
-# Current Available Repositories
+# Current Available Paperback Repositories
 
 | Source(s) | Description | Link |
 | ---       | ---         | ---  |
