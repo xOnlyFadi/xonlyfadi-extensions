@@ -377,15 +377,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Nana = exports.NanaInfo = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -420,156 +411,142 @@ class Nana extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 30000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'referer': `${Nana_Base}/`,
-                    });
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            'referer': `${Nana_Base}/`,
+                        }
+                    };
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
     }
     getMangaShareUrl(mangaId) {
         return `${Nana_Base}/reader/${mangaId}`;
     }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const sections = [
-                {
-                    request: createRequestObject({
-                        url: `${Nana_Base}`,
-                        method: 'GET'
-                    }),
-                    section: createHomeSection({
-                        id: '0',
-                        title: 'Latest Upload',
-                        view_more: true,
-                    }),
-                },
-            ];
-            const promises = [];
-            for (const section of sections) {
+    async getHomePageSections(sectionCallback) {
+        const sections = [
+            {
+                request: createRequestObject({
+                    url: `${Nana_Base}`,
+                    method: 'GET'
+                }),
+                section: createHomeSection({
+                    id: '0',
+                    title: 'Latest Upload',
+                    view_more: true,
+                }),
+            },
+        ];
+        const promises = [];
+        for (const section of sections) {
+            sectionCallback(section.section);
+            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
+                const $ = this.cheerio.load(response.data);
+                section.section.items = this.parser.parseSearchResults($, Nana_Base);
                 sectionCallback(section.section);
-                promises.push(this.requestManager.schedule(section.request, 1).then((response) => __awaiter(this, void 0, void 0, function* () {
-                    const $ = this.cheerio.load(response.data);
-                    section.section.items = this.parser.parseSearchResults($, Nana_Base);
-                    sectionCallback(section.section);
-                })));
+            }));
+        }
+        await Promise.all(promises);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        let param = '';
+        switch (homepageSectionId) {
+            case '0':
+                param = `/?p=${page}`;
+                break;
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
+        }
+        const request = createRequestObject({
+            url: Nana_Base,
+            method: 'GET',
+            param
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const manga = this.parser.parseSearchResults($, Nana_Base);
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
+        });
+    }
+    async getMangaDetails(mangaId) {
+        const options = createRequestObject({
+            url: `${Nana_Base}/reader/${mangaId}`,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseMangaDetails($, mangaId, this.baseUrl);
+    }
+    async getChapters(mangaId) {
+        return [
+            createChapter({
+                id: mangaId,
+                mangaId: mangaId,
+                name: 'Chapter 1',
+                chapNum: 1,
+                time: undefined,
+                langCode: paperback_extensions_common_1.LanguageCode.ENGLISH
+            })
+        ];
+    }
+    async getSearchTags() {
+        const arrayTags = [
+            {
+                id: 'search.asc',
+                label: 'Ascending'
+            },
+            {
+                id: 'search.desc',
+                label: 'Descending'
             }
-            yield Promise.all(promises);
-        });
+        ];
+        return [
+            createTagSection({ id: '1', label: 'Sort Date Added by', tags: arrayTags.map(x => createTag(x)) }),
+        ];
     }
-    getViewMoreItems(homepageSectionId, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            let param = '';
-            switch (homepageSectionId) {
-                case '0':
-                    param = `/?p=${page}`;
-                    break;
-                default:
-                    throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
-            }
-            const request = createRequestObject({
-                url: Nana_Base,
-                method: 'GET',
-                param
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const manga = this.parser.parseSearchResults($, Nana_Base);
-            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
+    async getChapterDetails(mangaId, chapterId) {
+        const options = createRequestObject({
+            url: `${Nana_Base}/api/archives/${mangaId}/extractthumbnails`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        let data;
+        try {
+            data = JSON.parse(response.data);
+        }
+        catch (e) {
+            throw new Error(`${e}`);
+        }
+        if (data.pages.length == 0)
+            throw new Error(`Could not fetch chapter details for ${mangaId}`);
+        return this.parser.parseChapterDetails(data, mangaId, chapterId, Nana_Base);
     }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${Nana_Base}/reader/${mangaId}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseMangaDetails($, mangaId, this.baseUrl);
+    async getSearchResults(query, metadata) {
+        const page = metadata?.page ?? 1;
+        const request = createRequestObject({
+            url: `${Nana_Base}/?q=${query.title?.replace(/ /g, '+')?.replace(/%20/g, '+') ?? ''}${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x) => { if (x.id.includes('details.')) {
+                return `%2B%22${encodeURIComponent(x.id.split('.').pop())}%22`;
+            } return ''; }) ?? '' : ''}&sort=${query?.includedTags?.length !== 0 ? query?.includedTags?.map((x) => { if (x.id.includes('search.'))
+                return x.id.split('.').pop(); })[0] ?? 'desc' : 'desc'}&p=${page}`,
+            method: 'GET'
         });
-    }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return [
-                createChapter({
-                    id: mangaId,
-                    mangaId: mangaId,
-                    name: 'Chapter 1',
-                    chapNum: 1,
-                    time: undefined,
-                    langCode: paperback_extensions_common_1.LanguageCode.ENGLISH
-                })
-            ];
-        });
-    }
-    getSearchTags() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const arrayTags = [
-                {
-                    id: 'search.asc',
-                    label: 'Ascending'
-                },
-                {
-                    id: 'search.desc',
-                    label: 'Descending'
-                }
-            ];
-            return [
-                createTagSection({ id: '1', label: 'Sort Date Added by', tags: arrayTags.map(x => createTag(x)) }),
-            ];
-        });
-    }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${Nana_Base}/api/archives/${mangaId}/extractthumbnails`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            let data;
-            try {
-                data = JSON.parse(response.data);
-            }
-            catch (e) {
-                throw new Error(`${e}`);
-            }
-            if (data.pages.length == 0)
-                throw new Error(`Could not fetch chapter details for ${mangaId}`);
-            return this.parser.parseChapterDetails(data, mangaId, chapterId, Nana_Base);
-        });
-    }
-    getSearchResults(query, metadata) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            const request = createRequestObject({
-                url: `${Nana_Base}/?q=${(_d = (_c = (_b = query.title) === null || _b === void 0 ? void 0 : _b.replace(/ /g, '+')) === null || _c === void 0 ? void 0 : _c.replace(/%20/g, '+')) !== null && _d !== void 0 ? _d : ''}${((_e = query === null || query === void 0 ? void 0 : query.includedTags) === null || _e === void 0 ? void 0 : _e.length) !== 0 ? (_g = (_f = query === null || query === void 0 ? void 0 : query.includedTags) === null || _f === void 0 ? void 0 : _f.map((x) => { if (x.id.includes('details.')) {
-                    return `%2B%22${encodeURIComponent(x.id.split('.').pop())}%22`;
-                } return ''; })) !== null && _g !== void 0 ? _g : '' : ''}&sort=${((_h = query === null || query === void 0 ? void 0 : query.includedTags) === null || _h === void 0 ? void 0 : _h.length) !== 0 ? (_k = (_j = query === null || query === void 0 ? void 0 : query.includedTags) === null || _j === void 0 ? void 0 : _j.map((x) => { if (x.id.includes('search.'))
-                    return x.id.split('.').pop(); })[0]) !== null && _k !== void 0 ? _k : 'desc' : 'desc'}&p=${page}`,
-                method: 'GET'
-            });
-            const data = yield this.requestManager.schedule(request, 2);
-            const $ = this.cheerio.load(data.data);
-            const manga = this.parser.parseSearchResults($, Nana_Base);
-            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
+        const data = await this.requestManager.schedule(request, 2);
+        const $ = this.cheerio.load(data.data);
+        const manga = this.parser.parseSearchResults($, Nana_Base);
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
         });
     }
 }
@@ -602,10 +579,9 @@ class Parser {
         });
     }
     parseMangaDetails($, mangaId, baseUrl) {
-        var _a, _b, _c, _d;
-        const title = (_a = this.decodeHTMLEntity($('title').first().text().substringBeforeFirst('by').trim())) !== null && _a !== void 0 ? _a : '';
-        const author = (_b = $('title').first().text().substringAfterFirst('by').substringBeforeFirst('-').trim()) !== null && _b !== void 0 ? _b : '';
-        let image = (_d = (_c = $('a#display img').attr('src')) !== null && _c !== void 0 ? _c : $('a#display img').attr('data-src')) !== null && _d !== void 0 ? _d : '';
+        const title = this.decodeHTMLEntity($('title').first().text().substringBeforeFirst('by').trim()) ?? '';
+        const author = $('title').first().text().substringAfterFirst('by').substringBeforeFirst('-').trim() ?? '';
+        let image = $('a#display img').attr('src') ?? $('a#display img').attr('data-src') ?? '';
         if (image.startsWith('/'))
             image = baseUrl + image.replace('page', 'thumbnails');
         const tagsRegex = /Reader.tags = ['"`](.*)['"`]/i;
@@ -633,12 +609,11 @@ class Parser {
         });
     }
     parseSearchResults($, baseUrl) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
         const results = [];
         for (const obj of $('.id3 > a').toArray()) {
-            const id = (_c = (_b = (_a = $(obj).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/')) === null || _b === void 0 ? void 0 : _b.pop()) !== null && _c !== void 0 ? _c : '';
-            const title = (_f = this.decodeHTMLEntity((_e = (_d = $(obj).attr('title')) === null || _d === void 0 ? void 0 : _d.trim()) !== null && _e !== void 0 ? _e : '')) !== null && _f !== void 0 ? _f : '';
-            let image = (_h = (_g = $('img', obj).attr('src')) !== null && _g !== void 0 ? _g : $('img', obj).attr('data-src')) !== null && _h !== void 0 ? _h : '';
+            const id = $(obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($(obj).attr('title')?.trim() ?? '') ?? '';
+            let image = $('img', obj).attr('src') ?? $('img', obj).attr('data-src') ?? '';
             if (image.startsWith('/'))
                 image = baseUrl + image;
             if (!id)

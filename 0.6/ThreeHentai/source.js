@@ -2397,15 +2397,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":9,"./ChapterDetails":10,"./Constants":11,"./DynamicUI":27,"./HomeSection":28,"./Languages":29,"./Manga":30,"./MangaTile":31,"./MangaUpdate":32,"./PagedResults":33,"./RawData":34,"./RequestHeaders":35,"./RequestInterceptor":36,"./RequestManager":37,"./RequestObject":38,"./ResponseObject":39,"./SearchField":40,"./SearchRequest":41,"./SourceInfo":42,"./SourceManga":43,"./SourceStateManager":44,"./SourceTag":45,"./TagSection":46,"./TrackedManga":47,"./TrackedMangaChapterReadAction":48,"./TrackerActionQueue":49}],51:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThreeHentai = exports.ThreeHentaiInfo = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -2437,26 +2428,24 @@ exports.ThreeHentaiInfo = {
         },
     ]
 };
-const language = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const lang = (_a = (yield stateManager.retrieve('languages'))) !== null && _a !== void 0 ? _a : ThreeHentaiHelper_1.THLanguages.getDefault();
+const language = async (stateManager) => {
+    const lang = await stateManager.retrieve('languages') ?? ThreeHentaiHelper_1.THLanguages.getDefault();
     return `language:${lang}`;
-});
-const sortOrder = (query, stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c, _d, _e;
+};
+const sortOrder = async (query, stateManager) => {
     const inQuery = ThreeHentaiHelper_1.THSortOrders.containsShortcut(query);
-    if (((_b = inQuery[0]) === null || _b === void 0 ? void 0 : _b.length) !== 0) {
-        return [(_c = inQuery[0]) !== null && _c !== void 0 ? _c : '', query.replace((_d = inQuery[1]) !== null && _d !== void 0 ? _d : '', '')];
+    if (inQuery[0]?.length !== 0) {
+        return [inQuery[0] ?? '', query.replace(inQuery[1] ?? '', '')];
     }
     else {
-        const sortOrder = (_e = (yield stateManager.retrieve('sort_order'))) !== null && _e !== void 0 ? _e : ThreeHentaiHelper_1.THSortOrders.getDefault();
+        const sortOrder = await stateManager.retrieve('sort_order') ?? ThreeHentaiHelper_1.THSortOrders.getDefault();
         return [sortOrder, query];
     }
-});
-const extraArgs = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    const args = yield (0, ThreeHentaiSettings_1.getExtraArgs)(stateManager);
+};
+const extraArgs = async (stateManager) => {
+    const args = await (0, ThreeHentaiSettings_1.getExtraArgs)(stateManager);
     return ` ${args}`;
-});
+};
 class ThreeHentai extends paperback_extensions_common_1.Source {
     constructor() {
         super(...arguments);
@@ -2465,155 +2454,126 @@ class ThreeHentai extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 30000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36 Edg/103.0.1264.62',
-                        'referer': `${ThreeHentai_Base}/`,
-                    });
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36 Edg/103.0.1264.62',
+                            'referer': `${ThreeHentai_Base}/`,
+                        }
+                    };
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
         this.stateManager = createSourceStateManager({});
     }
-    getSourceMenu() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Promise.resolve(createSection({
-                id: 'main',
-                header: 'Source Settings',
-                rows: () => Promise.resolve([
-                    (0, ThreeHentaiSettings_1.settings)(this.stateManager),
-                    (0, ThreeHentaiSettings_1.resetSettings)(this.stateManager),
-                ])
-            }));
-        });
+    async getSourceMenu() {
+        return Promise.resolve(createSection({
+            id: 'main',
+            header: 'Source Settings',
+            rows: () => Promise.resolve([
+                (0, ThreeHentaiSettings_1.settings)(this.stateManager),
+                (0, ThreeHentaiSettings_1.resetSettings)(this.stateManager),
+            ])
+        }));
     }
     getMangaShareUrl(mangaId) {
         return `${ThreeHentai_Base}/d/${mangaId}`;
     }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const section1 = createHomeSection({ id: 'date', title: 'Recent', view_more: true });
-            const section2 = createHomeSection({ id: 'popular-24h', title: 'Popular Today', view_more: true });
-            const section3 = createHomeSection({ id: 'popular-7d', title: 'Popular Week', view_more: true });
-            const section4 = createHomeSection({ id: 'popular', title: 'Popular All-time', view_more: true });
-            const sections = [section1, section2, section3, section4];
-            for (const section of sections) {
-                sectionCallback(section);
+    async getHomePageSections(sectionCallback) {
+        const section1 = createHomeSection({ id: 'date', title: 'Recent', view_more: true });
+        const section2 = createHomeSection({ id: 'popular-24h', title: 'Popular Today', view_more: true });
+        const section3 = createHomeSection({ id: 'popular-7d', title: 'Popular Week', view_more: true });
+        const section4 = createHomeSection({ id: 'popular', title: 'Popular All-time', view_more: true });
+        const sections = [section1, section2, section3, section4];
+        for (const section of sections) {
+            sectionCallback(section);
+            const request = createRequestObject({
+                url: `${ThreeHentai_Base}/search?q=${encodeURIComponent(await language(this.stateManager) + await extraArgs(this.stateManager))}&sort=${section.id}`,
+                method: 'GET'
+            });
+            const data = await this.requestManager.schedule(request, 1);
+            const $ = this.cheerio.load(data.data);
+            section.items = this.parser.parseSearchResults($, this);
+            sectionCallback(section);
+        }
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        const request = createRequestObject({
+            url: `${ThreeHentai_Base}/search?q=${encodeURIComponent(await language(this.stateManager) + await extraArgs(this.stateManager))}&sort=${homepageSectionId}&page=${page}`,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const manga = this.parser.parseSearchResults($, this);
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
+        });
+    }
+    async getMangaDetails(mangaId) {
+        const options = createRequestObject({
+            url: `${ThreeHentai_Base}/d/${mangaId}`,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseMangaDetails($, mangaId, this);
+    }
+    async getChapters(mangaId) {
+        const lang = await this.stateManager.retrieve('languages') ?? ThreeHentaiHelper_1.THLanguages.getDefault();
+        const options = createRequestObject({
+            url: `${ThreeHentai_Base}/d/${mangaId}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapters($, mangaId, lang, this);
+    }
+    async getChapterDetails(mangaId, chapterId) {
+        const options = createRequestObject({
+            url: `${ThreeHentai_Base}/d/${chapterId}/1`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(options, 1);
+        return this.parser.parseChapterDetails(response.data, mangaId, chapterId);
+    }
+    async getSearchResults(query, metadata) {
+        if (metadata?.completed)
+            return metadata;
+        const page = metadata?.page ?? 1;
+        const title = query.title ?? '';
+        if (query.title) {
+            if (/^\d+$/.test(title)) {
                 const request = createRequestObject({
-                    url: `${ThreeHentai_Base}/search?q=${encodeURIComponent((yield language(this.stateManager)) + (yield extraArgs(this.stateManager)))}&sort=${section.id}`,
+                    url: `${ThreeHentai_Base}/d/${title}`,
                     method: 'GET'
                 });
-                const data = yield this.requestManager.schedule(request, 1);
+                const data = await this.requestManager.schedule(request, 1);
+                if (data.status == 404)
+                    return createPagedResults({ results: [], metadata: undefined });
                 const $ = this.cheerio.load(data.data);
-                section.items = this.parser.parseSearchResults($, this);
-                sectionCallback(section);
-            }
-        });
-    }
-    getViewMoreItems(homepageSectionId, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            const request = createRequestObject({
-                url: `${ThreeHentai_Base}/search?q=${encodeURIComponent((yield language(this.stateManager)) + (yield extraArgs(this.stateManager)))}&sort=${homepageSectionId}&page=${page}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const manga = this.parser.parseSearchResults($, this);
-            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
-        });
-    }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${ThreeHentai_Base}/d/${mangaId}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseMangaDetails($, mangaId, this);
-        });
-    }
-    getChapters(mangaId) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const lang = (_a = (yield this.stateManager.retrieve('languages'))) !== null && _a !== void 0 ? _a : ThreeHentaiHelper_1.THLanguages.getDefault();
-            const options = createRequestObject({
-                url: `${ThreeHentai_Base}/d/${mangaId}`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapters($, mangaId, lang, this);
-        });
-    }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${ThreeHentai_Base}/d/${chapterId}/1`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            return this.parser.parseChapterDetails(response.data, mangaId, chapterId);
-        });
-    }
-    getSearchResults(query, metadata) {
-        var _a, _b, _c, _d;
-        return __awaiter(this, void 0, void 0, function* () {
-            if (metadata === null || metadata === void 0 ? void 0 : metadata.completed)
-                return metadata;
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            const title = (_b = query.title) !== null && _b !== void 0 ? _b : '';
-            if (query.title) {
-                if (/^\d+$/.test(title)) {
-                    const request = createRequestObject({
-                        url: `${ThreeHentai_Base}/d/${title}`,
-                        method: 'GET'
-                    });
-                    const data = yield this.requestManager.schedule(request, 1);
-                    if (data.status == 404)
-                        return createPagedResults({ results: [], metadata: undefined });
-                    const $ = this.cheerio.load(data.data);
-                    const manga = this.parser.parseSearchResultsArchive($, this, title);
-                    return createPagedResults({
-                        results: manga,
-                        metadata: undefined
-                    });
-                }
-                else {
-                    const q = title + ' ' + (yield language(this.stateManager)) + (yield extraArgs(this.stateManager));
-                    const [sort, query] = (_c = yield sortOrder(q, this.stateManager)) !== null && _c !== void 0 ? _c : ['', q];
-                    console.log(`sort is ${sort}`);
-                    const request = createRequestObject({
-                        url: `${ThreeHentai_Base}/search?q=${encodeURIComponent(query !== null && query !== void 0 ? query : '')}&sort=${sort}&page=${page}`,
-                        method: 'GET',
-                    });
-                    const data = yield this.requestManager.schedule(request, 2);
-                    const $ = this.cheerio.load(data.data);
-                    const manga = this.parser.parseSearchResults($, this);
-                    metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-                    return createPagedResults({
-                        results: manga,
-                        metadata
-                    });
-                }
+                const manga = this.parser.parseSearchResultsArchive($, this, title);
+                return createPagedResults({
+                    results: manga,
+                    metadata: undefined
+                });
             }
             else {
+                const q = title + ' ' + await language(this.stateManager) + await extraArgs(this.stateManager);
+                const [sort, query] = await sortOrder(q, this.stateManager) ?? ['', q];
+                console.log(`sort is ${sort}`);
                 const request = createRequestObject({
-                    url: `${ThreeHentai_Base}/tags/${(_d = query === null || query === void 0 ? void 0 : query.includedTags) === null || _d === void 0 ? void 0 : _d.map((x) => x.id)[0]}`,
+                    url: `${ThreeHentai_Base}/search?q=${encodeURIComponent(query ?? '')}&sort=${sort}&page=${page}`,
                     method: 'GET',
                 });
-                const data = yield this.requestManager.schedule(request, 2);
+                const data = await this.requestManager.schedule(request, 2);
                 const $ = this.cheerio.load(data.data);
                 const manga = this.parser.parseSearchResults($, this);
                 metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
@@ -2622,7 +2582,21 @@ class ThreeHentai extends paperback_extensions_common_1.Source {
                     metadata
                 });
             }
-        });
+        }
+        else {
+            const request = createRequestObject({
+                url: `${ThreeHentai_Base}/tags/${query?.includedTags?.map((x) => x.id)[0]}`,
+                method: 'GET',
+            });
+            const data = await this.requestManager.schedule(request, 2);
+            const $ = this.cheerio.load(data.data);
+            const manga = this.parser.parseSearchResults($, this);
+            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+            return createPagedResults({
+                results: manga,
+                metadata
+            });
+        }
     }
 }
 exports.ThreeHentai = ThreeHentai;
@@ -2693,12 +2667,10 @@ class THLanguagesClass {
         return this.Languages.map(Language => Language.THCode);
     }
     getName(THCode) {
-        var _a, _b;
-        return (_b = (_a = this.Languages.filter(Language => Language.THCode == THCode)[0]) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'Unknown';
+        return this.Languages.filter(Language => Language.THCode == THCode)[0]?.name ?? 'Unknown';
     }
     getPBCode(THCode) {
-        var _a, _b;
-        return (_b = (_a = this.Languages.filter(Language => Language.THCode == THCode)[0]) === null || _a === void 0 ? void 0 : _a.PBCode) !== null && _b !== void 0 ? _b : paperback_extensions_common_1.LanguageCode.UNKNOWN;
+        return this.Languages.filter(Language => Language.THCode == THCode)[0]?.PBCode ?? paperback_extensions_common_1.LanguageCode.UNKNOWN;
     }
     getDefault() {
         return this.Languages.filter(Language => Language.default).map(Language => Language.THCode);
@@ -2751,8 +2723,7 @@ class THSortOrderClass {
         return this.SortOrders.map(SortOrder => SortOrder.THCode);
     }
     getName(THCode) {
-        var _a, _b;
-        return (_b = (_a = this.SortOrders.filter(SortOrder => SortOrder.THCode == THCode)[0]) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'Unknown';
+        return this.SortOrders.filter(SortOrder => SortOrder.THCode == THCode)[0]?.name ?? 'Unknown';
     }
     getDefault() {
         return this.SortOrders.filter(SortOrder => SortOrder.default).map(SortOrder => SortOrder.THCode);
@@ -2777,9 +2748,8 @@ class Parser {
         });
     }
     parseMangaDetails($, mangaId, _source) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-        const title = (_a = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim())) !== null && _a !== void 0 ? _a : '';
-        const image = (_c = (_b = $('.large-container #main-cover a img').attr('src')) !== null && _b !== void 0 ? _b : $('.large-container #main-cover a img').attr('data-src')) !== null && _c !== void 0 ? _c : 'https://paperback.moe/icons/logo-alt.svg';
+        const title = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim()) ?? '';
+        const image = $('.large-container #main-cover a img').attr('src') ?? $('.large-container #main-cover a img').attr('data-src') ?? 'https://paperback.moe/icons/logo-alt.svg';
         const arrayTags = [];
         let author;
         let artist;
@@ -2787,8 +2757,8 @@ class Parser {
             const info = $(details).text().trim().toLocaleLowerCase();
             if (/tags:/i.test(info)) {
                 for (const tags of $('span', details).toArray()) {
-                    const label = (_d = $('.name', tags).text().trim()) !== null && _d !== void 0 ? _d : '';
-                    const id = (_g = (_f = (_e = $('.name', tags).attr('href')) === null || _e === void 0 ? void 0 : _e.split('/')) === null || _f === void 0 ? void 0 : _f.pop()) !== null && _g !== void 0 ? _g : '';
+                    const label = $('.name', tags).text().trim() ?? '';
+                    const id = $('.name', tags).attr('href')?.split('/')?.pop() ?? '';
                     if (!id || !label)
                         continue;
                     arrayTags.push({
@@ -2800,7 +2770,7 @@ class Parser {
             if (/artists:/i.test(info)) {
                 let i = 0;
                 for (const artists of $('span', details).toArray()) {
-                    const names = (_h = $('.name', artists).text().trim()) !== null && _h !== void 0 ? _h : '';
+                    const names = $('.name', artists).text().trim() ?? '';
                     if (i == 0) {
                         artist = names;
                     }
@@ -2813,7 +2783,7 @@ class Parser {
             if (/groups:/i.test(info)) {
                 let i = 0;
                 for (const artists of $('span', details).toArray()) {
-                    const names = (_j = $('.name', artists).text().trim()) !== null && _j !== void 0 ? _j : '';
+                    const names = $('.name', artists).text().trim() ?? '';
                     if (i == 0) {
                         author = names;
                     }
@@ -2836,14 +2806,13 @@ class Parser {
         });
     }
     parseChapters($, mangaId, LanguageCodes, _source) {
-        var _a, _b;
         const chapters = [];
-        const name = (_a = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim())) !== null && _a !== void 0 ? _a : '';
+        const name = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim()) ?? '';
         let release_date;
         for (const details of $('#main-info .tag-container').toArray()) {
             const info = $(details).text().trim().toLocaleLowerCase();
             if (/uploaded:/i.test(info)) {
-                const date = (_b = $('time', details).attr('datetime')) !== null && _b !== void 0 ? _b : '';
+                const date = $('time', details).attr('datetime') ?? '';
                 release_date = date;
             }
         }
@@ -2852,18 +2821,17 @@ class Parser {
             mangaId: mangaId,
             name,
             chapNum: 1,
-            time: new Date(release_date !== null && release_date !== void 0 ? release_date : ''),
+            time: new Date(release_date ?? ''),
             langCode: ThreeHentaiHelper_1.THLanguages.getPBCode(LanguageCodes)
         }));
         return chapters;
     }
     parseChapterDetails(data, mangaId, chapterId) {
-        var _a, _b;
         const pages = [];
-        const scriptData = (_a = data.match(/var readerPages = JSON.parse\(atob\([`'"](.*?)[`'"]\)\)/i)) !== null && _a !== void 0 ? _a : [];
+        const scriptData = data.match(/var readerPages = JSON.parse\(atob\([`'"](.*?)[`'"]\)\)/i) ?? [];
         if (!scriptData && !scriptData[1])
             throw new Error(`Could Not Get info for ${mangaId}`);
-        const decodedJson = Buffer.from((_b = scriptData[1]) !== null && _b !== void 0 ? _b : '', 'base64').toString('utf-8');
+        const decodedJson = Buffer.from(scriptData[1] ?? '', 'base64').toString('utf-8');
         const parsedJson = JSON.parse(decodedJson);
         const cdnUrl = parsedJson.baseUriImg.replace('%s', '');
         for (const test in parsedJson.pages) {
@@ -2877,12 +2845,11 @@ class Parser {
         });
     }
     parseSearchResults($, _source) {
-        var _a, _b, _c, _d, _e, _f;
         const results = [];
         for (const obj of $('#main-content .listing-container .doujin-col').toArray()) {
-            const id = (_c = (_b = (_a = $('a', obj).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/')) === null || _b === void 0 ? void 0 : _b.pop()) !== null && _c !== void 0 ? _c : '';
-            const title = (_d = $('.title', obj).text().shortenTitle()) !== null && _d !== void 0 ? _d : '';
-            const image = (_f = (_e = $('img', obj).attr('src')) !== null && _e !== void 0 ? _e : $('img', obj).attr('data-src')) !== null && _f !== void 0 ? _f : '';
+            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = $('.title', obj).text().shortenTitle() ?? '';
+            const image = $('img', obj).attr('src') ?? $('img', obj).attr('data-src') ?? '';
             if (id || title) {
                 results.push(createMangaTile({
                     id,
@@ -2924,17 +2891,16 @@ class Parser {
         return 'Unknown';
     }
     parseSearchResultsArchive($, _source, detailsid) {
-        var _a, _b, _c, _d;
         const results = [];
-        const id = detailsid !== null && detailsid !== void 0 ? detailsid : '';
-        const title = (_a = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim())) !== null && _a !== void 0 ? _a : '';
-        const image = (_c = (_b = $('.large-container #main-cover a img').attr('src')) !== null && _b !== void 0 ? _b : $('.large-container #main-cover a img').attr('data-src')) !== null && _c !== void 0 ? _c : 'https://paperback.moe/icons/logo-alt.svg';
+        const id = detailsid ?? '';
+        const title = this.decodeHTMLEntity($('#main-info .middle-title').first().text().trim()) ?? '';
+        const image = $('.large-container #main-cover a img').attr('src') ?? $('.large-container #main-cover a img').attr('data-src') ?? 'https://paperback.moe/icons/logo-alt.svg';
         let subtitle;
         for (const details of $('#main-info .tag-container').toArray()) {
             const info = $(details).text().trim().toLocaleLowerCase();
             if (/languages:/i.test(info)) {
                 for (const artists of $('span', details).toArray()) {
-                    const names = (_d = $('.name', artists).text().trim()) !== null && _d !== void 0 ? _d : '';
+                    const names = $('.name', artists).text().trim() ?? '';
                     if (names !== 'translated') {
                         subtitle = names;
                     }
@@ -2947,7 +2913,7 @@ class Parser {
                 image,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
                 subtitleText: createIconText({
-                    text: ThreeHentaiHelper_1.THLanguages.getName(subtitle !== null && subtitle !== void 0 ? subtitle : '')
+                    text: ThreeHentaiHelper_1.THLanguages.getName(subtitle ?? '')
                 }),
             }));
         }
@@ -2971,32 +2937,20 @@ String.prototype.shortenTitle = function () {
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"./ThreeHentaiHelper":52,"buffer":3,"paperback-extensions-common":8}],54:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetSettings = exports.settings = exports.getSortOrders = exports.getExtraArgs = exports.getLanguages = void 0;
 const ThreeHentaiHelper_1 = require("./ThreeHentaiHelper");
-const getLanguages = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    return (_a = (yield stateManager.retrieve('languages'))) !== null && _a !== void 0 ? _a : ThreeHentaiHelper_1.THLanguages.getDefault();
-});
+const getLanguages = async (stateManager) => {
+    return await stateManager.retrieve('languages') ?? ThreeHentaiHelper_1.THLanguages.getDefault();
+};
 exports.getLanguages = getLanguages;
-const getExtraArgs = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    return (_b = (yield stateManager.retrieve('extra_args'))) !== null && _b !== void 0 ? _b : '';
-});
+const getExtraArgs = async (stateManager) => {
+    return await stateManager.retrieve('extra_args') ?? '';
+};
 exports.getExtraArgs = getExtraArgs;
-const getSortOrders = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    return (_c = (yield stateManager.retrieve('sort_order'))) !== null && _c !== void 0 ? _c : ThreeHentaiHelper_1.THSortOrders.getDefault();
-});
+const getSortOrders = async (stateManager) => {
+    return await stateManager.retrieve('sort_order') ?? ThreeHentaiHelper_1.THSortOrders.getDefault();
+};
 exports.getSortOrders = getSortOrders;
 const settings = (stateManager) => {
     return createNavigationButton({
@@ -3004,14 +2958,14 @@ const settings = (stateManager) => {
         value: '',
         label: 'Content Settings',
         form: createForm({
-            onSubmit: (values) => __awaiter(void 0, void 0, void 0, function* () {
-                yield Promise.all([
+            onSubmit: async (values) => {
+                await Promise.all([
                     stateManager.store('languages', values.languages),
                     stateManager.store('sort_order', values.sort_order),
                     stateManager.store('extra_args', values.extra_args.replace(/[“”‘’]/g, '"')),
                 ]);
-            }),
-            validate: () => __awaiter(void 0, void 0, void 0, function* () { return true; }),
+            },
+            validate: async () => true,
             sections: () => {
                 return Promise.resolve([
                     createSection({
@@ -3022,35 +2976,33 @@ const settings = (stateManager) => {
                                 (0, exports.getLanguages)(stateManager),
                                 (0, exports.getSortOrders)(stateManager),
                                 (0, exports.getExtraArgs)(stateManager),
-                            ]).then((values) => __awaiter(void 0, void 0, void 0, function* () {
-                                return [
-                                    createSelect({
-                                        id: 'languages',
-                                        label: 'Languages',
-                                        options: ThreeHentaiHelper_1.THLanguages.getTHCodeList(),
-                                        displayLabel: option => ThreeHentaiHelper_1.THLanguages.getName(option),
-                                        value: values[0],
-                                        allowsMultiselect: false,
-                                        minimumOptionCount: 1,
-                                    }),
-                                    createSelect({
-                                        id: 'sort_order',
-                                        label: 'Default search sort',
-                                        options: ThreeHentaiHelper_1.THSortOrders.getTHCodeList(),
-                                        displayLabel: option => ThreeHentaiHelper_1.THSortOrders.getName(option),
-                                        value: values[1],
-                                        allowsMultiselect: false,
-                                        minimumOptionCount: 1,
-                                    }),
-                                    createInputField({
-                                        id: 'extra_args',
-                                        label: 'Additional arguments',
-                                        placeholder: 'woman -lolicon -shotacon -yaoi',
-                                        maskInput: false,
-                                        value: values[2],
-                                    })
-                                ];
-                            }));
+                            ]).then(async (values) => [
+                                createSelect({
+                                    id: 'languages',
+                                    label: 'Languages',
+                                    options: ThreeHentaiHelper_1.THLanguages.getTHCodeList(),
+                                    displayLabel: option => ThreeHentaiHelper_1.THLanguages.getName(option),
+                                    value: values[0],
+                                    allowsMultiselect: false,
+                                    minimumOptionCount: 1,
+                                }),
+                                createSelect({
+                                    id: 'sort_order',
+                                    label: 'Default search sort',
+                                    options: ThreeHentaiHelper_1.THSortOrders.getTHCodeList(),
+                                    displayLabel: option => ThreeHentaiHelper_1.THSortOrders.getName(option),
+                                    value: values[1],
+                                    allowsMultiselect: false,
+                                    minimumOptionCount: 1,
+                                }),
+                                createInputField({
+                                    id: 'extra_args',
+                                    label: 'Additional arguments',
+                                    placeholder: 'woman -lolicon -shotacon -yaoi',
+                                    maskInput: false,
+                                    value: values[2],
+                                })
+                            ]);
                         }
                     })
                 ]);
@@ -3064,13 +3016,13 @@ const resetSettings = (stateManager) => {
         id: 'reset',
         label: 'Reset to Default',
         value: '',
-        onTap: () => __awaiter(void 0, void 0, void 0, function* () {
-            yield Promise.all([
+        onTap: async () => {
+            await Promise.all([
                 stateManager.store('languages', null),
                 stateManager.store('sort_order', null),
                 stateManager.store('extra_args', null),
             ]);
-        })
+        }
     });
 };
 exports.resetSettings = resetSettings;

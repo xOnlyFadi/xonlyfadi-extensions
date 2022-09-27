@@ -377,15 +377,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TuMangaOnline = exports.TuMangaOnlineInfo = void 0;
 /* eslint-disable no-useless-escape */
@@ -422,17 +413,19 @@ class TuMangaOnline extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'user-agent': this.userAgent,
-                        'referer': `${TuMangaOnline_Base}/`
-                    });
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            'user-agent': this.userAgent,
+                            'referer': `${TuMangaOnline_Base}/`
+                        }
+                    };
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
         this.stateManager = createSourceStateManager({});
@@ -440,18 +433,14 @@ class TuMangaOnline extends paperback_extensions_common_1.Source {
     getMangaShareUrl(mangaId) {
         return `${TuMangaOnline_Base}/library/${mangaId}`;
     }
-    getSourceMenu() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Promise.resolve(createSection({
-                id: 'main',
-                header: 'Source Settings',
-                rows: () => __awaiter(this, void 0, void 0, function* () {
-                    return [
-                        (0, TuMangaOnlineSettings_1.contentSettings)(this.stateManager),
-                    ];
-                })
-            }));
-        });
+    async getSourceMenu() {
+        return Promise.resolve(createSection({
+            id: 'main',
+            header: 'Source Settings',
+            rows: async () => [
+                (0, TuMangaOnlineSettings_1.contentSettings)(this.stateManager),
+            ]
+        }));
     }
     getCloudflareBypassRequest() {
         return createRequestObject({
@@ -462,245 +451,225 @@ class TuMangaOnline extends paperback_extensions_common_1.Source {
             }
         });
     }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const getNSFWOption = yield (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
-            const sections = [
-                {
-                    request: createRequestObject({
-                        url: `${TuMangaOnline_Base}/library?order_item=creation&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=1`,
-                        method: 'GET',
-                    }),
-                    section: createHomeSection({
-                        id: '1',
-                        title: 'Últimas actualizaciones',
-                        view_more: true,
-                    }),
-                },
-                {
-                    request: createRequestObject({
-                        url: `${TuMangaOnline_Base}/library?order_item=likes_count&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=1`,
-                        method: 'GET'
-                    }),
-                    section: createHomeSection({
-                        id: '2',
-                        title: 'Series populares',
-                        view_more: true,
-                    }),
-                },
-            ];
-            const promises = [];
-            for (const section of sections) {
+    async getHomePageSections(sectionCallback) {
+        const getNSFWOption = await (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
+        const sections = [
+            {
+                request: createRequestObject({
+                    url: `${TuMangaOnline_Base}/library?order_item=creation&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=1`,
+                    method: 'GET',
+                }),
+                section: createHomeSection({
+                    id: '1',
+                    title: 'Últimas actualizaciones',
+                    view_more: true,
+                }),
+            },
+            {
+                request: createRequestObject({
+                    url: `${TuMangaOnline_Base}/library?order_item=likes_count&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=1`,
+                    method: 'GET'
+                }),
+                section: createHomeSection({
+                    id: '2',
+                    title: 'Series populares',
+                    view_more: true,
+                }),
+            },
+        ];
+        const promises = [];
+        for (const section of sections) {
+            sectionCallback(section.section);
+            promises.push(this.requestManager.schedule(section.request, 1).then(response => {
+                this.CloudFlareError(response.status);
+                const $ = this.cheerio.load(response.data);
+                section.section.items = this.parser.parseHomeSection($, this);
                 sectionCallback(section.section);
-                promises.push(this.requestManager.schedule(section.request, 1).then(response => {
-                    this.CloudFlareError(response.status);
-                    const $ = this.cheerio.load(response.data);
-                    section.section.items = this.parser.parseHomeSection($, this);
-                    sectionCallback(section.section);
-                }));
-            }
-            yield Promise.all(promises);
+            }));
+        }
+        await Promise.all(promises);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const getNSFWOption = await (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
+        const page = metadata?.page ?? 1;
+        let param = '';
+        switch (homepageSectionId) {
+            case '1':
+                param = `/library?order_item=creation&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=${page}`;
+                break;
+            case '2':
+                param = `/library?order_item=likes_count&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=${page}`;
+                break;
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
+        }
+        const request = createRequestObject({
+            url: `${TuMangaOnline_Base}${param}`,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const manga = this.parser.parseHomeSection($, this);
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
         });
     }
-    getViewMoreItems(homepageSectionId, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const getNSFWOption = yield (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            let param = '';
-            switch (homepageSectionId) {
-                case '1':
-                    param = `/library?order_item=creation&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=${page}`;
-                    break;
-                case '2':
-                    param = `/library?order_item=likes_count&order_dir=desc&filter_by=title${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&_pg=1&page=${page}`;
-                    break;
-                default:
-                    throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
-            }
-            const request = createRequestObject({
-                url: `${TuMangaOnline_Base}${param}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const manga = this.parser.parseHomeSection($, this);
-            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
+    async getSearchTags() {
+        const getNSFWOption = await (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
+        const options = createRequestObject({
+            url: `${TuMangaOnline_Base}/library`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        this.CloudFlareError(response.status);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseTags($, getNSFWOption);
     }
-    getSearchTags() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const getNSFWOption = yield (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
-            const options = createRequestObject({
-                url: `${TuMangaOnline_Base}/library`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseTags($, getNSFWOption);
+    async getMangaDetails(mangaId) {
+        const options = createRequestObject({
+            url: `${TuMangaOnline_Base}/library/${mangaId}`,
+            method: 'GET',
         });
+        const response = await this.requestManager.schedule(options, 1);
+        this.CloudFlareError(response.status);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseMangaDetails($, mangaId, this);
     }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TuMangaOnline_Base}/library/${mangaId}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseMangaDetails($, mangaId, this);
+    async getChapters(mangaId) {
+        const options = createRequestObject({
+            url: `${TuMangaOnline_Base}/library/${mangaId}`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        this.CloudFlareError(response.status);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapters($, mangaId, this);
     }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TuMangaOnline_Base}/library/${mangaId}`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapters($, mangaId, this);
+    async getChapterDetails(mangaId, chapterId) {
+        const options = createRequestObject({
+            url: await this.getChapterURL(chapterId),
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        this.CloudFlareError(response.status);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapterDetails($, mangaId, chapterId);
     }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: yield this.getChapterURL(chapterId),
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            this.CloudFlareError(response.status);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapterDetails($, mangaId, chapterId);
+    async getChapterURL(chapterId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/view_uploads/${chapterId}/`,
+            method: 'GET'
         });
-    }
-    getChapterURL(chapterId) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/view_uploads/${chapterId}/`,
-                method: 'GET'
-            });
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            const button = (_a = $('.flex-row button.btn-social').attr('onclick')) === null || _a === void 0 ? void 0 : _a.match(/copyToClipboard\(['"`](.*)['"`]\)/i);
-            let url;
-            if (button && button[1]) {
-                const chapurl = button[1];
-                if (chapurl.includes('paginated')) {
-                    url = chapurl.replace('paginated', '') + 'cascade';
-                }
-                else {
-                    url = chapurl;
-                }
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const button = $('.flex-row button.btn-social').attr('onclick')?.match(/copyToClipboard\(['"`](.*)['"`]\)/i);
+        let url;
+        if (button && button[1]) {
+            const chapurl = button[1];
+            if (chapurl.includes('paginated')) {
+                url = chapurl.replace('paginated', '') + 'cascade';
             }
             else {
-                throw new Error(`Failed to parse the chapter url for ${chapterId}`);
+                url = chapurl;
             }
-            return url;
-        });
+        }
+        else {
+            throw new Error(`Failed to parse the chapter url for ${chapterId}`);
+        }
+        return url;
     }
-    getSearchResults(query, metadata) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
-        return __awaiter(this, void 0, void 0, function* () {
-            const getNSFWOption = yield (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            const search = {
-                types: '',
-                status: '',
-                translationstatus: '',
-                demography: '',
-                filter: 'title',
-                sorting: 'likes_count',
-                sortby: 'asc',
-                webcomic: '',
-                yonkoma: '',
-                amateur: '',
-                erotic: getNSFWOption ? '' : 'false',
-                genres: ''
-            };
-            const tags = (_c = (_b = query.includedTags) === null || _b === void 0 ? void 0 : _b.map(tag => tag.id)) !== null && _c !== void 0 ? _c : [];
-            const genres = [];
-            tags.map((value) => {
-                var _a, _b, _c, _d, _e, _f, _g, _h;
-                if (value.indexOf('.') === -1) {
-                    genres.push(`&genders[]=${value}`);
-                }
-                else {
-                    switch (value.split('.')[0]) {
-                        case 'types':
-                            search.types = (_a = value.split('.')[1]) !== null && _a !== void 0 ? _a : '';
-                            break;
-                        case 'status':
-                            search.status = (_b = value.split('.')[1]) !== null && _b !== void 0 ? _b : '';
-                            break;
-                        case 'trstatus':
-                            search.translationstatus = (_c = value.split('.')[1]) !== null && _c !== void 0 ? _c : '';
-                            break;
-                        case 'demog':
-                            search.demography = (_d = value.split('.')[1]) !== null && _d !== void 0 ? _d : '';
-                            break;
-                        case 'filby':
-                            search.filter = (_e = value.split('.')[1]) !== null && _e !== void 0 ? _e : 'title';
-                            break;
-                        case 'sorting':
-                            search.sorting = (_f = value.split('.')[1]) !== null && _f !== void 0 ? _f : 'likes_count';
-                            break;
-                        case 'byaplha':
-                            search.sortby = (_g = value.split('.')[1]) !== null && _g !== void 0 ? _g : 'asc';
-                            break;
-                        case 'contenttype':
-                            // eslint-disable-next-line no-case-declarations
-                            const contype = (_h = value.split('.')[1]) !== null && _h !== void 0 ? _h : '';
-                            if (contype == 'webcomic') {
-                                search.webcomic = 'true';
-                            }
-                            else if (contype == 'yonkoma') {
-                                search.yonkoma = 'true';
-                            }
-                            else if (contype == 'amateur') {
-                                search.amateur = 'true';
-                            }
-                            else if (contype == 'erotic') {
-                                if (getNSFWOption) {
-                                    search.erotic = 'true';
-                                }
-                            }
-                            break;
-                    }
-                }
-            });
-            search.genres = (genres !== null && genres !== void 0 ? genres : []).join('');
-            let request;
-            if (((_d = query.includedTags) === null || _d === void 0 ? void 0 : _d.length) == 0) {
-                request = createRequestObject({
-                    url: encodeURI(`${TuMangaOnline_Base}/library?title=${(_f = (_e = query === null || query === void 0 ? void 0 : query.title) === null || _e === void 0 ? void 0 : _e.replace(/%20/g, '+').replace(/ /g, '+')) !== null && _f !== void 0 ? _f : ''}${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&page=${page}&_pg=1`),
-                    method: 'GET',
-                });
+    async getSearchResults(query, metadata) {
+        const getNSFWOption = await (0, TuMangaOnlineSettings_1.getNSFW)(this.stateManager);
+        const page = metadata?.page ?? 1;
+        const search = {
+            types: '',
+            status: '',
+            translationstatus: '',
+            demography: '',
+            filter: 'title',
+            sorting: 'likes_count',
+            sortby: 'asc',
+            webcomic: '',
+            yonkoma: '',
+            amateur: '',
+            erotic: getNSFWOption ? '' : 'false',
+            genres: ''
+        };
+        const tags = query.includedTags?.map(tag => tag.id) ?? [];
+        const genres = [];
+        tags.map((value) => {
+            if (value.indexOf('.') === -1) {
+                genres.push(`&genders[]=${value}`);
             }
             else {
-                request = createRequestObject({
-                    url: encodeURI(`${TuMangaOnline_Base}/library?title=${(_h = (_g = query === null || query === void 0 ? void 0 : query.title) === null || _g === void 0 ? void 0 : _g.replace(/%20/g, '+').replace(/ /g, '+')) !== null && _h !== void 0 ? _h : ''}${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&page=${page}&_pg=1&type=${search.types}&demography=${search.demography}&status=${search.status}&translation_status=${search.translationstatus}&${search.filter}&order_item=${search.sorting}&order_dir=${search.sortby}&webcomic=${search.webcomic}&yonkoma=${search.yonkoma}&amateur=${search.amateur}&erotic=${search.erotic}${search.genres}`),
-                    method: 'GET',
-                });
+                switch (value.split('.')[0]) {
+                    case 'types':
+                        search.types = value.split('.')[1] ?? '';
+                        break;
+                    case 'status':
+                        search.status = value.split('.')[1] ?? '';
+                        break;
+                    case 'trstatus':
+                        search.translationstatus = value.split('.')[1] ?? '';
+                        break;
+                    case 'demog':
+                        search.demography = value.split('.')[1] ?? '';
+                        break;
+                    case 'filby':
+                        search.filter = value.split('.')[1] ?? 'title';
+                        break;
+                    case 'sorting':
+                        search.sorting = value.split('.')[1] ?? 'likes_count';
+                        break;
+                    case 'byaplha':
+                        search.sortby = value.split('.')[1] ?? 'asc';
+                        break;
+                    case 'contenttype':
+                        // eslint-disable-next-line no-case-declarations
+                        const contype = value.split('.')[1] ?? '';
+                        if (contype == 'webcomic') {
+                            search.webcomic = 'true';
+                        }
+                        else if (contype == 'yonkoma') {
+                            search.yonkoma = 'true';
+                        }
+                        else if (contype == 'amateur') {
+                            search.amateur = 'true';
+                        }
+                        else if (contype == 'erotic') {
+                            if (getNSFWOption) {
+                                search.erotic = 'true';
+                            }
+                        }
+                        break;
+                }
             }
-            const data = yield this.requestManager.schedule(request, 2);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            const manga = this.parser.parseHomeSection($, this);
-            metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata,
+        });
+        search.genres = (genres ?? []).join('');
+        let request;
+        if (query.includedTags?.length == 0) {
+            request = createRequestObject({
+                url: encodeURI(`${TuMangaOnline_Base}/library?title=${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&page=${page}&_pg=1`),
+                method: 'GET',
             });
+        }
+        else {
+            request = createRequestObject({
+                url: encodeURI(`${TuMangaOnline_Base}/library?title=${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}${getNSFWOption ? '' : '&exclude_genders%5B%5D=6&exclude_genders%5B%5D=17&exclude_genders%5B%5D=18&exclude_genders%5B%5D=19&erotic=false'}&page=${page}&_pg=1&type=${search.types}&demography=${search.demography}&status=${search.status}&translation_status=${search.translationstatus}&${search.filter}&order_item=${search.sorting}&order_dir=${search.sortby}&webcomic=${search.webcomic}&yonkoma=${search.yonkoma}&amateur=${search.amateur}&erotic=${search.erotic}${search.genres}`),
+                method: 'GET',
+            });
+        }
+        const data = await this.requestManager.schedule(request, 2);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const manga = this.parser.parseHomeSection($, this);
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata,
         });
     }
     parseStatus(str) {
@@ -750,13 +719,12 @@ class Parser {
         });
     }
     parseHomeSection($, source) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const items = [];
         for (const obj of $('div.element').toArray()) {
             const info = $('div.element > a', obj);
-            const id = (_c = this.idCleaner((_b = (_a = info.attr('href')) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : '', source)) !== null && _c !== void 0 ? _c : '';
-            const title = (_h = (_d = this.decodeHTMLEntity($('h4.text-truncate', info).text().trim())) !== null && _d !== void 0 ? _d : this.decodeHTMLEntity((_g = (_f = (_e = $('h4.text-truncate', info)) === null || _e === void 0 ? void 0 : _e.attr('title')) === null || _f === void 0 ? void 0 : _f.trim()) !== null && _g !== void 0 ? _g : '')) !== null && _h !== void 0 ? _h : '';
-            const image = (_j = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')')) !== null && _j !== void 0 ? _j : '';
+            const id = this.idCleaner(info.attr('href')?.trim() ?? '', source) ?? '';
+            const title = this.decodeHTMLEntity($('h4.text-truncate', info).text().trim()) ?? this.decodeHTMLEntity($('h4.text-truncate', info)?.attr('title')?.trim() ?? '') ?? '';
+            const image = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')') ?? '';
             if (!id || !title)
                 continue;
             items.push(createMangaTile({
@@ -768,10 +736,9 @@ class Parser {
         return items;
     }
     parseChapterDetails($, mangaId, chapterId) {
-        var _a, _b;
         const pages = [];
         for (const obj of $('div.viewer-container img').toArray()) {
-            const page = (_b = (_a = $(obj).attr('data-src')) !== null && _a !== void 0 ? _a : $(obj).attr('src')) !== null && _b !== void 0 ? _b : '';
+            const page = $(obj).attr('data-src') ?? $(obj).attr('src') ?? '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`);
             }
@@ -785,15 +752,14 @@ class Parser {
         });
     }
     parseChapters($, mangaId, source) {
-        var _a, _b, _c, _d, _e, _f;
         const chapters = [];
         const ChapterNumRegex = /capítulo ([\d.]+)?|capitulo ([\d.]+)?/i;
         if ($('div.chapters').contents().length == 0) {
             for (const obj of $('div.chapter-list-element > ul.list-group li.list-group-item').toArray()) {
-                const id = this.idCleaner((_a = $('div.row > .text-right > a', obj).attr('href')) !== null && _a !== void 0 ? _a : '', source);
+                const id = this.idCleaner($('div.row > .text-right > a', obj).attr('href') ?? '', source);
                 const name = 'One Shot';
-                const scanlator = (_b = $('div.col-md-6.text-truncate', obj).text().trim()) !== null && _b !== void 0 ? _b : '';
-                const date_upload = (_c = $('span.badge.badge-primary.p-2', obj).first().text()) !== null && _c !== void 0 ? _c : '';
+                const scanlator = $('div.col-md-6.text-truncate', obj).text().trim() ?? '';
+                const date_upload = $('span.badge.badge-primary.p-2', obj).first().text() ?? '';
                 if (typeof id === 'undefined') {
                     throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`);
                 }
@@ -817,9 +783,9 @@ class Parser {
                 const name = $('div.col-10.text-truncate', obj).text().trim();
                 const scanelement = $('ul.chapter-list > li', obj).toArray();
                 for (const allchaps of scanelement) {
-                    const id = this.idCleaner((_d = $('div.row > .text-right > a', allchaps).attr('href')) !== null && _d !== void 0 ? _d : '', source);
-                    const scanlator = (_e = $('div.col-md-6.text-truncate', allchaps).text().trim()) !== null && _e !== void 0 ? _e : '';
-                    const date_upload = (_f = $('span.badge.badge-primary.p-2', allchaps).first().text()) !== null && _f !== void 0 ? _f : '';
+                    const id = this.idCleaner($('div.row > .text-right > a', allchaps).attr('href') ?? '', source);
+                    const scanlator = $('div.col-md-6.text-truncate', allchaps).text().trim() ?? '';
+                    const date_upload = $('span.badge.badge-primary.p-2', allchaps).first().text() ?? '';
                     if (typeof id === 'undefined') {
                         throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`);
                     }
@@ -827,7 +793,7 @@ class Parser {
                         id: id,
                         mangaId: mangaId,
                         name: `${name} \nBy ${scanlator}`,
-                        chapNum: chapNum !== null && chapNum !== void 0 ? chapNum : 0,
+                        chapNum: chapNum ?? 0,
                         time: new Date(date_upload),
                         langCode: paperback_extensions_common_1.LanguageCode.SPANISH,
                     }));
@@ -837,26 +803,25 @@ class Parser {
         return chapters;
     }
     parseMangaDetails($, mangaId, source) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         const infotitle = $('h1.element-title').first();
         infotitle.find('small').remove();
-        const title = (_a = infotitle.text().trim()) !== null && _a !== void 0 ? _a : '';
-        const title2 = (_b = this.decodeHTMLEntity($('h2.element-subtitle').first().text().trim())) !== null && _b !== void 0 ? _b : '';
-        const image = (_c = $('.book-thumbnail').attr('src')) !== null && _c !== void 0 ? _c : 'https://paperback.moe/icons/logo-alt.svg';
-        const desc = (_d = this.decodeHTMLEntity($('p.element-description').text().trim())) !== null && _d !== void 0 ? _d : '';
+        const title = infotitle.text().trim() ?? '';
+        const title2 = this.decodeHTMLEntity($('h2.element-subtitle').first().text().trim()) ?? '';
+        const image = $('.book-thumbnail').attr('src') ?? 'https://paperback.moe/icons/logo-alt.svg';
+        const desc = this.decodeHTMLEntity($('p.element-description').text().trim()) ?? '';
         const infoAuth = $('h5.card-title');
-        const author = (_e = this.decodeHTMLEntity(infoAuth.first().text().trim().substringAfterFirst(', '))) !== null && _e !== void 0 ? _e : '';
-        const artist = (_f = this.decodeHTMLEntity(infoAuth.last().text().trim().substringAfterFirst(', '))) !== null && _f !== void 0 ? _f : '';
-        const status = (_g = this.decodeHTMLEntity($('span.book-status').text().trim())) !== null && _g !== void 0 ? _g : '';
+        const author = this.decodeHTMLEntity(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? '';
+        const artist = this.decodeHTMLEntity(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? '';
+        const status = this.decodeHTMLEntity($('span.book-status').text().trim()) ?? '';
         const arrayTags = [];
         const genreregex = /genders.*?=(\d+)?/i;
         for (const obj of $('a.py-2').toArray()) {
-            const link = (_j = (_h = $(obj)) === null || _h === void 0 ? void 0 : _h.attr('href')) !== null && _j !== void 0 ? _j : '';
+            const link = $(obj)?.attr('href') ?? '';
             const idRegex = link.match(genreregex);
             let id;
             if (idRegex && idRegex[1])
                 id = idRegex[1];
-            const label = (_k = $(obj).text()) !== null && _k !== void 0 ? _k : '';
+            const label = $(obj).text() ?? '';
             if (!id || !label)
                 continue;
             arrayTags.push({
@@ -877,7 +842,6 @@ class Parser {
         });
     }
     parseTags($, isNSFW) {
-        var _a;
         const arrayTags = [];
         const arrayTags2 = [
             {
@@ -1035,7 +999,7 @@ class Parser {
         isNSFW ? NSFWids.push() : NSFWids.push('6', '17', '18', '19');
         for (const tag of $('#books-genders .col-auto .custom-control').toArray()) {
             const label = $('label', tag).text().trim();
-            const id = (_a = $('input', tag).attr('value')) !== null && _a !== void 0 ? _a : '0';
+            const id = $('input', tag).attr('value') ?? '0';
             if (!NSFWids.includes(id)) {
                 if (!id || !label)
                     continue;
@@ -1084,21 +1048,11 @@ String.prototype.substringBeforeFirst = function (substring) {
 
 },{"paperback-extensions-common":5}],50:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentSettings = exports.getNSFW = void 0;
-const getNSFW = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    return (_a = (yield stateManager.retrieve('nsfw'))) !== null && _a !== void 0 ? _a : false;
-});
+const getNSFW = async (stateManager) => {
+    return await stateManager.retrieve('nsfw') ?? false;
+};
 exports.getNSFW = getNSFW;
 const contentSettings = (stateManager) => {
     return createNavigationButton({
@@ -1122,7 +1076,7 @@ const contentSettings = (stateManager) => {
                         rows: () => {
                             return Promise.all([
                                 (0, exports.getNSFW)(stateManager),
-                            ]).then((values) => __awaiter(void 0, void 0, void 0, function* () {
+                            ]).then(async (values) => {
                                 return [
                                     createSwitch({
                                         id: 'nsfw',
@@ -1130,7 +1084,7 @@ const contentSettings = (stateManager) => {
                                         value: values[0]
                                     })
                                 ];
-                            }));
+                            });
                         }
                     })
                 ]);

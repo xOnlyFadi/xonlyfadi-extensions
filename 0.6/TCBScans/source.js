@@ -377,15 +377,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TCBScans = exports.TCBScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -410,71 +401,63 @@ class TCBScans extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'referer': TCBScans_Base
-                    });
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            'referer': TCBScans_Base
+                        }
+                    };
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
     }
     getMangaShareUrl(mangaId) {
         return `${TCBScans_Base}/mangas/${mangaId}`;
     }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TCBScans_Base}/projects`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseHomeSections($, sectionCallback, this);
+    async getHomePageSections(sectionCallback) {
+        const options = createRequestObject({
+            url: `${TCBScans_Base}/projects`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseHomeSections($, sectionCallback, this);
     }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TCBScans_Base}/mangas/${mangaId}`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseMangaDetails($, mangaId, this);
+    async getMangaDetails(mangaId) {
+        const options = createRequestObject({
+            url: `${TCBScans_Base}/mangas/${mangaId}`,
+            method: 'GET',
         });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseMangaDetails($, mangaId, this);
     }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TCBScans_Base}/mangas/${mangaId}`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapters($, mangaId, this);
+    async getChapters(mangaId) {
+        const options = createRequestObject({
+            url: `${TCBScans_Base}/mangas/${mangaId}`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapters($, mangaId, this);
     }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = createRequestObject({
-                url: `${TCBScans_Base}${chapterId}`,
-                method: 'GET'
-            });
-            const response = yield this.requestManager.schedule(options, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapterDetails($, mangaId, chapterId);
+    async getChapterDetails(mangaId, chapterId) {
+        const options = createRequestObject({
+            url: `${TCBScans_Base}${chapterId}`,
+            method: 'GET'
         });
+        const response = await this.requestManager.schedule(options, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapterDetails($, mangaId, chapterId);
     }
-    getSearchResults(_query, _metadata) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return createPagedResults({
-                results: [],
-            });
+    async getSearchResults(_query, _metadata) {
+        return createPagedResults({
+            results: [],
         });
     }
 }
@@ -482,15 +465,6 @@ exports.TCBScans = TCBScans;
 
 },{"./TCBScansParser":49,"paperback-extensions-common":5}],49:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -503,31 +477,27 @@ class Parser {
             return String.fromCharCode(dec);
         });
     }
-    parseHomeSections($, sectionCallback, _source) {
-        var _a, _b, _c, _d;
-        return __awaiter(this, void 0, void 0, function* () {
-            const section1 = createHomeSection({ id: '1', title: 'Projects', view_more: false });
-            const projects = [];
-            const arrManga = $('.bg-card.border.border-border.rounded.p-3.mb-3').toArray();
-            for (const obj of arrManga) {
-                const id = (_b = (_a = $('a.mb-3.text-white.text-lg.font-bold', obj).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/mangas\//gi, '')) !== null && _b !== void 0 ? _b : '';
-                const title = (_c = $('a.mb-3.text-white.text-lg.font-bold', obj).text().trim()) !== null && _c !== void 0 ? _c : '';
-                const image = (_d = $('.w-24.h-24.object-cover.rounded-lg', obj).attr('src')) !== null && _d !== void 0 ? _d : '';
-                projects.push(createMangaTile({
-                    id,
-                    image,
-                    title: createIconText({ text: this.decodeHTMLEntity(title) }),
-                }));
-            }
-            section1.items = projects;
-            sectionCallback(section1);
-        });
+    async parseHomeSections($, sectionCallback, _source) {
+        const section1 = createHomeSection({ id: '1', title: 'Projects', view_more: false });
+        const projects = [];
+        const arrManga = $('.bg-card.border.border-border.rounded.p-3.mb-3').toArray();
+        for (const obj of arrManga) {
+            const id = $('a.mb-3.text-white.text-lg.font-bold', obj).attr('href')?.replace(/\/mangas\//gi, '') ?? '';
+            const title = $('a.mb-3.text-white.text-lg.font-bold', obj).text().trim() ?? '';
+            const image = $('.w-24.h-24.object-cover.rounded-lg', obj).attr('src') ?? '';
+            projects.push(createMangaTile({
+                id,
+                image,
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+            }));
+        }
+        section1.items = projects;
+        sectionCallback(section1);
     }
     parseChapterDetails($, mangaId, chapterId) {
-        var _a;
         const pages = [];
         for (const obj of $('.flex.flex-col.items-center.justify-center picture img').toArray()) {
-            const page = (_a = $(obj).attr('src')) !== null && _a !== void 0 ? _a : '';
+            const page = $(obj).attr('src') ?? '';
             if (!page) {
                 throw new Error(`Could not parse page for ${chapterId}`);
             }
@@ -541,13 +511,12 @@ class Parser {
         });
     }
     parseChapters($, mangaId, _source) {
-        var _a, _b;
         const chapters = [];
         let lastNumber = null;
         const arrChapters = $('.block.border.border-border.bg-card.mb-3.p-3.rounded').toArray();
         for (const obj of arrChapters) {
-            const url = (_a = $(obj).attr('href')) !== null && _a !== void 0 ? _a : '';
-            const name = (_b = $('.text-lg.font-bold:not(.flex)', obj).text().trim()) !== null && _b !== void 0 ? _b : 'No Chpater Name';
+            const url = $(obj).attr('href') ?? '';
+            const name = $('.text-lg.font-bold:not(.flex)', obj).text().trim() ?? 'No Chpater Name';
             const match = name.match(this.chapterTitleRegex);
             let chapNum;
             if (match && !isNaN(Number(match[1]))) {
@@ -566,18 +535,17 @@ class Parser {
                 id: encodeURI(url),
                 mangaId: mangaId,
                 name: name,
-                chapNum: chapNum !== null && chapNum !== void 0 ? chapNum : 0,
+                chapNum: chapNum ?? 0,
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH
             }));
         }
         return chapters;
     }
     parseMangaDetails($, mangaId, _source) {
-        var _a, _b, _c;
         const descElement = $('.order-1.bg-card.border.border-border.rounded.py-3');
-        const title = (_a = $('.my-3.font-bold.text-3xl', descElement).first().text().trim()) !== null && _a !== void 0 ? _a : '';
-        const image = (_b = $('.flex.items-center.justify-center img', descElement).attr('src')) !== null && _b !== void 0 ? _b : 'https://paperback.moe/icons/logo-alt.svg';
-        let desc = (_c = $('.leading-6.my-3', descElement).text().trim()) !== null && _c !== void 0 ? _c : '';
+        const title = $('.my-3.font-bold.text-3xl', descElement).first().text().trim() ?? '';
+        const image = $('.flex.items-center.justify-center img', descElement).attr('src') ?? 'https://paperback.moe/icons/logo-alt.svg';
+        let desc = $('.leading-6.my-3', descElement).text().trim() ?? '';
         if (desc == '')
             desc = 'No Decscription provided by the source (TCB Scans)';
         return createManga({

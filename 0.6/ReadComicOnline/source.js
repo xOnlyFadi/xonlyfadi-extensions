@@ -2397,15 +2397,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":9,"./ChapterDetails":10,"./Constants":11,"./DynamicUI":27,"./HomeSection":28,"./Languages":29,"./Manga":30,"./MangaTile":31,"./MangaUpdate":32,"./PagedResults":33,"./RawData":34,"./RequestHeaders":35,"./RequestInterceptor":36,"./RequestManager":37,"./RequestObject":38,"./ResponseObject":39,"./SearchField":40,"./SearchRequest":41,"./SourceInfo":42,"./SourceManga":43,"./SourceStateManager":44,"./SourceTag":45,"./TagSection":46,"./TrackedManga":47,"./TrackedMangaChapterReadAction":48,"./TrackerActionQueue":49}],51:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadComicOnline = exports.ReadComicOnlineInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -2434,145 +2425,132 @@ class ReadComicOnline extends paperback_extensions_common_1.Source {
             requestsPerSecond: 2,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
-                        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-                        'referer': RCO_DOMAIN
-                    });
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+                            'referer': RCO_DOMAIN
+                        }
+                    };
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
     }
     getMangaShareUrl(mangaId) { return `${RCO_DOMAIN}/Comic/${mangaId}`; }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${RCO_DOMAIN}/Comic/`,
-                method: 'GET',
-                param: mangaId
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            return (0, ReadComicOnlineParser_1.parseMangaDetails)($, mangaId);
+    async getMangaDetails(mangaId) {
+        const request = createRequestObject({
+            url: `${RCO_DOMAIN}/Comic/`,
+            method: 'GET',
+            param: mangaId
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return (0, ReadComicOnlineParser_1.parseMangaDetails)($, mangaId);
+    }
+    async getChapters(mangaId) {
+        const request = createRequestObject({
+            url: `${RCO_DOMAIN}/Comic/`,
+            method: 'GET',
+            param: mangaId,
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return (0, ReadComicOnlineParser_1.parseChapters)($, mangaId);
+    }
+    async getChapterDetails(mangaId, chapterId) {
+        const request = createRequestObject({
+            url: `${RCO_DOMAIN}/Comic/${mangaId}/${chapterId}`,
+            method: 'GET',
+            param: '?readType=1&quality=hq'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        return (0, ReadComicOnlineParser_1.parseChapterDetails)(response.data, mangaId, chapterId);
+    }
+    async getTags() {
+        const request = createRequestObject({
+            url: `${RCO_DOMAIN}/ComicList`,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return (0, ReadComicOnlineParser_1.parseTags)($);
+    }
+    async getHomePageSections(sectionCallback) {
+        const request = createRequestObject({
+            url: RCO_DOMAIN,
+            method: 'GET',
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        (0, ReadComicOnlineParser_1.parseHomeSections)($, sectionCallback);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        let param = '';
+        switch (homepageSectionId) {
+            case 'latest_comic':
+                param = `/LatestUpdate?page=${page}`;
+                break;
+            case 'new_comic':
+                param = `/Newest?page=${page}`;
+                break;
+            case 'popular_comic':
+                param = `/MostPopular?page=${page}`;
+                break;
+            default:
+                throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist');
+        }
+        const request = createRequestObject({
+            url: `${RCO_DOMAIN}/ComicList`,
+            method: 'GET',
+            param,
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const manga = (0, ReadComicOnlineParser_1.parseViewMore)($, this.cheerio);
+        metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
         });
     }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${RCO_DOMAIN}/Comic/`,
+    async getSearchResults(query, metadata) {
+        const page = metadata?.page ?? 1;
+        let request;
+        //Regular search
+        if (query.title) {
+            request = createRequestObject({
+                url: `${RCO_DOMAIN}/Search/Comic`,
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-type': 'application/x-www-form-urlencoded',
+                },
+                data: `keyword=${encodeURI(query.title ?? '')}`
+            });
+            //Tag Search
+        }
+        else {
+            request = createRequestObject({
+                url: `${RCO_DOMAIN}/Genre/`,
                 method: 'GET',
-                param: mangaId,
+                param: `${query?.includedTags?.map((x) => x.id)[0]}?page=${page}`
             });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            return (0, ReadComicOnlineParser_1.parseChapters)($, mangaId);
+        }
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const manga = (0, ReadComicOnlineParser_1.parseSearch)($, this.cheerio);
+        metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
+        return createPagedResults({
+            results: manga,
+            metadata
         });
-    }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${RCO_DOMAIN}/Comic/${mangaId}/${chapterId}`,
-                method: 'GET',
-                param: '?readType=1&quality=hq'
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            return (0, ReadComicOnlineParser_1.parseChapterDetails)(response.data, mangaId, chapterId);
-        });
-    }
-    getTags() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${RCO_DOMAIN}/ComicList`,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            return (0, ReadComicOnlineParser_1.parseTags)($);
-        });
-    }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: RCO_DOMAIN,
-                method: 'GET',
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            (0, ReadComicOnlineParser_1.parseHomeSections)($, sectionCallback);
-        });
-    }
-    getViewMoreItems(homepageSectionId, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            let param = '';
-            switch (homepageSectionId) {
-                case 'latest_comic':
-                    param = `/LatestUpdate?page=${page}`;
-                    break;
-                case 'new_comic':
-                    param = `/Newest?page=${page}`;
-                    break;
-                case 'popular_comic':
-                    param = `/MostPopular?page=${page}`;
-                    break;
-                default:
-                    throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist');
-            }
-            const request = createRequestObject({
-                url: `${RCO_DOMAIN}/ComicList`,
-                method: 'GET',
-                param,
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const manga = (0, ReadComicOnlineParser_1.parseViewMore)($, this.cheerio);
-            metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
-        });
-    }
-    getSearchResults(query, metadata) {
-        var _a, _b, _c;
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            let request;
-            //Regular search
-            if (query.title) {
-                request = createRequestObject({
-                    url: `${RCO_DOMAIN}/Search/Comic`,
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-type': 'application/x-www-form-urlencoded',
-                    },
-                    data: `keyword=${encodeURI((_b = query.title) !== null && _b !== void 0 ? _b : '')}`
-                });
-                //Tag Search
-            }
-            else {
-                request = createRequestObject({
-                    url: `${RCO_DOMAIN}/Genre/`,
-                    method: 'GET',
-                    param: `${(_c = query === null || query === void 0 ? void 0 : query.includedTags) === null || _c === void 0 ? void 0 : _c.map((x) => x.id)[0]}?page=${page}`
-                });
-            }
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const manga = (0, ReadComicOnlineParser_1.parseSearch)($, this.cheerio);
-            metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
-            return createPagedResults({
-                results: manga,
-                metadata
-            });
-        });
+        //Genre search, no advanced search since it requires reCaptcha
     }
     getCloudflareBypassRequest() {
         return createRequestObject({
@@ -2594,20 +2572,19 @@ exports.isLastPage = exports.parseSearch = exports.parseTags = exports.parseView
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 const parseMangaDetails = ($, mangaId) => {
-    var _a, _b, _c, _d, _e, _f;
     const contentSection = $('div.barContent').first();
     const titles = [];
     titles.push(decodeHTMLEntity($('a.bigChar').text().trim()));
-    let image = (_a = $('img', $('.rightBox')).attr('src')) !== null && _a !== void 0 ? _a : 'https://i.imgur.com/GYUxEX8.png';
+    let image = $('img', $('.rightBox')).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
     image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-    const author = (_b = $('a', $('span:contains(Writer)', contentSection).parent()).text().trim()) !== null && _b !== void 0 ? _b : '';
-    const artist = (_c = $('a', $('span:contains(Artist)', contentSection).parent()).text().trim()) !== null && _c !== void 0 ? _c : '';
-    const description = decodeHTMLEntity((_d = $('span:contains(Summary)', contentSection).parent().next().text().trim()) !== null && _d !== void 0 ? _d : '');
+    const author = $('a', $('span:contains(Writer)', contentSection).parent()).text().trim() ?? '';
+    const artist = $('a', $('span:contains(Artist)', contentSection).parent()).text().trim() ?? '';
+    const description = decodeHTMLEntity($('span:contains(Summary)', contentSection).parent().next().text().trim() ?? '');
     let hentai = false;
     const arrayTags = [];
     for (const tag of $('a', $('span:contains(Genres)', contentSection).parent()).toArray()) {
         const label = $(tag).text().trim();
-        const id = (_f = (_e = $(tag).attr('href')) === null || _e === void 0 ? void 0 : _e.replace(/\/genre\//i, '')) !== null && _f !== void 0 ? _f : '';
+        const id = $(tag).attr('href')?.replace(/\/genre\//i, '') ?? '';
         if (!id || !label)
             continue;
         if (['ADULT', 'SMUT', 'MATURE'].includes(label.toUpperCase()))
@@ -2633,11 +2610,10 @@ const parseMangaDetails = ($, mangaId) => {
 };
 exports.parseMangaDetails = parseMangaDetails;
 const parseChapters = ($, mangaId) => {
-    var _a, _b, _c, _d;
     const chapters = [];
     for (const chapter of $('tr', $('.listing').first()).toArray()) {
-        const title = (_a = $('a', chapter).first().text().trim()) !== null && _a !== void 0 ? _a : '';
-        const chapterId = (_d = (_c = (_b = $('a', chapter).attr('href')) === null || _b === void 0 ? void 0 : _b.split('/').pop()) === null || _c === void 0 ? void 0 : _c.split('?').shift()) !== null && _d !== void 0 ? _d : '';
+        const title = $('a', chapter).first().text().trim() ?? '';
+        const chapterId = $('a', chapter).attr('href')?.split('/').pop()?.split('?').shift() ?? '';
         if (!chapterId)
             continue;
         const chapNumRegex = chapterId.match(/(\d+\.?\d?)+/);
@@ -2689,7 +2665,6 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
 };
 exports.parseChapterDetails = parseChapterDetails;
 const parseHomeSections = ($, sectionCallback) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1;
     const latestSection = createHomeSection({ id: 'latest_comic', title: 'Latest Updated Comics', view_more: true });
     const newSection = createHomeSection({ id: 'new_comic', title: 'New Comics', view_more: true });
     const popularSection = createHomeSection({ id: 'popular_comic', title: 'Most Popular Comics', view_more: true });
@@ -2699,13 +2674,13 @@ const parseHomeSections = ($, sectionCallback) => {
     //Latest Updated Comic
     const latestSection_Array = [];
     for (const comic of $('a', $('div.items', 'div.bigBarContainer')).toArray()) {
-        let image = (_a = $('img', comic).first().attr('src')) !== null && _a !== void 0 ? _a : '';
+        let image = $('img', comic).first().attr('src') ?? '';
         if (image == '')
-            image = (_b = $('img', comic).first().attr('srctemp')) !== null && _b !== void 0 ? _b : '';
+            image = $('img', comic).first().attr('srctemp') ?? '';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_c = $(comic).contents().not('span').text().trim()) !== null && _c !== void 0 ? _c : '';
-        const id = (_e = (_d = $(comic).attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/comic\//i, '')) !== null && _e !== void 0 ? _e : '';
-        const subtitle = (_f = $(comic).attr('title')) !== null && _f !== void 0 ? _f : '';
+        const title = $(comic).contents().not('span').text().trim() ?? '';
+        const id = $(comic).attr('href')?.replace(/comic\//i, '') ?? '';
+        const subtitle = $(comic).attr('title') ?? '';
         if (!id || !title)
             continue;
         latestSection_Array.push(createMangaTile({
@@ -2720,10 +2695,10 @@ const parseHomeSections = ($, sectionCallback) => {
     //New Comic
     const newSection_Array = [];
     for (const comic of $('div', 'div#tab-newest').toArray()) {
-        let image = (_g = $('img', comic).first().attr('src')) !== null && _g !== void 0 ? _g : 'https://i.imgur.com/GYUxEX8.png';
+        let image = $('img', comic).first().attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_h = $('a.title', comic).last().text().trim()) !== null && _h !== void 0 ? _h : '';
-        const id = (_k = (_j = $('a', comic).attr('href')) === null || _j === void 0 ? void 0 : _j.replace(/comic\//i, '')) !== null && _k !== void 0 ? _k : '';
+        const title = $('a.title', comic).last().text().trim() ?? '';
+        const id = $('a', comic).attr('href')?.replace(/comic\//i, '') ?? '';
         const subtitle = $('span:contains(Latest)', comic).next().text().trim();
         if (!id || !title)
             continue;
@@ -2739,10 +2714,10 @@ const parseHomeSections = ($, sectionCallback) => {
     //Most Popular
     const popularSection_Array = [];
     for (const comic of $('div', 'div#tab-mostview').toArray()) {
-        let image = (_l = $('img', comic).first().attr('src')) !== null && _l !== void 0 ? _l : 'https://i.imgur.com/GYUxEX8.png';
+        let image = $('img', comic).first().attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_m = $('a.title', comic).last().text().trim()) !== null && _m !== void 0 ? _m : '';
-        const id = (_p = (_o = $('a', comic).attr('href')) === null || _o === void 0 ? void 0 : _o.replace(/comic\//i, '')) !== null && _p !== void 0 ? _p : '';
+        const title = $('a.title', comic).last().text().trim() ?? '';
+        const id = $('a', comic).attr('href')?.replace(/comic\//i, '') ?? '';
         const subtitle = $('span:contains(Latest)', comic).next().text().trim();
         if (!id || !title)
             continue;
@@ -2758,10 +2733,10 @@ const parseHomeSections = ($, sectionCallback) => {
     //Top Day
     const TopDaySection_Array = [];
     for (const comic of $('div', 'div#tab-top-day').toArray()) {
-        let image = (_q = $('img', comic).first().attr('src')) !== null && _q !== void 0 ? _q : 'https://i.imgur.com/GYUxEX8.png';
+        let image = $('img', comic).first().attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_r = $('a.title', comic).last().text().trim()) !== null && _r !== void 0 ? _r : '';
-        const id = (_t = (_s = $('a', comic).attr('href')) === null || _s === void 0 ? void 0 : _s.replace(/comic\//i, '')) !== null && _t !== void 0 ? _t : '';
+        const title = $('a.title', comic).last().text().trim() ?? '';
+        const id = $('a', comic).attr('href')?.replace(/comic\//i, '') ?? '';
         const subtitle = $('span:contains(Latest)', comic).next().text().trim();
         if (!id || !title)
             continue;
@@ -2777,10 +2752,10 @@ const parseHomeSections = ($, sectionCallback) => {
     //Top Week
     const TopWeekSection_Array = [];
     for (const comic of $('div', 'div#tab-top-week').toArray()) {
-        let image = (_u = $('img', comic).first().attr('src')) !== null && _u !== void 0 ? _u : 'https://i.imgur.com/GYUxEX8.png';
+        let image = $('img', comic).first().attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_v = $('a.title', comic).last().text().trim()) !== null && _v !== void 0 ? _v : '';
-        const id = (_x = (_w = $('a', comic).attr('href')) === null || _w === void 0 ? void 0 : _w.replace(/comic\//i, '')) !== null && _x !== void 0 ? _x : '';
+        const title = $('a.title', comic).last().text().trim() ?? '';
+        const id = $('a', comic).attr('href')?.replace(/comic\//i, '') ?? '';
         const subtitle = $('span:contains(Latest)', comic).next().text().trim();
         if (!id || !title)
             continue;
@@ -2796,10 +2771,10 @@ const parseHomeSections = ($, sectionCallback) => {
     //Top Month
     const TopMonthSection_Array = [];
     for (const comic of $('div', 'div#tab-top-month').toArray()) {
-        let image = (_y = $('img', comic).first().attr('src')) !== null && _y !== void 0 ? _y : 'https://i.imgur.com/GYUxEX8.png';
+        let image = $('img', comic).first().attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
-        const title = (_z = $('a.title', comic).last().text().trim()) !== null && _z !== void 0 ? _z : '';
-        const id = (_1 = (_0 = $('a', comic).attr('href')) === null || _0 === void 0 ? void 0 : _0.replace(/comic\//i, '')) !== null && _1 !== void 0 ? _1 : '';
+        const title = $('a.title', comic).last().text().trim() ?? '';
+        const id = $('a', comic).attr('href')?.replace(/comic\//i, '') ?? '';
         const subtitle = $('span:contains(Latest)', comic).next().text().trim();
         if (!id || !title)
             continue;
@@ -2815,13 +2790,12 @@ const parseHomeSections = ($, sectionCallback) => {
 };
 exports.parseHomeSections = parseHomeSections;
 const parseViewMore = ($, _cheerio) => {
-    var _a, _b, _c, _d, _e;
     const comics = [];
     const collectedIds = [];
     for (const item of $('.list-comic > .item > a:first-child').toArray()) {
-        const title = (_a = $(item).first().text().trim()) !== null && _a !== void 0 ? _a : '';
-        const id = (_d = (_c = (_b = $(item).attr('href')) === null || _b === void 0 ? void 0 : _b.split('/').pop()) === null || _c === void 0 ? void 0 : _c.split('?').shift()) !== null && _d !== void 0 ? _d : '';
-        let image = (_e = $('img', item).attr('src')) !== null && _e !== void 0 ? _e : 'https://i.imgur.com/GYUxEX8.png';
+        const title = $(item).first().text().trim() ?? '';
+        const id = $(item).attr('href')?.split('/').pop()?.split('?').shift() ?? '';
+        let image = $('img', item).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
         const subtitle = $('td', item).last().text().trim();
         if (!id || !title)
@@ -2840,12 +2814,11 @@ const parseViewMore = ($, _cheerio) => {
 };
 exports.parseViewMore = parseViewMore;
 const parseTags = ($) => {
-    var _a, _b;
     const arrayTags = [];
     const rightBox = $('div.barContent').get(1);
     for (const tag of $('a', rightBox).toArray()) {
         const label = $(tag).text().trim();
-        const id = (_b = (_a = $(tag).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/genre\//i, '')) !== null && _b !== void 0 ? _b : '';
+        const id = $(tag).attr('href')?.replace(/\/genre\//i, '') ?? '';
         if (!id || !label)
             continue;
         arrayTags.push({ id: id, label: label });
@@ -2855,7 +2828,6 @@ const parseTags = ($) => {
 };
 exports.parseTags = parseTags;
 const parseSearch = ($, _cheerio) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     const comics = [];
     const collectedIds = [];
     //Thanks Aurora!
@@ -2863,8 +2835,8 @@ const parseSearch = ($, _cheerio) => {
     //Parse direct comic result page
     if (directMatch.toLocaleLowerCase() == 'cover') {
         const title = $('a.bigChar').text().trim();
-        const id = (_b = ($('a'), (_a = $('.bigChar').attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/comic\//i, ''))) !== null && _b !== void 0 ? _b : '';
-        let image = (_c = $('img', $('.rightBox')).attr('src')) !== null && _c !== void 0 ? _c : 'https://i.imgur.com/GYUxEX8.png';
+        const id = ($('a'), $('.bigChar').attr('href')?.replace(/comic\//i, '')) ?? '';
+        let image = $('img', $('.rightBox')).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
         image = image.startsWith('/') ? RCO_DOMAIN + image : image;
         if (!id || !title)
             throw new Error(`Unable to parse title: ${title} or id: ${id}!`);
@@ -2877,9 +2849,9 @@ const parseSearch = ($, _cheerio) => {
     else {
         //Parse search results page
         for (const item of $('.list-comic > .item > a:first-child').toArray()) {
-            const title = (_d = $(item).first().text().trim()) !== null && _d !== void 0 ? _d : '';
-            const id = (_g = (_f = (_e = $(item).attr('href')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) === null || _f === void 0 ? void 0 : _f.split('?').shift()) !== null && _g !== void 0 ? _g : '';
-            let image = (_h = $('img', item).attr('src')) !== null && _h !== void 0 ? _h : 'https://i.imgur.com/GYUxEX8.png';
+            const title = $(item).first().text().trim() ?? '';
+            const id = $(item).attr('href')?.split('/').pop()?.split('?').shift() ?? '';
+            let image = $('img', item).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
             image = image.startsWith('/') ? RCO_DOMAIN + image : image;
             const subtitle = $('td', item).last().text().trim();
             if (!id || !title)
