@@ -31,20 +31,25 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
 
     const titles: string[] = []
     titles.push(comic.title)
-    for(const altTitles of comic.md_titles){
-        titles.push(altTitles.title)
+    if (comic.md_titles) {
+        for (const altTitles of comic.md_titles){
+            titles.push(altTitles.title)
+        }
     }
-
     const image = comic.cover_url
 
     const author = []
-    for(const authors of data.authors){
-        author.push(authors.name)
+    if (data.authors) {
+        for (const authors of data.authors){
+            author.push(authors.name)
+        }
     }
 
     const artist = []
-    for(const authors of data.artists){
-        artist.push(authors.name)
+    if (data.artists) {
+        for (const authors of data.artists){
+            artist.push(authors.name)
+        }
     }
 
     const description = convert(decodeHTML(comic.desc),{wordwrap: 130})
@@ -57,7 +62,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
         cn: 'Manhua',
     }
 
-    if(comic.country){
+    if (comic.country) {
         const id = `type.${comic.country}`
         const label = countryConvert[comic.country]
 
@@ -69,27 +74,30 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
         }
     }
 
-    for (const tag of data.genres) {
-        const label = tag.name
-        const id = `genre.${tag.slug}`
+    if (data.genres) {
+        for (const tag of data.genres) {
+            const label = tag.name
+            const id = `genre.${tag.slug}`
 
-        if (!id || !label) continue
+            if (!id || !label) continue
 
-        arrayTags.push({ id: id, label: label })
+            arrayTags.push({ id: id, label: label })
+        }
     }
-
+    
     const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })]
 
     let status = MangaStatus.UNKNOWN
-    switch(comic.status){
-        case 1:
-            status = MangaStatus.ONGOING
-            break
-        case 2:
-            status = MangaStatus.COMPLETED
-            break
+    if (comic.status) {
+        switch(comic.status){
+            case 1:
+                status = MangaStatus.ONGOING
+                break
+            case 2:
+                status = MangaStatus.COMPLETED
+                break
+        }
     }
-
     return createManga({
         id: mangaId,
         titles: titles,
@@ -105,13 +113,13 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
 
 export const parseChapters = (data: ChapterDetailsT, mangaId: string, chapSettings: {show_volume: boolean, show_title: boolean}): Chapter[] => {
     const chapters: Chapter[] = []
-    for(const chapter of data.chapters){
+    for (const chapter of data.chapters) {
         const chapNum = Number(chapter.chap)
         const volume = Number(chapter.vol)
 
         const groups = []
-        if(chapter.group_name){
-            for(const group of chapter.group_name){
+        if (chapter.group_name) {
+            for (const group of chapter.group_name){
                 groups.push(group)
             }
         }
@@ -135,7 +143,7 @@ export const parseChapters = (data: ChapterDetailsT, mangaId: string, chapSettin
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
 
-    for(const images of data.chapter.images){
+    for (const images of data.chapter.images) {
         pages.push(images.url)
     }
 
@@ -246,13 +254,13 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
 export const parseSearch = (data: SearchData[], usesSearch?: boolean): MangaTile[] => {
     const results: MangaTile[] = []
 
-    for (const manga of data){
+    for (const manga of data) {
         const id = usesSearch ? manga.slug : manga.md_comics.slug
         const title = usesSearch ? manga.title : manga.md_comics.title
         const image = usesSearch ? manga.cover_url : manga.md_comics.cover_url
         const subtitle = usesSearch ? manga.last_chapter : manga.md_comics.last_chapter
 
-        if(!id) continue
+        if (!id) continue
 
         results.push(createMangaTile({
             id,

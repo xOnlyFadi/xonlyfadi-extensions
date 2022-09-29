@@ -43,7 +43,7 @@ const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
 export const ComickInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'Comick',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -211,8 +211,8 @@ export class Comick extends Source {
         const HomeFilter = await getHomeFilter(this.stateManager)
         const Languages = await getLanguages(this.stateManager)
         let filterLang = []
-        for(const lang of Languages){
-            if(lang === 'all'){
+        for (const lang of Languages) {
+            if (lang === 'all') {
                 filterLang = []
                 break
             }
@@ -301,8 +301,8 @@ export class Comick extends Source {
         const HomeFilter = await getHomeFilter(this.stateManager)
         const Languages = await getLanguages(this.stateManager)
         let filterLang = []
-        for(const lang of Languages){
-            if(lang === 'all'){
+        for (const lang of Languages) {
+            if (lang === 'all') {
                 filterLang = []
                 break
             }
@@ -353,8 +353,8 @@ export class Comick extends Source {
         const HomeFilter = await getHomeFilter(this.stateManager)
         const Languages = await getLanguages(this.stateManager)
         let filterLang = []
-        for(const lang of Languages){
-            if(lang === 'all'){
+        for (const lang of Languages) {
+            if (lang === 'all') {
                 filterLang = []
                 break
             }
@@ -380,7 +380,7 @@ export class Comick extends Source {
             for (const chapter of data) {
                 const mangaId = chapter.md_comics.slug
                 const mangaTime = new Date(chapter.updated_at ?? '')
-                if(mangaTime <= time){
+                if (mangaTime <= time) {
                     if (ids.includes(mangaId) && !updatedManga.includes(mangaId)) {
                         mangaToUpdate.push(mangaId)
                         updatedManga.push(mangaId)
@@ -401,37 +401,37 @@ export class Comick extends Source {
     override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         const includedGenres = query.includedTags?.map((x: any) => {
-            if(x.id.includes('genre.')){
+            if (x.id.includes('genre.')) {
                 return `&genres=${x.id?.split('.')?.pop()}`
             }
             return undefined
         }).join('') ?? ''
         const excludedGenres = query.excludedTags?.map((x: any) => {
-            if(x.id.includes('genre.')){
+            if (x.id.includes('genre.')) {
                 return `&excludes=${x.id?.split('.')?.pop()}`
             }
             return undefined
         }).join('') ?? ''
         const Sort = query.includedTags?.map((x: any) => {
-            if(x.id.includes('sort.')){
+            if (x.id.includes('sort.')) {
                 return `&sort=${x.id?.split('.')?.pop()}`
             }
             return undefined
         })[0] ?? ''
         const CreatedAt = query.includedTags?.map((x: any) => {
-            if(x.id.includes('createdat.')){
+            if (x.id.includes('createdat.')) {
                 return `&time=${x.id?.split('.')?.pop()}`
             }
             return undefined
         })[0] ?? ''
         const Type = query.includedTags?.map((x: any) => {
-            if(x.id.includes('type.')){
+            if (x.id.includes('type.')) {
                 return `&country=${x.id?.split('.')?.pop()}`
             }
             return undefined
         }).join('') ?? ''
         const Demographic = query.includedTags?.map((x: any) => {
-            if(x.id.includes('demographic.')){
+            if (x.id.includes('demographic.')) {
                 return `&demographic=${x.id?.split('.')?.pop()}`
             }
             return undefined
