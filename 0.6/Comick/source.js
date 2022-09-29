@@ -9869,7 +9869,7 @@ const COMICK_DOMAIN = 'https://comick.fun';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComickInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'Comick',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -10496,17 +10496,23 @@ const parseMangaDetails = (data, mangaId) => {
     const comic = data.comic;
     const titles = [];
     titles.push(comic.title);
-    for (const altTitles of comic.md_titles) {
-        titles.push(altTitles.title);
+    if (comic.md_titles) {
+        for (const altTitles of comic.md_titles) {
+            titles.push(altTitles.title);
+        }
     }
     const image = comic.cover_url;
     const author = [];
-    for (const authors of data.authors) {
-        author.push(authors.name);
+    if (data.authors) {
+        for (const authors of data.authors) {
+            author.push(authors.name);
+        }
     }
     const artist = [];
-    for (const authors of data.artists) {
-        artist.push(authors.name);
+    if (data.artists) {
+        for (const authors of data.artists) {
+            artist.push(authors.name);
+        }
     }
     const description = (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic.desc), { wordwrap: 130 });
     const arrayTags = [];
@@ -10525,22 +10531,26 @@ const parseMangaDetails = (data, mangaId) => {
             });
         }
     }
-    for (const tag of data.genres) {
-        const label = tag.name;
-        const id = `genre.${tag.slug}`;
-        if (!id || !label)
-            continue;
-        arrayTags.push({ id: id, label: label });
+    if (data.genres) {
+        for (const tag of data.genres) {
+            const label = tag.name;
+            const id = `genre.${tag.slug}`;
+            if (!id || !label)
+                continue;
+            arrayTags.push({ id: id, label: label });
+        }
     }
     const tagSections = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })];
     let status = paperback_extensions_common_1.MangaStatus.UNKNOWN;
-    switch (comic.status) {
-        case 1:
-            status = paperback_extensions_common_1.MangaStatus.ONGOING;
-            break;
-        case 2:
-            status = paperback_extensions_common_1.MangaStatus.COMPLETED;
-            break;
+    if (comic.status) {
+        switch (comic.status) {
+            case 1:
+                status = paperback_extensions_common_1.MangaStatus.ONGOING;
+                break;
+            case 2:
+                status = paperback_extensions_common_1.MangaStatus.COMPLETED;
+                break;
+        }
     }
     return createManga({
         id: mangaId,
