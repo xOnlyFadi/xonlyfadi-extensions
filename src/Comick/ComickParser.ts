@@ -19,9 +19,9 @@ import {
     MangaDetails, 
     PageList,
     SearchData
-} from './ComickHelper'
+} from './ComicKHelper'
 
-import { CMLanguages } from './ComickHelper'
+import { CMLanguages } from './ComicKHelper'
 
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'

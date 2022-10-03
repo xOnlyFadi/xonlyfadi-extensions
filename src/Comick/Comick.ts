@@ -19,7 +19,7 @@ import {
     HomeSectionType,
     TagType
 } from 'paperback-extensions-common'
-import { SearchData } from './ComickHelper'
+import { SearchData } from './ComicKHelper'
 
 import {
     parseChapterDetails,
@@ -27,7 +27,7 @@ import {
     parseChapters,
     parseMangaDetails,
     parseSearch
-} from './ComickParser'
+} from './ComicKParser'
 import { 
     chapterSettings, 
     getHomeFilter, 
@@ -36,14 +36,14 @@ import {
     getShowChapterVolume, 
     languageSettings,
     resetSettings
-} from './ComickSettings'
+} from './ComicKSettings'
 
 const COMICK_DOMAIN = 'https://comick.fun'
 const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
-export const ComickInfo: SourceInfo = {
-    version: '1.0.1',
+export const ComicKInfo: SourceInfo = {
+    version: '1.0.2',
     name: 'Comick',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -63,7 +63,7 @@ export const ComickInfo: SourceInfo = {
     ]
 }
 
-export class Comick extends Source {
+export class ComicK extends Source {
     requestManager = createRequestManager({
         requestsPerSecond: 2,
         requestTimeout: 15000,

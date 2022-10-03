@@ -5,7 +5,7 @@ import {
     NavigationButton,
     SourceStateManager,
 } from 'paperback-extensions-common'
-import { CMLanguages } from './ComickHelper'
+import { CMLanguages } from './ComicKHelper'
 
 
 
