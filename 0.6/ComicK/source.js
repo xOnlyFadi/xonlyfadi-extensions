@@ -9869,8 +9869,8 @@ const COMICK_DOMAIN = 'https://comick.fun';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '1.0.2',
-    name: 'Comick',
+    version: '1.0.3',
+    name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
