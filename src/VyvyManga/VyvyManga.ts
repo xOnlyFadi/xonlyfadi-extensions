@@ -27,7 +27,7 @@ export const VyvyMangaInfo: SourceInfo = {
     description: 'Extension that pulls manga from VyvyMangas.com',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.5',
+    version: '1.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: ContentRating.ADULT,
