@@ -390,7 +390,7 @@ exports.VyvyMangaInfo = {
     description: 'Extension that pulls manga from VyvyMangas.com',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.5',
+    version: '1.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -673,35 +673,22 @@ class Parser {
     }
     parseChapters($, mangaId, _source) {
         const chapters = [];
-        let lastNumber = null;
         const arrChapters = $('.div-chapter .list-group a').toArray();
         for (const obj of arrChapters) {
             let url = $(obj).attr('href') ?? '';
             if (url.startsWith('/'))
                 url = 'https:' + url;
             const time = this.parseDate($('.text-right', obj).text().trim() ?? '');
-            $('p', obj).remove();
-            $('span', obj).remove();
-            const name = $(obj).first().text().trim() ?? 'No Chpater Name';
-            const match = name.match(this.chapterTitleRegex);
-            let chapNum;
-            if (match && !isNaN(Number(match[1]))) {
-                chapNum = Number(match[1]);
-            }
-            else {
-                if (lastNumber === null) {
-                    chapNum = 0;
-                }
-                else {
-                    chapNum = Number((lastNumber + 0.001).toFixed(3));
-                }
-            }
-            lastNumber = chapNum;
+            const name = this.decodeHTMLEntity($('span', obj).first().text().trim() ?? '');
+            const chapNumRegex = name.match(this.chapterTitleRegex);
+            let chapNum = 0;
+            if (chapNumRegex && chapNumRegex[1])
+                chapNum = Number(chapNumRegex[1]);
             chapters.push(createChapter({
                 id: url,
                 mangaId: mangaId,
                 name: name,
-                chapNum: chapNum ?? 0,
+                chapNum: !isNaN(chapNum) ? chapNum : NaN,
                 time: time,
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH
             }));
@@ -710,7 +697,7 @@ class Parser {
     }
     parseMangaDetails($, mangaId, _source) {
         const details = $('.col-lg-8');
-        const title = $('.col-md-7 .title', details).first().text().trim() ?? '';
+        const title = this.decodeHTMLEntity($('.col-md-7 .title', details).first().text().trim() ?? '');
         const image = this.getImageSrc($('.col-md-5 img', details));
         let desc = $('.summary .content').first().children().remove().end().text().replaceAll(/\s{2,}/g, ' ').trim() ?? '';
         if (desc == '')
@@ -769,12 +756,12 @@ class Parser {
             author,
             artist,
             tags: tagSections,
-            desc,
+            desc: this.decodeHTMLEntity(desc),
         });
     }
     parseTags($) {
         const genres = [];
-        for (const obj of $('.check-genre .col-lg-3').toArray()) {
+        for (const obj of $('#advance-search .check-genre .form-check').toArray()) {
             const label = $('label', obj).text().trim();
             const id = encodeURI($('input', obj).attr('value') ?? '');
             if (!label || !id)
