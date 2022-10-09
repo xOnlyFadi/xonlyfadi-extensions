@@ -383,7 +383,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const AEMangaParser_1 = require("./AEMangaParser");
 const AEManga_DOMAIN = 'https://manga.ae';
 exports.AEMangaInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'MangaAE',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -624,7 +624,7 @@ class AEManga extends paperback_extensions_common_1.Source {
     }
     CloudFlareError(status) {
         if (status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > MangaFreak and press Cloudflare Bypass or press the Cloud image on the right');
+            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > MangaAE and press Cloudflare Bypass or press the Cloud image on the right');
         }
     }
 }
