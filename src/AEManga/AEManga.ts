@@ -29,7 +29,7 @@ import {
 const AEManga_DOMAIN = 'https://manga.ae'
 
 export const AEMangaInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'MangaAE',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -312,7 +312,7 @@ export class AEManga extends Source {
     
     CloudFlareError(status: number): void {
         if(status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > MangaFreak and press Cloudflare Bypass or press the Cloud image on the right')
+            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > MangaAE and press Cloudflare Bypass or press the Cloud image on the right')
         }
     }
 }
