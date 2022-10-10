@@ -440,45 +440,45 @@ __exportStar(require("./compat/DyamicUI"), exports);
 },{"./base/index":7,"./compat/DyamicUI":13,"./generated/_exports":57}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AEManga = exports.AEMangaInfo = void 0;
+exports.VyvyManga = exports.VyvyMangaInfo = void 0;
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
-const AEMangaParser_1 = require("./AEMangaParser");
-const AEManga_DOMAIN = 'https://manga.ae';
-exports.AEMangaInfo = {
-    version: '1.0.0',
-    name: 'MangaAE',
-    icon: 'icon.png',
+const VyvyMangaParser_1 = require("./VyvyMangaParser");
+const VyvyManga_Base = 'https://vyvymanga.com';
+exports.VyvyMangaInfo = {
     author: 'xOnlyFadi',
+    description: 'Extension that pulls manga from VyvyMangas.com',
+    icon: 'icon.png',
+    name: 'VyvyManga',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls comics from manga.ae.',
-    contentRating: types_1.ContentRating.EVERYONE,
-    websiteBaseURL: AEManga_DOMAIN,
-    language: 'العربية',
+    websiteBaseURL: VyvyManga_Base,
+    contentRating: types_1.ContentRating.ADULT,
+    language: 'English',
     sourceTags: [
         {
-            text: 'Cloudflare',
+            text: '18+',
             type: types_1.BadgeColor.RED
-        },
-        {
-            text: 'العربية',
-            type: types_1.BadgeColor.GREY
         }
     ]
 };
-class AEManga extends types_1.Source {
+class VyvyManga extends types_1.Source {
     constructor() {
         super(...arguments);
-        this.baseUrl = AEManga_DOMAIN;
+        this.parser = new VyvyMangaParser_1.Parser();
+        this.baseUrl = VyvyManga_Base;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
-            requestTimeout: 15000,
+            requestsPerSecond: 3,
+            requestTimeout: 30000,
             interceptor: {
                 interceptRequest: async (request) => {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
-                            'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${AEManga_DOMAIN}/`
+                            'referer': `${VyvyManga_Base}/`,
+                            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36'
                         }
                     };
                     return request;
@@ -489,369 +489,404 @@ class AEManga extends types_1.Source {
             }
         });
     }
-    getMangaShareUrl(mangaId) { return `${AEManga_DOMAIN}/${mangaId}`; }
+    getMangaShareUrl(mangaId) {
+        return `${VyvyManga_Base}/manga/${mangaId}`;
+    }
     async getHomePageSections(sectionCallback) {
-        const sections = [
-            {
-                request: App.createRequest({
-                    url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:views`),
-                    method: 'GET',
-                }),
-                section: App.createHomeSection({
-                    id: 'views',
-                    title: 'المانجا المشهورة',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                }),
-            },
-            {
-                request: App.createRequest({
-                    url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:updated_at`),
-                    method: 'GET',
-                }),
-                section: App.createHomeSection({
-                    id: 'updated_at',
-                    title: 'المانجا المحدثه',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                }),
-            },
-            {
-                request: App.createRequest({
-                    url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:release_date`),
-                    method: 'GET',
-                }),
-                section: App.createHomeSection({
-                    id: 'release_date',
-                    title: 'تاريخ النشر',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                }),
-            },
-            {
-                request: App.createRequest({
-                    url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:chapter_count`),
-                    method: 'GET',
-                }),
-                section: App.createHomeSection({
-                    id: 'chapter_count',
-                    title: 'عدد الفصول',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                }),
-            },
-            {
-                request: App.createRequest({
-                    url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:status`),
-                    method: 'GET',
-                }),
-                section: App.createHomeSection({
-                    id: 'status',
-                    title: 'الحالة',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                }),
-            },
-        ];
-        const promises = [];
-        for (const section of sections) {
-            sectionCallback(section.section);
-            promises.push(this.requestManager.schedule(section.request, 1).then(response => {
-                this.CloudFlareError(response.status);
-                const $ = this.cheerio.load(response.data);
-                section.section.items = (0, AEMangaParser_1.parseSearch)($, this);
-                sectionCallback(section.section);
-            }));
-        }
-        await Promise.all(promises);
+        const options = App.createRequest({
+            url: `${VyvyManga_Base}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(options, 1);
+        this.CloudFlareError(response.status);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseHomeSections($, sectionCallback, this);
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
+        let param = '';
+        switch (homepageSectionId) {
+            case '1':
+                param = `/search?page=${page}`;
+                break;
+            case '2':
+                param = `/search?sort=updated_at&page=${page}`;
+                break;
+            case '3':
+                param = `/search?sort=created_at&page=${page}`;
+                break;
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
+        }
         const request = App.createRequest({
-            url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}|order:${homepageSectionId}`),
+            url: VyvyManga_Base,
             method: 'GET',
+            param
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        const manga = (0, AEMangaParser_1.parseSearch)($, this);
-        metadata = (0, AEMangaParser_1.NextPage)($) ? { page: page + 1 } : undefined;
-        return App.createPagedResults({
-            results: manga,
-            metadata
-        });
-    }
-    async getSearchResults(query, metadata) {
-        const page = metadata?.page ?? 1;
-        const Genres = [];
-        const Order = [];
-        const Sort = [];
-        query.includedTags?.map((x) => {
-            if (x.id.includes('genres.')) {
-                Genres.push(`|tag:${x.id?.split('.')?.pop()}`);
-            }
-            if (x.id.includes('order.')) {
-                Order.push(`|order:${x.id?.split('.')?.pop()}`);
-            }
-            if (x.id.includes('sort.')) {
-                Sort.push(`|arrange:${x.id?.split('.')?.pop()}`);
-            }
-        });
-        let request;
-        if (query.title) {
-            request = App.createRequest({
-                url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}|search:${query.title.replace(/ /g, '%20')}${Order.length !== 0 ? Order[0] : ''}${Sort.length !== 0 ? Sort[0] : ''}`),
-                method: 'GET',
-            });
-        }
-        else {
-            request = App.createRequest({
-                url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}${Genres.length !== 0 ? Genres[0] : ''}${Order.length !== 0 ? Order[0] : ''}${Sort.length !== 0 ? Sort[0] : ''}`),
-                method: 'GET',
-            });
-        }
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        const manga = (0, AEMangaParser_1.parseSearch)($, this);
-        metadata = (0, AEMangaParser_1.NextPage)($) ? { page: page + 1 } : undefined;
+        const manga = this.parser.parseSearchResults($);
+        metadata = manga.length < 36 ? undefined : { page: page + 1 };
         return App.createPagedResults({
             results: manga,
             metadata
         });
     }
     async getTags() {
-        const request = App.createRequest({
-            url: `${AEManga_DOMAIN}/manga/`,
-            method: 'GET',
+        const options = App.createRequest({
+            url: `${VyvyManga_Base}/search`,
+            method: 'GET'
         });
-        const response = await this.requestManager.schedule(request, 1);
+        const response = await this.requestManager.schedule(options, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return (0, AEMangaParser_1.parseTags)($);
+        return [App.createTagSection({
+                id: '1',
+                label: 'Genres',
+                tags: this.parser.parseTags($)
+            })];
     }
     async getMangaDetails(mangaId) {
-        const request = App.createRequest({
-            url: `${AEManga_DOMAIN}/${mangaId}`,
+        const options = App.createRequest({
+            url: `${VyvyManga_Base}/manga/${mangaId}`,
             method: 'GET',
         });
-        const response = await this.requestManager.schedule(request, 1);
+        const response = await this.requestManager.schedule(options, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return (0, AEMangaParser_1.parseMangaDetails)($, mangaId);
+        return this.parser.parseMangaDetails($, mangaId, this);
     }
     async getChapters(mangaId) {
-        const request = App.createRequest({
-            url: `${AEManga_DOMAIN}/${mangaId}`,
-            method: 'GET',
+        const options = App.createRequest({
+            url: `${VyvyManga_Base}/manga/${mangaId}`,
+            method: 'GET'
         });
-        const response = await this.requestManager.schedule(request, 1);
+        const response = await this.requestManager.schedule(options, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return (0, AEMangaParser_1.parseChapters)($);
+        return this.parser.parseChapters($, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
-        const request = App.createRequest({
-            url: `${AEManga_DOMAIN}/${mangaId}/${chapterId}`,
-            method: 'GET',
+        const options = App.createRequest({
+            url: `${chapterId}`,
+            method: 'GET'
         });
-        const response = await this.requestManager.schedule(request, 1);
+        const response = await this.requestManager.schedule(options, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return (0, AEMangaParser_1.parseChapterDetails)($, mangaId, chapterId);
+        return this.parser.parseChapterDetails($, mangaId, chapterId);
     }
-    async getCloudflareBypassRequestAsync() {
-        return App.createRequest({
-            url: AEManga_DOMAIN,
-            method: 'GET',
-            headers: {
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
-                'referer': `${AEManga_DOMAIN}/`
-            }
+    async getSearchResults(query, metadata) {
+        const page = metadata?.page ?? 1;
+        let request;
+        const firstTag = query?.includedTags?.map((x) => x.id)[0] ?? [];
+        if (firstTag.includes('details.')) {
+            request = App.createRequest({
+                url: encodeURI(`${VyvyManga_Base}/genre/${firstTag.split('.')[1]}`),
+                method: 'GET'
+            });
+        }
+        else {
+            request = App.createRequest({
+                url: encodeURI(`${VyvyManga_Base}/search?q=${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}&completed=&sort=viewed${query?.includedTags?.map((x) => '&genre[]=' + x.id)}`),
+                method: 'GET'
+            });
+        }
+        const data = await this.requestManager.schedule(request, 2);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const manga = this.parser.parseSearchResults($);
+        metadata = manga.length < 36 ? undefined : { page: page + 1 };
+        return App.createPagedResults({
+            results: manga,
+            metadata
         });
     }
     CloudFlareError(status) {
         if (status == 503) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${AEManga.name}> and press the cloud icon.`);
+            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > VyvyManga and press Cloudflare Bypass or press the Cloud image on the right');
         }
     }
 }
-exports.AEManga = AEManga;
+exports.VyvyManga = VyvyManga;
 
-},{"./AEMangaParser":60,"@paperback/types":58}],60:[function(require,module,exports){
+},{"./VyvyMangaParser":60,"@paperback/types":58}],60:[function(require,module,exports){
 "use strict";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NextPage = exports.parseSearch = exports.parseTags = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
-const parseMangaDetails = ($, mangaId) => {
-    const contentSection = $('.indexcontainer').first();
-    const titles = [];
-    titles.push(decodeHTMLEntity($('h1.EnglishName', contentSection).text().trim().replace('(', '').replace(')', '')));
-    const image = $('img.manga-cover', contentSection).attr('src') ?? '';
-    const authors = [];
-    for (const obj of $('div.manga-details-author h4', contentSection).toArray()) {
-        const author = $(obj).text().trim();
-        if (!author)
-            continue;
-        authors.push(author);
+exports.Parser = void 0;
+class Parser {
+    constructor() {
+        this.chapterTitleRegex = /Chapter ([\d.]+)/i;
+        // taken from TheNetSky/extension-generic/Madara on Github
+        this.parseDate = (date) => {
+            date = date.toUpperCase();
+            let time;
+            const number = Number((/\d*/.exec(date) ?? [])[0]);
+            if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
+                time = new Date(Date.now());
+            }
+            else if (date.includes('YEAR') || date.includes('YEARS')) {
+                time = new Date(Date.now() - (number * 31556952000));
+            }
+            else if (date.includes('MONTH') || date.includes('MONTHS')) {
+                time = new Date(Date.now() - (number * 2592000000));
+            }
+            else if (date.includes('WEEK') || date.includes('WEEKS')) {
+                time = new Date(Date.now() - (number * 604800000));
+            }
+            else if (date.includes('YESTERDAY')) {
+                time = new Date(Date.now() - 86400000);
+            }
+            else if (date.includes('DAY') || date.includes('DAYS')) {
+                time = new Date(Date.now() - (number * 86400000));
+            }
+            else if (date.includes('HOUR') || date.includes('HOURS')) {
+                time = new Date(Date.now() - (number * 3600000));
+            }
+            else if (date.includes('MINUTE') || date.includes('MINUTES')) {
+                time = new Date(Date.now() - (number * 60000));
+            }
+            else if (date.includes('SECOND') || date.includes('SECONDS')) {
+                time = new Date(Date.now() - (number * 1000));
+            }
+            else {
+                time = new Date(date);
+            }
+            return time;
+        };
     }
-    const description = decodeHTMLEntity($('div.manga-details-extended h4', contentSection).eq(4).text().trim() ?? '');
-    const arrayTags = [];
-    for (const tag of $('div.manga-details-extended a[href*=tag]', contentSection).toArray()) {
-        const label = $(tag).text().trim();
-        const link = $(tag).attr('href') ?? '';
-        const idRegex = link.match(/tag:(.*)\|/);
-        let id;
-        if (idRegex && idRegex[1])
-            id = idRegex[1];
-        if (!id || !label)
-            continue;
-        arrayTags.push({
-            id: `genres.${id}`,
-            label
+    decodeHTMLEntity(str) {
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
+            return String.fromCharCode(dec);
         });
     }
-    const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-    const status = $('div.manga-details-extended h4', contentSection).first().text().trim().toLowerCase();
-    return App.createSourceManga({
-        id: mangaId,
-        mangaInfo: App.createMangaInfo({
-            titles: titles,
-            image: image,
-            status: status,
-            author: authors.length !== 0 ? authors.join(', ') : '',
-            tags: tagSections,
-            desc: description,
-        })
-    });
-};
-exports.parseMangaDetails = parseMangaDetails;
-const parseChapters = ($) => {
-    const chapters = [];
-    const contentSection = $('.indexcontainer').first();
-    const LastUpdated = $('div.manga-details-extended h4', contentSection).eq(3).text().trim();
-    for (const chapter of $('li', $('ul.new-manga-chapters')).toArray()) {
-        const AElement = $('a', chapter);
-        const title = AElement.text() ?? '';
-        const chapterId = $('a', chapter).attr('href')?.split('?').shift()?.slice(0, -3)?.split('/').pop() ?? '';
-        if (!chapterId)
-            continue;
-        const chapNum = Number(chapterId);
-        if (!chapterId || !title)
-            continue;
-        chapters.push(App.createChapter({
-            id: `${chapterId}/0/allpages`,
-            name: decodeHTMLEntity(title),
-            chapNum: isNaN(chapNum) ? 0 : chapNum,
-            time: new Date(LastUpdated),
-            langCode: 'العربية'
-        }));
-    }
-    return chapters;
-};
-exports.parseChapters = parseChapters;
-const parseChapterDetails = ($, mangaId, chapterId) => {
-    const pages = [];
-    for (const page of $('div#showchaptercontainer img').toArray()) {
-        const url = $(page).attr('src');
-        if (!url)
-            continue;
-        pages.push(url);
-    }
-    return App.createChapterDetails({
-        id: chapterId,
-        mangaId: mangaId,
-        pages: pages,
-    });
-};
-exports.parseChapterDetails = parseChapterDetails;
-const parseTags = ($) => {
-    const arrayTags = [];
-    for (const tag of $('#filter .order:contains(أظهار المانجا التي تحتوي على:) a').toArray()) {
-        const label = $(tag).text().trim();
-        const link = $(tag).attr('href') ?? '';
-        const idRegex = link.match(/tag:(.*)\|/);
-        let id;
-        if (idRegex && idRegex[1])
-            id = idRegex[1];
-        if (!id || !label)
-            continue;
-        arrayTags.push({
-            id: `genres.${id}`,
-            label
-        });
-    }
-    const OrderBy = [];
-    for (const tag of $('#mangadirectory .order:contains(ترتيب المانجا على حسب :) a').toArray()) {
-        const label = $(tag).text().trim();
-        const link = $(tag).attr('href') ?? '';
-        const idRegex = link.match(/order:(.*)\|/);
-        let id;
-        if (idRegex && idRegex[1])
-            id = idRegex[1];
-        if (!id || !label)
-            continue;
-        OrderBy.push({
-            id: `order.${id}`,
-            label
-        });
-    }
-    OrderBy.push({
-        id: 'order.english_name',
-        label: 'اسم المانجا'
-    });
-    const sortByTags = [
-        {
-            id: 'sort.plus',
-            label: 'تصاعدي'
-        },
-        {
-            id: 'sort.minus',
-            label: 'تنازلي'
+    async parseHomeSections($, sectionCallback, _source) {
+        const section1 = App.createHomeSection({ id: '1', title: 'Most Popular Manga', containsMoreItems: true, type: 'singleRowNormal' });
+        const section2 = App.createHomeSection({ id: '2', title: 'Latest', containsMoreItems: true, type: 'singleRowNormal' });
+        const section3 = App.createHomeSection({ id: '3', title: 'New Releases', containsMoreItems: true, type: 'singleRowNormal' });
+        const popular = [];
+        const latest = [];
+        const newManga = [];
+        const arrPopular = $('.slick-manga .comic-item').toArray();
+        const arrLatest = $('.comic-item', $('.col-lg-8 h4.home-title:contains(\'Lastest Update\')').next()).toArray();
+        const arrNewRel = $('.comic-item', $('.col-lg-8 h4.home-title:contains(\'New Release\')').next()).toArray();
+        for (const obj of arrPopular) {
+            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
+            const image = $('.comic-image', obj).attr('data-background-image') ?? '';
+            const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            popular.push(App.createPartialSourceManga({
+                mangaId: id,
+                image,
+                title: this.decodeHTMLEntity(title),
+                subtitle: subTitle,
+            }));
         }
-    ];
-    return [
-        App.createTagSection({ id: 'empty', label: 'العناوين لن تعمل مع الأنواع', tags: [] }),
-        App.createTagSection({ id: '0', label: 'أظهار المانجا التي تحتوي على', tags: arrayTags.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: '1', label: 'ترتيب المانجا على حسب', tags: OrderBy.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: '2', label: 'ترتيب حسب', tags: sortByTags.map(x => App.createTag(x)) })
-    ];
-};
-exports.parseTags = parseTags;
-const parseSearch = ($, source) => {
-    const results = [];
-    for (const obj of $('div.mangacontainer').toArray()) {
-        const title = $('a.manga', obj).first().text().trim() ?? '';
-        const id = $('a.manga', obj).first().attr('href')?.replace(`${source.baseUrl}/`, '')?.split('?').shift()?.replace(/\/+$/, '') ?? '';
-        const lazysrc = $('img', obj)?.attr('data-pagespeed-lazy-src') ?? '';
-        const image = !lazysrc ? $('img', obj).attr('src') : lazysrc;
-        const subtitle = $('.details a', obj).last().text().trim();
-        if (!id || !title)
-            continue;
-        results.push(App.createPartialSourceManga({
-            mangaId: id,
-            image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-            title: decodeHTMLEntity(title),
-            subtitle: subtitle ? `أخر فصل : ${subtitle}` : '',
-        }));
+        section1.items = popular;
+        sectionCallback(section1);
+        for (const obj of arrLatest) {
+            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
+            const image = $('.comic-image', obj).attr('data-background-image') ?? '';
+            const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            latest.push(App.createPartialSourceManga({
+                mangaId: id,
+                image,
+                title: this.decodeHTMLEntity(title),
+                subtitle: subTitle,
+            }));
+        }
+        section2.items = latest;
+        sectionCallback(section2);
+        for (const obj of arrNewRel) {
+            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
+            const image = $('.comic-image', obj).attr('data-background-image') ?? '';
+            const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            newManga.push(App.createPartialSourceManga({
+                mangaId: id,
+                image,
+                title: this.decodeHTMLEntity(title),
+                subtitle: subTitle,
+            }));
+        }
+        section3.items = newManga;
+        sectionCallback(section3);
     }
-    return results;
-};
-exports.parseSearch = parseSearch;
-const decodeHTMLEntity = (str) => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec);
-    });
-};
-const NextPage = ($) => {
-    const nextPage = $('div.pagination a:last-child:not(.active)');
-    if (nextPage.contents().length !== 0) {
-        return true;
+    parseChapterDetails($, mangaId, chapterId) {
+        const pages = [];
+        for (const obj of $('.col-lg-8 .carousel-item img').toArray()) {
+            const page = this.getImageSrc($(obj));
+            if (!page) {
+                throw new Error(`Could not parse page for ${chapterId}`);
+            }
+            pages.push(page);
+        }
+        return App.createChapterDetails({
+            id: chapterId,
+            mangaId: mangaId,
+            pages: pages,
+        });
     }
-    else {
-        return false;
+    parseChapters($, mangaId, _source) {
+        const chapters = [];
+        const arrChapters = $('.div-chapter .list-group a').toArray();
+        for (const obj of arrChapters) {
+            let url = $(obj).attr('href') ?? '';
+            if (url.startsWith('/'))
+                url = 'https:' + url;
+            const time = this.parseDate($('.text-right', obj).text().trim() ?? '');
+            const name = this.decodeHTMLEntity($('span', obj).first().text().trim() ?? '');
+            const chapNumRegex = name.match(this.chapterTitleRegex);
+            let chapNum = 0;
+            if (chapNumRegex && chapNumRegex[1])
+                chapNum = Number(chapNumRegex[1]);
+            chapters.push(App.createChapter({
+                id: url,
+                name: name,
+                chapNum: !isNaN(chapNum) ? chapNum : NaN,
+                time: time,
+                langCode: 'English'
+            }));
+        }
+        return chapters;
     }
-};
-exports.NextPage = NextPage;
+    parseMangaDetails($, mangaId, _source) {
+        const details = $('.col-lg-8');
+        const title = this.decodeHTMLEntity($('.col-md-7 .title', details).first().text().trim() ?? '');
+        const image = this.getImageSrc($('.col-md-5 img', details));
+        let desc = $('.summary .content').first().children().remove().end().text().replace(/\s{2,}/g, ' ').trim() ?? '';
+        if (desc == '')
+            desc = 'No Decscription provided by the source (VyvyManga)';
+        let author = '';
+        let artist = '';
+        let status = '';
+        const arrayTags = [];
+        const info = $('.col-md-7 p', details).toArray();
+        for (const obj of info) {
+            const label = $('.pre-title', obj).first().children().remove().end().text().replace(/\s{2,}/, ' ').trim().toLowerCase();
+            switch (label) {
+                case 'author':
+                case 'authors':
+                case 'author(s)':
+                    $('span', obj).remove().end().text().replace(/\s{2,}/, ' ').trim();
+                    author = $(obj).text().trim();
+                    break;
+                case 'artist':
+                case 'artists':
+                case 'artist(s)':
+                    $('span', obj).remove().end().text().replace(/\s{2,}/, ' ').trim();
+                    artist = $(obj).text().trim();
+                    break;
+                case 'status':
+                    $('span', obj).remove().end().text().replace(/\s{2,}/, ' ').trim();
+                    status = $(obj).text().trim();
+                    break;
+                case 'genres':
+                    $('span', obj).remove().end().text().replace(/\s{2,}/, ' ').trim();
+                    for (const genreobj of $('a', obj).toArray()) {
+                        const id = $(genreobj)?.attr('href')?.split('/')?.pop() ?? '';
+                        const label = $(genreobj).text() ?? '';
+                        if (!id || !label)
+                            continue;
+                        arrayTags.push({
+                            id: `details.${id}`,
+                            label: label
+                        });
+                    }
+                    break;
+            }
+        }
+        const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })];
+        return App.createSourceManga({
+            id: mangaId,
+            mangaInfo: App.createMangaInfo({
+                titles: [title],
+                image,
+                status: this.parseStatus(status),
+                author,
+                artist,
+                tags: tagSections,
+                desc: this.decodeHTMLEntity(desc),
+            })
+        });
+    }
+    parseTags($) {
+        const genres = [];
+        for (const obj of $('#advance-search .check-genre .form-check').toArray()) {
+            const label = $('label', obj).text().trim();
+            const id = encodeURI($('input', obj).attr('value') ?? '');
+            if (!label || !id)
+                continue;
+            genres.push(App.createTag({
+                id,
+                label
+            }));
+        }
+        return genres;
+    }
+    parseSearchResults($) {
+        const results = [];
+        for (const obj of $('.row .col-lg-2').toArray()) {
+            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
+            const image = $('.comic-image', obj).attr('data-background-image') ?? '';
+            const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            if (!id)
+                continue;
+            results.push(App.createPartialSourceManga({
+                mangaId: id,
+                image,
+                title: this.decodeHTMLEntity(title),
+                subtitle: subTitle,
+            }));
+        }
+        return results;
+    }
+    idCleaner(str, source) {
+        const base = source.baseUrl.split('://').pop();
+        str = str.replace(/(https:\/\/|http:\/\/)/, '');
+        str = str.replace(/\/$/, '');
+        str = str.replace(`${base}/`, '');
+        str = str.replace('/single/', '');
+        return str;
+    }
+    parseStatus(str) {
+        let status = 'ONGOING';
+        switch (str.toLowerCase()) {
+            case 'ongoing':
+                status = 'ONGOING';
+                break;
+            case 'completed':
+                status = 'COMPLETED';
+                break;
+        }
+        return status;
+    }
+    getImageSrc(imageObj) {
+        let image;
+        if (typeof imageObj?.attr('data-src') != 'undefined') {
+            image = imageObj?.attr('data-src');
+        }
+        else if (typeof imageObj?.attr('data-lazy-src') != 'undefined') {
+            image = imageObj?.attr('data-lazy-src');
+        }
+        else if (typeof imageObj?.attr('srcset') != 'undefined') {
+            image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
+        }
+        else if (typeof imageObj?.attr('src') != 'undefined') {
+            image = imageObj?.attr('src');
+        }
+        else {
+            image = 'https://paperback.moe/icons/logo-alt.svg';
+        }
+        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')));
+    }
+}
+exports.Parser = Parser;
 
 },{}]},{},[59])(59)
 });

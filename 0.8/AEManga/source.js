@@ -478,8 +478,7 @@ class AEManga extends types_1.Source {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${AEManga_DOMAIN}/`,
-                            'authrioty': 'manga.ae'
+                            'referer': `${AEManga_DOMAIN}/`
                         }
                     };
                     return request;
