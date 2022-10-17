@@ -94,7 +94,16 @@ exports.urlEncodeObject = urlEncodeObject;
 },{}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContentRating = void 0;
+exports.ContentRating = exports.SourceIntents = void 0;
+var SourceIntents;
+(function (SourceIntents) {
+    SourceIntents[SourceIntents["MANGA_CHAPTERS"] = 1] = "MANGA_CHAPTERS";
+    SourceIntents[SourceIntents["MANGA_TRACKING"] = 2] = "MANGA_TRACKING";
+    SourceIntents[SourceIntents["HOMEPAGE_SECTIONS"] = 4] = "HOMEPAGE_SECTIONS";
+    SourceIntents[SourceIntents["COLLECTION_MANAGEMENT"] = 8] = "COLLECTION_MANAGEMENT";
+    SourceIntents[SourceIntents["CLOUDFLARE_BYPASS_REQUIRED"] = 16] = "CLOUDFLARE_BYPASS_REQUIRED";
+    SourceIntents[SourceIntents["SETTINGS_UI"] = 32] = "SETTINGS_UI";
+})(SourceIntents = exports.SourceIntents || (exports.SourceIntents = {}));
 /**
  * A content rating to be attributed to each source.
  */
