@@ -36,13 +36,13 @@ import './TsuminoHelper'
 const TSUMINO_DOMAIN = 'https://www.tsumino.com'
 
 export const TsuminoInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'Tsumino',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls comics from tsumino.com.',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.ADULT,
     websiteBaseURL: TSUMINO_DOMAIN,
     language: LanguageCode.ENGLISH,
 }
