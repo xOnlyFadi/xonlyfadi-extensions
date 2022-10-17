@@ -957,13 +957,13 @@ const TsuminoParser_1 = require("./TsuminoParser");
 require("./TsuminoHelper");
 const TSUMINO_DOMAIN = 'https://www.tsumino.com';
 exports.TsuminoInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'Tsumino',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls comics from tsumino.com.',
-    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
+    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
     websiteBaseURL: TSUMINO_DOMAIN,
     language: paperback_extensions_common_1.LanguageCode.ENGLISH,
 };
