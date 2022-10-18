@@ -461,7 +461,7 @@ exports.VyvyMangaInfo = {
     description: 'Extension that pulls manga from VyvyMangas.com',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.5',
+    version: '1.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: types_1.ContentRating.ADULT,
@@ -613,7 +613,7 @@ class VyvyManga extends types_1.Source {
     }
     CloudFlareError(status) {
         if (status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > VyvyManga and press Cloudflare Bypass or press the Cloud image on the right');
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${VyvyManga.name}> and press the cloud icon.`);
         }
     }
 }
