@@ -957,7 +957,7 @@ const TsuminoParser_1 = require("./TsuminoParser");
 require("./TsuminoHelper");
 const TSUMINO_DOMAIN = 'https://www.tsumino.com';
 exports.TsuminoInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'Tsumino',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -1044,50 +1044,6 @@ class Tsumino extends paperback_extensions_common_1.Source {
                 section: createHomeSection({
                     id: 'Random',
                     title: 'Random',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: encodeURI(`${TSUMINO_DOMAIN}/Search/Operate/?PageNumber=1&Sort=Alphabetical`),
-                    method: 'GET',
-                }),
-                section: createHomeSection({
-                    id: 'Alphabetical',
-                    title: 'Alphabetical',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: encodeURI(`${TSUMINO_DOMAIN}/Search/Operate/?PageNumber=1&Sort=Rating`),
-                    method: 'GET',
-                }),
-                section: createHomeSection({
-                    id: 'Rating',
-                    title: 'Rating',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: encodeURI(`${TSUMINO_DOMAIN}/Search/Operate/?PageNumber=1&Sort=Pages`),
-                    method: 'GET',
-                }),
-                section: createHomeSection({
-                    id: 'Pages',
-                    title: 'Pages',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: encodeURI(`${TSUMINO_DOMAIN}/Search/Operate/?PageNumber=1&Sort=Comments`),
-                    method: 'GET',
-                }),
-                section: createHomeSection({
-                    id: 'Comments',
-                    title: 'Comments',
                     view_more: true,
                 }),
             }
