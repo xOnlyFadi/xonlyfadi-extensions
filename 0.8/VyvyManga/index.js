@@ -461,7 +461,7 @@ exports.VyvyMangaInfo = {
     description: 'Extension that pulls manga from VyvyMangas.com',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.6',
+    version: '1.0.7',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: types_1.ContentRating.ADULT,
@@ -573,7 +573,7 @@ class VyvyManga extends types_1.Source {
         const response = await this.requestManager.schedule(options, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapters($, mangaId, this);
+        return this.parser.parseChapters($);
     }
     async getChapterDetails(mangaId, chapterId) {
         const options = App.createRequest({
@@ -740,7 +740,7 @@ class Parser {
             pages: pages,
         });
     }
-    parseChapters($, mangaId, _source) {
+    parseChapters($) {
         const chapters = [];
         const arrChapters = $('.div-chapter .list-group a').toArray();
         for (const obj of arrChapters) {

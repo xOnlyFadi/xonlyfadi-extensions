@@ -2468,13 +2468,15 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 },{}],62:[function(require,module,exports){
 "use strict";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadComicOnline = exports.ReadComicOnlineInfo = void 0;
 const types_1 = require("@paperback/types");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '1.0.7',
+    version: '1.0.8',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -2532,7 +2534,7 @@ class ReadComicOnline extends types_1.Source {
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
-        return (0, ReadComicOnlineParser_1.parseChapters)($, mangaId);
+        return (0, ReadComicOnlineParser_1.parseChapters)($);
     }
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
@@ -2584,7 +2586,7 @@ class ReadComicOnline extends types_1.Source {
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
-        const manga = (0, ReadComicOnlineParser_1.parseViewMore)($, this.cheerio);
+        const manga = (0, ReadComicOnlineParser_1.parseViewMore)($);
         metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
@@ -2616,7 +2618,7 @@ class ReadComicOnline extends types_1.Source {
         }
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
-        const manga = (0, ReadComicOnlineParser_1.parseSearch)($, this.cheerio);
+        const manga = (0, ReadComicOnlineParser_1.parseSearch)($);
         metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
@@ -2681,7 +2683,7 @@ const parseMangaDetails = ($, mangaId) => {
     });
 };
 exports.parseMangaDetails = parseMangaDetails;
-const parseChapters = ($, mangaId) => {
+const parseChapters = ($) => {
     const chapters = [];
     for (const chapter of $('tr', $('.listing').first()).toArray()) {
         const title = $('a', chapter).first().text().trim() ?? '';
@@ -2859,7 +2861,7 @@ const parseHomeSections = ($, sectionCallback) => {
     sectionCallback(TopMonthSection);
 };
 exports.parseHomeSections = parseHomeSections;
-const parseViewMore = ($, _cheerio) => {
+const parseViewMore = ($) => {
     const comics = [];
     const collectedIds = [];
     for (const item of $('.list-comic > .item > a:first-child').toArray()) {
@@ -2897,7 +2899,7 @@ const parseTags = ($) => {
     return tagSections;
 };
 exports.parseTags = parseTags;
-const parseSearch = ($, _cheerio) => {
+const parseSearch = ($) => {
     const comics = [];
     const collectedIds = [];
     //Thanks Aurora!
