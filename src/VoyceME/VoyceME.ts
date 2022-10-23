@@ -33,7 +33,7 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.6',
+    version: '1.0.7',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
@@ -41,11 +41,12 @@ export const VoyceMEInfo: SourceInfo = {
 }
 
 export class VoyceME extends Source {
+
     private readonly parser: Parser = new Parser()
+    
     private readonly graphqlURL: string = 'https://graphql.voyce.me/v1/graphql'
-    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net/'
-    private readonly baseUrl: string = VoyceME_Base
     private readonly popularPerPage: number = 10
+
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
         requestTimeout: 15000,
@@ -71,6 +72,7 @@ export class VoyceME extends Source {
             }
         }
     })
+
     override getMangaShareUrl(mangaId: string): string {
         return `${VoyceME_Base}/series/${mangaId}`
     }
@@ -114,6 +116,7 @@ export class VoyceME extends Source {
                 }),
             },
         ]
+
         const promises: Promise<void>[] = []
         for (const section of sections) {
             sectionCallback(section.section)
@@ -122,7 +125,7 @@ export class VoyceME extends Source {
                     let data
                     try {
                         data = JSON.parse(response.data)
-                        section.section.items = this.parser.parseHomeSections(data, this)
+                        section.section.items = this.parser.parseHomeSections(data)
                         sectionCallback(section.section)
                     } catch (e) {
                         throw new Error(`${e}`)
@@ -138,6 +141,7 @@ export class VoyceME extends Source {
         if (metadata?.completed) return metadata
         const page: number = metadata?.page ?? 1
         let graph
+
         switch (homepageSectionId) {
             case '1':
                 graph = LatestQuery(page,this)
@@ -148,6 +152,7 @@ export class VoyceME extends Source {
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
         }
+
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
@@ -155,13 +160,15 @@ export class VoyceME extends Source {
         })
 
         const response = await this.requestManager.schedule(request, 1)
+
         let data
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
-        const manga = this.parser.parseHomeSections(data, this)
+
+        const manga = this.parser.parseHomeSections(data)
         metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 
         return createPagedResults({
@@ -176,14 +183,18 @@ export class VoyceME extends Source {
             method: 'POST',
             data: MangaDetailQuery(mangaId)
         })
+
         const response = await this.requestManager.schedule(options, 1)
+
         let data
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
+
         if(!data.data.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
+
         return this.parser.parseMangaDetails(data, mangaId,this)
     }
 
@@ -193,16 +204,20 @@ export class VoyceME extends Source {
             method: 'POST',
             data: ChapterDetailQuery(mangaId)
         })
+
         const response = await this.requestManager.schedule(options, 1)
+        
         let data
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
+
         if(!data.data?.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
         if (data.data?.manga?.voyce_series[0]?.length == 0) throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`)
-        return this.parser.parseChapters(data, mangaId, this)
+
+        return this.parser.parseChapters(data, mangaId)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -210,28 +225,34 @@ export class VoyceME extends Source {
             url: `${VoyceME_Base}/series/${chapterId}`,
             method: 'GET'
         })
+
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data)
+
         return this.parser.parseChapterDetails($, mangaId, chapterId,this)
     }
 
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
-        if (metadata?.completed) return metadata
-        const page: number = metadata?.page ?? 1
         if(!query.title) return createPagedResults({ results: [], metadata: undefined })
+
+        const page: number = metadata?.page ?? 1
+        
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
             data: SearchQuery(query.title.replace(/%20/g, ' ').replace(/_/g,' ') ?? '',page,this)
         })
+
         const response = await this.requestManager.schedule(request, 2)
+
         let data
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
-        const manga = this.parser.parseHomeSections(data, this)
+
+        const manga = this.parser.parseHomeSections(data)
 
         metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 

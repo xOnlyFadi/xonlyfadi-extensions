@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-useless-escape */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -14,7 +15,12 @@ import {VoyceData,
 import {decodeHTML} from 'entities'
 import {convert} from 'html-to-text'
 
+import './VoyceMEHelper'
+
 export class Parser {
+
+    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net/'
+    private readonly baseUrl: string = 'http://voyce.me'
 
     decodeHTMLEntity(str: string): string {
         return str.replace(/&#(\d+)/g, (_match, dec) => {
@@ -22,11 +28,11 @@ export class Parser {
         })
     }
 
-    parseHomeSections(VoyceD: VoyceData, source: any): MangaTile[] {
+    parseHomeSections(VoyceD: VoyceData): MangaTile[] {
         const items: MangaTile[] = []
         for(const data of VoyceD.data.voyce_series){
             const id = data.slug.trim() ?? ''
-            const image = encodeURI(`${source.staticURL}${data.thumbnail}`) ?? ''
+            const image = encodeURI(`${this.staticURL}${data.thumbnail}`) ?? ''
             const title = data.title.trim() ?? ''
             if(!id || !title) continue
             items.push(createMangaTile({
@@ -58,7 +64,7 @@ export class Parser {
         if(!chapter) throw new Error('Chapter data not found in website.')
         const info = JSON.parse(JSON.stringify(chapter),(_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v)
         for(const page of info[0].images){
-            pages.push(source.staticURL + page.image)
+            pages.push(this.staticURL + page.image)
         }
         return createChapterDetails({
             id: chapterId,
@@ -67,17 +73,19 @@ export class Parser {
             longStrip: true
         })
     }
+
     async ChapterDetailsApiRequest(buildId: string,mangaId: string, chapterI: string,source:any): Promise<any> {
         const chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#')
         const options = createRequestObject({
-            url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
+            url: `${this.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
             method: 'GET'
         })
         const response = await source.requestManager.schedule(options, 1)
         if(response.status == 500) throw Error('Chapter Does not info doest not exist on the site')
         return response.data
     }
-    parseChapters(VoyceD: VoyceChapterData, mangaId: string, source: any): Chapter[] {
+
+    parseChapters(VoyceD: VoyceChapterData, mangaId: string): Chapter[] {
         const data = VoyceD.data.voyce_series[0]
         const chapters: Chapter[] = []
         let sortingIndex = 0
@@ -109,7 +117,7 @@ export class Parser {
     parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string, source: any): Manga {
         const details = VoyceD.data.voyce_series[0]
         const title = details?.title.trim() ?? ''
-        const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg'
+        const image = encodeURI(this.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg'
         let desc = details?.description ?? ''
         if (desc == '') desc = 'No Decscription provided by the source (VoyceME)'
         const author = details?.author?.username ?? ''
@@ -137,20 +145,4 @@ export class Parser {
             desc: convert(decodeHTML(desc),{wordwrap: 130}),
         })
     }
-}
-export {}
-
-declare global {
-    interface String {
-        substringAfterLast(character:any): any
-        substringBeforeFirst(substring:any): any
-    }
-}
-String.prototype.substringAfterLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character)
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1) //should be 39
-}
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    return this.substring(0, startingIndexOfSubstring)
 }
