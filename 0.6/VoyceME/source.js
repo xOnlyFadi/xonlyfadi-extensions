@@ -9872,7 +9872,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.6',
+    version: '1.0.7',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -9883,8 +9883,6 @@ class VoyceME extends paperback_extensions_common_1.Source {
         super(...arguments);
         this.parser = new VoyceMEParser_1.Parser();
         this.graphqlURL = 'https://graphql.voyce.me/v1/graphql';
-        this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net/';
-        this.baseUrl = VoyceME_Base;
         this.popularPerPage = 10;
         this.requestManager = createRequestManager({
             requestsPerSecond: 3,
@@ -9958,7 +9956,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
                 let data;
                 try {
                     data = JSON.parse(response.data);
-                    section.section.items = this.parser.parseHomeSections(data, this);
+                    section.section.items = this.parser.parseHomeSections(data);
                     sectionCallback(section.section);
                 }
                 catch (e) {
@@ -9996,7 +9994,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = this.parser.parseHomeSections(data, this);
+        const manga = this.parser.parseHomeSections(data);
         metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
@@ -10039,7 +10037,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
             throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`);
         if (data.data?.manga?.voyce_series[0]?.length == 0)
             throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`);
-        return this.parser.parseChapters(data, mangaId, this);
+        return this.parser.parseChapters(data, mangaId);
     }
     async getChapterDetails(mangaId, chapterId) {
         const options = createRequestObject({
@@ -10051,11 +10049,9 @@ class VoyceME extends paperback_extensions_common_1.Source {
         return this.parser.parseChapterDetails($, mangaId, chapterId, this);
     }
     async getSearchResults(query, metadata) {
-        if (metadata?.completed)
-            return metadata;
-        const page = metadata?.page ?? 1;
         if (!query.title)
             return createPagedResults({ results: [], metadata: undefined });
+        const page = metadata?.page ?? 1;
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
@@ -10069,7 +10065,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = this.parser.parseHomeSections(data, this);
+        const manga = this.parser.parseHomeSections(data);
         metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
@@ -10092,7 +10088,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
 }
 exports.VoyceME = VoyceME;
 
-},{"./VoyceMEGraphQL":103,"./VoyceMEParser":104,"paperback-extensions-common":56}],103:[function(require,module,exports){
+},{"./VoyceMEGraphQL":103,"./VoyceMEParser":105,"paperback-extensions-common":56}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChapterDetailQuery = exports.MangaDetailQuery = exports.SearchQuery = exports.Top5Query = exports.popularQuery = exports.LatestQuery = void 0;
@@ -10226,24 +10222,42 @@ exports.ChapterDetailQuery = ChapterDetailQuery;
 },{}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+String.prototype.substringAfterLast = function (character) {
+    const lastIndexOfCharacter = this.lastIndexOf(character);
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
+};
+String.prototype.substringBeforeFirst = function (substring) {
+    const startingIndexOfSubstring = this.indexOf(substring);
+    return this.substring(0, startingIndexOfSubstring);
+};
+
+},{}],105:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-useless-escape */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
+require("./VoyceMEHelper");
 class Parser {
+    constructor() {
+        this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net/';
+        this.baseUrl = 'http://voyce.me';
+    }
     decodeHTMLEntity(str) {
         return str.replace(/&#(\d+)/g, (_match, dec) => {
             return String.fromCharCode(dec);
         });
     }
-    parseHomeSections(VoyceD, source) {
+    parseHomeSections(VoyceD) {
         const items = [];
         for (const data of VoyceD.data.voyce_series) {
             const id = data.slug.trim() ?? '';
-            const image = encodeURI(`${source.staticURL}${data.thumbnail}`) ?? '';
+            const image = encodeURI(`${this.staticURL}${data.thumbnail}`) ?? '';
             const title = data.title.trim() ?? '';
             if (!id || !title)
                 continue;
@@ -10274,7 +10288,7 @@ class Parser {
             throw new Error('Chapter data not found in website.');
         const info = JSON.parse(JSON.stringify(chapter), (_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v);
         for (const page of info[0].images) {
-            pages.push(source.staticURL + page.image);
+            pages.push(this.staticURL + page.image);
         }
         return createChapterDetails({
             id: chapterId,
@@ -10286,7 +10300,7 @@ class Parser {
     async ChapterDetailsApiRequest(buildId, mangaId, chapterI, source) {
         const chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#');
         const options = createRequestObject({
-            url: `${source.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
+            url: `${this.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
             method: 'GET'
         });
         const response = await source.requestManager.schedule(options, 1);
@@ -10294,7 +10308,7 @@ class Parser {
             throw Error('Chapter Does not info doest not exist on the site');
         return response.data;
     }
-    parseChapters(VoyceD, mangaId, source) {
+    parseChapters(VoyceD, mangaId) {
         const data = VoyceD.data.voyce_series[0];
         const chapters = [];
         let sortingIndex = 0;
@@ -10324,7 +10338,7 @@ class Parser {
     parseMangaDetails(VoyceD, mangaId, source) {
         const details = VoyceD.data.voyce_series[0];
         const title = details?.title.trim() ?? '';
-        const image = encodeURI(source.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg';
+        const image = encodeURI(this.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg';
         let desc = details?.description ?? '';
         if (desc == '')
             desc = 'No Decscription provided by the source (VoyceME)';
@@ -10354,14 +10368,6 @@ class Parser {
     }
 }
 exports.Parser = Parser;
-String.prototype.substringAfterLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
-};
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    return this.substring(0, startingIndexOfSubstring);
-};
 
-},{"entities":14,"html-to-text":16,"paperback-extensions-common":56}]},{},[102])(102)
+},{"./VoyceMEHelper":104,"entities":14,"html-to-text":16,"paperback-extensions-common":56}]},{},[102])(102)
 });
