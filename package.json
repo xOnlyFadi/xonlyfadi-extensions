@@ -23,6 +23,7 @@
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/cheerio": "^0.22.21",
+    "@types/crypto-js": "^4.1.1",
     "@types/html-to-text": "^8.1.0",
     "@types/mocha": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
@@ -39,6 +40,8 @@
   },
   "dependencies": {
     "cheerio": "^0.22.0",
+    "crypto-js": "^4.1.1",
+    "moment": "^2.29.4",
     "paperback-cli": "^1.4.0",
     "paperback-extensions-common": "^4.3.5",
     "ts-mocha": "^10.0.0"
