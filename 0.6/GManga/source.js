@@ -13499,6 +13499,16 @@ exports.GMangaInfo = {
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
     websiteBaseURL: GMANGA_BASE,
     language: 'العربية',
+    sourceTags: [
+        {
+            text: 'العربية',
+            type: paperback_extensions_common_1.TagType.GREY
+        },
+        {
+            text: 'Cloudflare',
+            type: paperback_extensions_common_1.TagType.RED
+        }
+    ]
 };
 class GManga extends paperback_extensions_common_1.Source {
     constructor() {
