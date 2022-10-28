@@ -13490,13 +13490,13 @@ const GMANGA_BASE = `https://${DOMAIN}`;
 const GMANGA_API = `https://api.${DOMAIN}/api`;
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36';
 exports.GMangaInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls from gmanga.org.',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
+    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     websiteBaseURL: GMANGA_BASE,
     language: 'العربية',
     sourceTags: [
