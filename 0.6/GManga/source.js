@@ -13490,7 +13490,7 @@ const GMANGA_BASE = `https://${DOMAIN}`;
 const GMANGA_API = `https://api.${DOMAIN}/api`;
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36';
 exports.GMangaInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -13754,6 +13754,7 @@ class GManga extends paperback_extensions_common_1.Source {
         return (0, GMangaParser_1.parseChapterDetails)($, mangaId, chapterId);
     }
     async filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
+        const updatedManga = [];
         let day = 0;
         while (day < 7) {
             const mangaToUpdate = [];
@@ -13778,8 +13779,9 @@ class GManga extends paperback_extensions_common_1.Source {
                 if (!id)
                     continue;
                 if (FormatedChapterDate === FormatedCurrentDate) {
-                    if (ids.includes(`${id}`)) {
+                    if (ids.includes(`${id}`) && !updatedManga.includes(`${id}`)) {
                         mangaToUpdate.push(`${id}`);
+                        updatedManga.push(`${id}`);
                     }
                 }
             }
