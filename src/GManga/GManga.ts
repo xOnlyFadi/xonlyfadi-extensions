@@ -17,6 +17,7 @@ import {
     TagSection,
     SearchField,
     MangaUpdates,
+    TagType,
 } from 'paperback-extensions-common'
 
 import {
@@ -55,6 +56,16 @@ export const GMangaInfo: SourceInfo = {
     contentRating: ContentRating.ADULT,
     websiteBaseURL: GMANGA_BASE,
     language: 'العربية',
+    sourceTags: [
+        {
+            text: 'العربية',
+            type: TagType.GREY
+        },
+        {
+            text: 'Cloudflare',
+            type: TagType.RED
+        }
+    ]
 }
 
 
