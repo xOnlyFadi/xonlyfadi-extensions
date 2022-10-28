@@ -47,7 +47,7 @@ const GMANGA_API = `https://api.${DOMAIN}/api`
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36'
 
 export const GMangaInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -348,6 +348,7 @@ export class GManga extends Source {
     }
     
     override async filterUpdatedManga(mangaUpdatesFoundCallback: (updates: MangaUpdates) => void, time: Date, ids: string[]): Promise<void> {
+        const updatedManga: string[] = []
         let day = 0
 
         while (day < 7) {
@@ -380,8 +381,9 @@ export class GManga extends Source {
                 if (!id) continue
 
                 if (FormatedChapterDate === FormatedCurrentDate) {
-                    if (ids.includes(`${id}`)) {
+                    if (ids.includes(`${id}`) && !updatedManga.includes(`${id}`)) {
                         mangaToUpdate.push(`${id}`)
+                        updatedManga.push(`${id}`)
                     }
                 }
             }
