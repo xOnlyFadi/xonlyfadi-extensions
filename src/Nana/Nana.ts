@@ -17,6 +17,7 @@ import {
     Response,
     TagSection,
     Tag,
+    HomeSectionType,
 } from 'paperback-extensions-common'
 
 import {Parser} from './NanaParser'
@@ -28,7 +29,7 @@ export const NanaInfo: SourceInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: ContentRating.ADULT,
@@ -82,6 +83,7 @@ export class Nana extends Source {
                     id: '0',
                     title: 'Latest Upload',
                     view_more: true,
+                    type: HomeSectionType.singleRowLarge
                 }),
             },
         ]
