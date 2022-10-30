@@ -390,7 +390,7 @@ exports.NanaInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -440,6 +440,7 @@ class Nana extends paperback_extensions_common_1.Source {
                     id: '0',
                     title: 'Latest Upload',
                     view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowLarge
                 }),
             },
         ];
