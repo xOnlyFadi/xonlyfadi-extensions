@@ -391,7 +391,7 @@ exports.TuMangaOnlineInfo = {
     description: 'Extensión que extrae el manga de lectortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '1.0.1',
+    version: '1.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -701,6 +701,7 @@ exports.Parser = void 0;
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const paperback_extensions_common_1 = require("paperback-extensions-common");
+require("../scopes");
 class Parser {
     constructor() {
         this.idCleaner = (str, source) => {
@@ -1032,21 +1033,8 @@ class Parser {
     }
 }
 exports.Parser = Parser;
-String.prototype.substringBeforeLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(0, lastIndexOfCharacter);
-};
-String.prototype.substringAfterFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1;
-    return this.substring(endIndexOfSubstring + 1, this.length);
-};
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    return this.substring(0, startingIndexOfSubstring);
-};
 
-},{"paperback-extensions-common":5}],50:[function(require,module,exports){
+},{"../scopes":51,"paperback-extensions-common":5}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentSettings = exports.getNSFW = void 0;
@@ -1093,6 +1081,45 @@ const contentSettings = (stateManager) => {
     });
 };
 exports.contentSettings = contentSettings;
+
+},{}],51:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+String.prototype.substringAfterLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1);
+};
+String.prototype.substringBeforeLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(0, lastIndexOfCharacter);
+};
+String.prototype.substringAfterFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    const endIndexOfSubstring = startingIndexOfSubstring + string.length - 1;
+    return this.substring(endIndexOfSubstring + 1, this.length);
+};
+String.prototype.substringBeforeFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    return this.substring(0, startingIndexOfSubstring);
+};
+String.prototype.removePrefix = function (prefix) {
+    if (this.startsWith(prefix)) {
+        return this.substring(prefix.length, this.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSuffix = function (suffix) {
+    if (this.endsWith(suffix)) {
+        return this.substring(0, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSurrounding = function (prefix, suffix) {
+    if ((this.length >= prefix.length + suffix.length) && this.startsWith(prefix) && this.endsWith(suffix)) {
+        return this.substring(prefix.length, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
 
 },{}]},{},[48])(48)
 });

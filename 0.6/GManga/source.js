@@ -13484,13 +13484,12 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const GMangaParser_1 = require("./GMangaParser");
 const GMangaUtils_1 = require("./GMangaUtils");
 const moment_1 = __importDefault(require("moment"));
-require("./GMangaHelper");
 const DOMAIN = 'gmanga.org';
 const GMANGA_BASE = `https://${DOMAIN}`;
 const GMANGA_API = `https://api.${DOMAIN}/api`;
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36';
 exports.GMangaInfo = {
-    version: '1.0.2',
+    version: '1.0.3',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -13813,15 +13812,7 @@ class GManga extends paperback_extensions_common_1.Source {
 }
 exports.GManga = GManga;
 
-},{"./GMangaHelper":94,"./GMangaParser":95,"./GMangaUtils":96,"moment":46,"paperback-extensions-common":50}],94:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-String.prototype.substringBeforeLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(0, lastIndexOfCharacter);
-};
-
-},{}],95:[function(require,module,exports){
+},{"./GMangaParser":94,"./GMangaUtils":95,"moment":46,"paperback-extensions-common":50}],94:[function(require,module,exports){
 "use strict";
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -13830,7 +13821,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.months = exports.popularQuery = exports.parseMetadata = exports.parseSearchFields = exports.parseTags = exports.parseHompage = exports.parseSearch = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities_1 = require("entities");
-require("./GMangaHelper");
+require("../scopes");
 const parseMangaDetails = (data, mangaId) => {
     const details = data.mangaData;
     const titles = [];
@@ -14490,7 +14481,7 @@ exports.months = {
     'December': 12,
 };
 
-},{"./GMangaHelper":94,"entities":45,"paperback-extensions-common":50}],96:[function(require,module,exports){
+},{"../scopes":96,"entities":45,"paperback-extensions-common":50}],95:[function(require,module,exports){
 "use strict";
 // touching anything in the code it will just break
 var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -14576,5 +14567,44 @@ class GMangaUtils {
 }
 exports.GMangaUtil = new GMangaUtils;
 
-},{"crypto-js":12}]},{},[93])(93)
+},{"crypto-js":12}],96:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+String.prototype.substringAfterLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1);
+};
+String.prototype.substringBeforeLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(0, lastIndexOfCharacter);
+};
+String.prototype.substringAfterFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    const endIndexOfSubstring = startingIndexOfSubstring + string.length - 1;
+    return this.substring(endIndexOfSubstring + 1, this.length);
+};
+String.prototype.substringBeforeFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    return this.substring(0, startingIndexOfSubstring);
+};
+String.prototype.removePrefix = function (prefix) {
+    if (this.startsWith(prefix)) {
+        return this.substring(prefix.length, this.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSuffix = function (suffix) {
+    if (this.endsWith(suffix)) {
+        return this.substring(0, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSurrounding = function (prefix, suffix) {
+    if ((this.length >= prefix.length + suffix.length) && this.startsWith(prefix) && this.endsWith(suffix)) {
+        return this.substring(prefix.length, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+
+},{}]},{},[93])(93)
 });

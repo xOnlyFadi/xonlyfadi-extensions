@@ -9872,7 +9872,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.7',
+    version: '1.0.8',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -10088,7 +10088,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
 }
 exports.VoyceME = VoyceME;
 
-},{"./VoyceMEGraphQL":103,"./VoyceMEParser":105,"paperback-extensions-common":56}],103:[function(require,module,exports){
+},{"./VoyceMEGraphQL":103,"./VoyceMEParser":104,"paperback-extensions-common":56}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChapterDetailQuery = exports.MangaDetailQuery = exports.SearchQuery = exports.Top5Query = exports.popularQuery = exports.LatestQuery = void 0;
@@ -10222,18 +10222,6 @@ exports.ChapterDetailQuery = ChapterDetailQuery;
 },{}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-String.prototype.substringAfterLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1); //should be 39
-};
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    return this.substring(0, startingIndexOfSubstring);
-};
-
-},{}],105:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-useless-escape */
@@ -10242,7 +10230,7 @@ exports.Parser = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
-require("./VoyceMEHelper");
+require("../scopes");
 class Parser {
     constructor() {
         this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net/';
@@ -10369,5 +10357,44 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"./VoyceMEHelper":104,"entities":14,"html-to-text":16,"paperback-extensions-common":56}]},{},[102])(102)
+},{"../scopes":105,"entities":14,"html-to-text":16,"paperback-extensions-common":56}],105:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+String.prototype.substringAfterLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1);
+};
+String.prototype.substringBeforeLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(0, lastIndexOfCharacter);
+};
+String.prototype.substringAfterFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    const endIndexOfSubstring = startingIndexOfSubstring + string.length - 1;
+    return this.substring(endIndexOfSubstring + 1, this.length);
+};
+String.prototype.substringBeforeFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    return this.substring(0, startingIndexOfSubstring);
+};
+String.prototype.removePrefix = function (prefix) {
+    if (this.startsWith(prefix)) {
+        return this.substring(prefix.length, this.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSuffix = function (suffix) {
+    if (this.endsWith(suffix)) {
+        return this.substring(0, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSurrounding = function (prefix, suffix) {
+    if ((this.length >= prefix.length + suffix.length) && this.startsWith(prefix) && this.endsWith(suffix)) {
+        return this.substring(prefix.length, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+
+},{}]},{},[102])(102)
 });

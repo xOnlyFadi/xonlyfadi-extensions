@@ -390,7 +390,7 @@ exports.NanaInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.3',
+    version: '1.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -561,6 +561,7 @@ exports.Nana = Nana;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
+require("../scopes");
 class Parser {
     decodeHTMLEntity(str) {
         return str.replace(/&#(\d+)/g, (_match, dec) => {
@@ -638,15 +639,45 @@ class Parser {
     }
 }
 exports.Parser = Parser;
-String.prototype.substringAfterFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
-    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1;
+
+},{"../scopes":50,"paperback-extensions-common":5}],50:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+String.prototype.substringAfterLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(lastIndexOfCharacter + 1, this.length + 1);
+};
+String.prototype.substringBeforeLast = function (string) {
+    const lastIndexOfCharacter = this.lastIndexOf(string);
+    return this.substring(0, lastIndexOfCharacter);
+};
+String.prototype.substringAfterFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
+    const endIndexOfSubstring = startingIndexOfSubstring + string.length - 1;
     return this.substring(endIndexOfSubstring + 1, this.length);
 };
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring);
+String.prototype.substringBeforeFirst = function (string) {
+    const startingIndexOfSubstring = this.indexOf(string);
     return this.substring(0, startingIndexOfSubstring);
 };
+String.prototype.removePrefix = function (prefix) {
+    if (this.startsWith(prefix)) {
+        return this.substring(prefix.length, this.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSuffix = function (suffix) {
+    if (this.endsWith(suffix)) {
+        return this.substring(0, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
+String.prototype.removeSurrounding = function (prefix, suffix) {
+    if ((this.length >= prefix.length + suffix.length) && this.startsWith(prefix) && this.endsWith(suffix)) {
+        return this.substring(prefix.length, this.length - suffix.length);
+    }
+    return this.substring(0, this.length);
+};
 
-},{"paperback-extensions-common":5}]},{},[48])(48)
+},{}]},{},[48])(48)
 });
