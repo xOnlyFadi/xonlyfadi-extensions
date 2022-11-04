@@ -9,6 +9,8 @@ import {Chapter,
     Tag,
     TagSection} from 'paperback-extensions-common'
 
+import '../scopes'
+
 export class Parser {
     decodeHTMLEntity(str: string): string {
         return str.replace(/&#(\d+)/g, (_match, dec) => {
@@ -365,27 +367,4 @@ export class Parser {
         str = str.replace('view_uploads/','')
         return str
     }
-}
-export {}
-
-declare global {
-    interface String {
-        substringBeforeLast(character:any): any
-        substringAfterFirst(substring:any): any
-        substringBeforeFirst(substring:any): any
-    }
-}
-
-String.prototype.substringBeforeLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character)
-    return this.substring(0, lastIndexOfCharacter)
-}
-String.prototype.substringAfterFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1
-    return this.substring(endIndexOfSubstring + 1, this.length)
-}
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    return this.substring(0, startingIndexOfSubstring)
 }

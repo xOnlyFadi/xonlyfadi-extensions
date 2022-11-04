@@ -15,7 +15,7 @@ import {VoyceData,
 import {decodeHTML} from 'entities'
 import {convert} from 'html-to-text'
 
-import './VoyceMEHelper'
+import '../scopes'
 
 export class Parser {
 

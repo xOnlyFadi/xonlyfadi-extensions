@@ -26,7 +26,7 @@ import {
 
 import { decodeHTML } from 'entities'
 
-import './GMangaHelper'
+import '../scopes'
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga => {
     const details = data.mangaData

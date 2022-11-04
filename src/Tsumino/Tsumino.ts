@@ -31,12 +31,12 @@ import {
     parseSearch
 } from './TsuminoParser'
 
-import './TsuminoHelper'
+import '../scopes'
 
 const TSUMINO_DOMAIN = 'https://www.tsumino.com'
 
 export const TsuminoInfo: SourceInfo = {
-    version: '1.0.2',
+    version: '1.0.3',
     name: 'Tsumino',
     icon: 'icon.png',
     author: 'xOnlyFadi',

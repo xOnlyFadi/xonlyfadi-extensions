@@ -15,8 +15,6 @@ import {
 
 import { decodeHTML } from 'entities'
 
-import './TsuminoHelper'
-
 export const parseMangaDetails = ($: CheerioStatic, mangaId: string): Manga => {
 
     const title = decodeHTML($('meta[property=\'og:title\']')?.first()?.attr('content')?.trim() ?? '')

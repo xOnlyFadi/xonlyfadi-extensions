@@ -64,21 +64,3 @@ export interface Chapter {
     title:      string;
     created_at: Date;
 }
-
-
-export {}
-
-declare global {
-    interface String {
-        substringAfterLast(character: string): string
-        substringBeforeFirst(substring: string): string
-    }
-}
-String.prototype.substringAfterLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character)
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1) //should be 39
-}
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    return this.substring(0, startingIndexOfSubstring)
-}

@@ -130,16 +130,3 @@ export interface ChapterDetailsImages {
         }
     }
 }
-
-export {}
-
-declare global {
-    interface String {
-        substringBeforeLast(character: string): string
-    }
-}
-
-String.prototype.substringBeforeLast = function (character) {
-    const lastIndexOfCharacter = this.lastIndexOf(character)
-    return this.substring(0, lastIndexOfCharacter)
-}

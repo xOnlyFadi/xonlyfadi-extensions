@@ -8,7 +8,10 @@ import {
     MangaStatus, 
     MangaTile, 
     Tag,
-    TagSection} from 'paperback-extensions-common'
+    TagSection
+} from 'paperback-extensions-common'
+
+import '../scopes'
 
 export class Parser {
 
@@ -107,23 +110,4 @@ export class Parser {
 
 export interface chap_thmbnails {
     pages: string[];
-}
-
-export {}
-
-declare global {
-    interface String {
-        substringAfterFirst(substring:any): any
-        substringBeforeFirst(substring:any): any
-    }
-}
-
-String.prototype.substringAfterFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1
-    return this.substring(endIndexOfSubstring + 1, this.length)
-}
-String.prototype.substringBeforeFirst = function (substring) {
-    const startingIndexOfSubstring = this.indexOf(substring)
-    return this.substring(0, startingIndexOfSubstring)
 }
