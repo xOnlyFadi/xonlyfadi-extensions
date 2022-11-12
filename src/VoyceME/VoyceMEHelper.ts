@@ -1,66 +1,102 @@
 
-export interface VoyceData {
-    data: Data;
-}
-
-export interface Data {
-    voyce_series: VoyceSery[];
-}
-
-export interface VoyceSery {
-    id:        number;
-    slug:      string;
-    thumbnail: string;
-    title:     string;
+export interface SearchData {
+    data: {
+        voyce_series: [
+            {
+                id:        number
+                thumbnail: string
+                title:     string
+            }
+        ] 
+    }
 }
 
 export interface VoyceMangaData {
-    data: Data2;
-}
-
-export interface Data2 {
-    voyce_series: VoyceSery2[];
-}
-
-export interface VoyceSery2 {
-    id:          number;
-    slug:        string;
-    thumbnail:   string;
-    title:       string;
-    description: string;
-    status:      string;
-    author:      Author;
-    genres:      GenreElement[];
-}
-
-export interface Author {
-    username: string;
-}
-
-export interface GenreElement {
-    genre: GenreGenre;
-}
-
-export interface GenreGenre {
-    title: string;
+    data: {
+        series: [
+            {
+                id:          number
+                slug:        string
+                thumbnail:   string
+                title:       string
+                description: string
+                status:      string
+                author: {
+                    username: string
+                }
+                genres: [
+                    {
+                        genre: {
+                            title: string
+                            id: number
+                        }
+                    }
+                ]
+            }
+        ]
+    }
 }
 
 
 export interface VoyceChapterData {
-    data: Data3;
+    data: {
+        series: [
+            {
+                chapters: [ 
+                    {
+                        id:         number
+                        title:      string
+                        created_at: Date
+                    }
+                ]
+            }
+        ]
+    }
 }
 
-export interface Data3 {
-    voyce_series: VoyceSery3[];
+export interface VoyceChapterDetailsData {
+    data: {
+        images: [
+            {
+                image:      string
+                id:         number
+                sort_order: number
+            }
+        ]
+    }
 }
 
-export interface VoyceSery3 {
-    slug:     string;
-    chapters: Chapter[];
+export interface HomePageData {
+    data: {
+        featured: Featured[]
+        popular: Featured[]
+        trending: Featured[]
+        recommended: Featured[]
+        recent: Featured[]
+        fresh: Featured[]
+    }
 }
 
-export interface Chapter {
-    id:         number;
-    title:      string;
-    created_at: Date;
+export interface Featured {
+    id:            number
+    thumbnail:     string
+    title:         string
+    chapter_count: number
+}
+
+export interface SearchType {
+    data: {
+        types: [
+            {
+                title: string
+                id:    number
+            } 
+        ]
+        genres: [
+            {
+                title: string
+                id:    number
+            } 
+        ] 
+    }
 }

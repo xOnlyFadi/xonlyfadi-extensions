@@ -10,22 +10,34 @@ import {
     HomeSection,
     SearchRequest,
     SourceInfo,
-    MangaStatus,
     ContentRating,
     LanguageCode,
     Request,
     Response,
-    HomeSectionType
+    TagSection,
+    SearchField
 } from 'paperback-extensions-common'
-import {LatestQuery,
-    popularQuery,
-    Top5Query,
+
+import {
     SearchQuery,
     MangaDetailQuery,
-    ChapterDetailQuery} from './VoyceMEGraphQL'
+    ChaptersQuery,
+    FiltersQuery,
+    ChapterDetailsQuery,
+    HomePageQuery
+} from './VoyceMEGraphQL'
+
+import { 
+    SearchType,
+    VoyceChapterData, 
+    VoyceChapterDetailsData, 
+    VoyceMangaData 
+} from './VoyceMEHelper'
+
 import {
     Parser
 } from './VoyceMEParser'
+
 const VoyceME_Base = 'http://voyce.me'
 
 export const VoyceMEInfo: SourceInfo = {
@@ -33,7 +45,7 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.8',
+    version: '2.0.0',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
@@ -45,7 +57,7 @@ export class VoyceME extends Source {
     private readonly parser: Parser = new Parser()
     
     private readonly graphqlURL: string = 'https://graphql.voyce.me/v1/graphql'
-    private readonly popularPerPage: number = 10
+    private readonly popularPerPage: number = 30
 
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
@@ -78,85 +90,30 @@ export class VoyceME extends Source {
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const sections = [
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: Top5Query()
-                }),
-                section: createHomeSection({
-                    id: '0',
-                    title: 'Top 5 Series',
-                    type: HomeSectionType.featured,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: LatestQuery(1,this)
-                }),
-                section: createHomeSection({
-                    id: '1',
-                    title: 'Latest Updates',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: popularQuery(1,this)
-                }),
-                section: createHomeSection({
-                    id: '2',
-                    title: 'Popular Series',
-                    view_more: true,
-                }),
-            },
-        ]
-
-        const promises: Promise<void>[] = []
-        for (const section of sections) {
-            sectionCallback(section.section)
-            promises.push(
-                this.requestManager.schedule(section.request, 1).then(response => {
-                    let data
-                    try {
-                        data = JSON.parse(response.data)
-                        section.section.items = this.parser.parseHomeSections(data)
-                        sectionCallback(section.section)
-                    } catch (e) {
-                        throw new Error(`${e}`)
-                    }
-                }),
-            )
-
+        const request = createRequestObject({
+            url: this.graphqlURL,
+            method: 'POST',
+            data: HomePageQuery(0, this)
+        })
+        const response = await this.requestManager.schedule(request, 1)
+        let data
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
         }
-        await Promise.all(promises)
+
+        this.parser.parseHomeSections(data, sectionCallback)
+
     }
 
     override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
-        if (metadata?.completed) return metadata
-        const page: number = metadata?.page ?? 1
-        let graph
-
-        switch (homepageSectionId) {
-            case '1':
-                graph = LatestQuery(page,this)
-                break
-            case '2':
-                graph = popularQuery(page,this)
-                break
-            default:
-                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
-        }
+        const page: number = metadata?.page ?? 0
 
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: graph
+            data: HomePageQuery(page, this)
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -168,7 +125,7 @@ export class VoyceME extends Source {
             throw new Error(`${e}`)
         }
 
-        const manga = this.parser.parseHomeSections(data)
+        const manga = this.parser.parseViewMore(homepageSectionId, data)
         metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 
         return createPagedResults({
@@ -181,66 +138,72 @@ export class VoyceME extends Source {
         const options = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: MangaDetailQuery(mangaId)
+            data: MangaDetailQuery(Number(mangaId))
         })
 
         const response = await this.requestManager.schedule(options, 1)
 
-        let data
+        let data: VoyceMangaData
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
 
-        if(!data.data.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
+        if(data.data.series?.isEmpty()) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
 
-        return this.parser.parseMangaDetails(data, mangaId,this)
+        return this.parser.parseMangaDetails(data, mangaId)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const options = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: ChapterDetailQuery(mangaId)
+            data: ChaptersQuery(Number(mangaId))
         })
 
         const response = await this.requestManager.schedule(options, 1)
         
-        let data
+        let data: VoyceChapterData
         try {
             data = JSON.parse(response.data)
         } catch (e) {
             throw new Error(`${e}`)
         }
 
-        if(!data.data?.voyce_series[0]) throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`)
-        if (data.data?.manga?.voyce_series[0]?.length == 0) throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`)
+        if (data.data?.series?.isEmpty()) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
+
+        if (data.data?.series?.first()?.chapters?.isEmpty()) throw new Error(`Failed to parse chapters property from manga object mangaId: ${mangaId}`)
 
         return this.parser.parseChapters(data, mangaId)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const options = createRequestObject({
-            url: `${VoyceME_Base}/series/${chapterId}`,
-            method: 'GET'
+            url: this.graphqlURL,
+            method: 'POST',
+            data: ChapterDetailsQuery(Number(chapterId))
         })
 
         const response = await this.requestManager.schedule(options, 1)
-        const $ = this.cheerio.load(response.data)
 
-        return this.parser.parseChapterDetails($, mangaId, chapterId,this)
+        let data: VoyceChapterDetailsData
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
+        }
+
+        return this.parser.parseChapterDetails(data, mangaId, chapterId)
     }
 
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
-        if(!query.title) return createPagedResults({ results: [], metadata: undefined })
+        const page: number = metadata?.page ?? 0
 
-        const page: number = metadata?.page ?? 1
-        
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: SearchQuery(query.title.replace(/%20/g, ' ').replace(/_/g,' ') ?? '',page,this)
+            data: SearchQuery(query, metadata, this)
         })
 
         const response = await this.requestManager.schedule(request, 2)
@@ -252,7 +215,7 @@ export class VoyceME extends Source {
             throw new Error(`${e}`)
         }
 
-        const manga = this.parser.parseHomeSections(data)
+        const manga = this.parser.parseSearch(data)
 
         metadata = manga.length == this.popularPerPage ? {page: page + 1} : undefined
 
@@ -262,17 +225,33 @@ export class VoyceME extends Source {
         })
     }
     
-    parseStatus(str: string): MangaStatus {
-        let status = MangaStatus.UNKNOWN
-        switch (str.toLowerCase()) {
-            case 'ongoing':
-            case 'on-going':
-                status = MangaStatus.ONGOING
-                break
-            case 'completed':
-                status = MangaStatus.COMPLETED
-                break
+    override async getSearchTags(): Promise<TagSection[]> {
+        const request = createRequestObject({
+            url: this.graphqlURL,
+            method: 'POST',
+            data: FiltersQuery()
+        })
+
+        const response = await this.requestManager.schedule(request, 2)
+
+        let data: SearchType
+        try {
+            data = JSON.parse(response.data)
+        } catch (e) {
+            throw new Error(`${e}`)
         }
-        return status
+
+        return this.parser.parseTags(data)
+    }
+
+    override async supportsSearchOperators(): Promise<boolean> {
+        return true
+    }
+
+    override async getSearchFields(): Promise<SearchField[]> {
+        return [
+            createSearchField({id: 'author', placeholder: '', name: 'Author'}),
+            createSearchField({id: 'description', placeholder: '', name: 'Description'})
+        ]
     }
 }
