@@ -9872,7 +9872,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '1.0.8',
+    version: '2.0.0',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -9883,7 +9883,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
         super(...arguments);
         this.parser = new VoyceMEParser_1.Parser();
         this.graphqlURL = 'https://graphql.voyce.me/v1/graphql';
-        this.popularPerPage = 10;
+        this.popularPerPage = 30;
         this.requestManager = createRequestManager({
             requestsPerSecond: 3,
             requestTimeout: 15000,
@@ -9911,80 +9911,10 @@ class VoyceME extends paperback_extensions_common_1.Source {
         return `${VoyceME_Base}/series/${mangaId}`;
     }
     async getHomePageSections(sectionCallback) {
-        const sections = [
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: (0, VoyceMEGraphQL_1.Top5Query)()
-                }),
-                section: createHomeSection({
-                    id: '0',
-                    title: 'Top 5 Series',
-                    type: paperback_extensions_common_1.HomeSectionType.featured,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: (0, VoyceMEGraphQL_1.LatestQuery)(1, this)
-                }),
-                section: createHomeSection({
-                    id: '1',
-                    title: 'Latest Updates',
-                    view_more: true,
-                }),
-            },
-            {
-                request: createRequestObject({
-                    url: this.graphqlURL,
-                    method: 'POST',
-                    data: (0, VoyceMEGraphQL_1.popularQuery)(1, this)
-                }),
-                section: createHomeSection({
-                    id: '2',
-                    title: 'Popular Series',
-                    view_more: true,
-                }),
-            },
-        ];
-        const promises = [];
-        for (const section of sections) {
-            sectionCallback(section.section);
-            promises.push(this.requestManager.schedule(section.request, 1).then(response => {
-                let data;
-                try {
-                    data = JSON.parse(response.data);
-                    section.section.items = this.parser.parseHomeSections(data);
-                    sectionCallback(section.section);
-                }
-                catch (e) {
-                    throw new Error(`${e}`);
-                }
-            }));
-        }
-        await Promise.all(promises);
-    }
-    async getViewMoreItems(homepageSectionId, metadata) {
-        if (metadata?.completed)
-            return metadata;
-        const page = metadata?.page ?? 1;
-        let graph;
-        switch (homepageSectionId) {
-            case '1':
-                graph = (0, VoyceMEGraphQL_1.LatestQuery)(page, this);
-                break;
-            case '2':
-                graph = (0, VoyceMEGraphQL_1.popularQuery)(page, this);
-                break;
-            default:
-                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
-        }
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: graph
+            data: (0, VoyceMEGraphQL_1.HomePageQuery)(0, this)
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -9994,7 +9924,24 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = this.parser.parseHomeSections(data);
+        this.parser.parseHomeSections(data, sectionCallback);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 0;
+        const request = createRequestObject({
+            url: this.graphqlURL,
+            method: 'POST',
+            data: (0, VoyceMEGraphQL_1.HomePageQuery)(page, this)
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        let data;
+        try {
+            data = JSON.parse(response.data);
+        }
+        catch (e) {
+            throw new Error(`${e}`);
+        }
+        const manga = this.parser.parseViewMore(homepageSectionId, data);
         metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
@@ -10005,7 +9952,7 @@ class VoyceME extends paperback_extensions_common_1.Source {
         const options = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.MangaDetailQuery)(mangaId)
+            data: (0, VoyceMEGraphQL_1.MangaDetailQuery)(Number(mangaId))
         });
         const response = await this.requestManager.schedule(options, 1);
         let data;
@@ -10015,15 +9962,15 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        if (!data.data.voyce_series[0])
-            throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`);
-        return this.parser.parseMangaDetails(data, mangaId, this);
+        if (data.data.series?.isEmpty())
+            throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`);
+        return this.parser.parseMangaDetails(data, mangaId);
     }
     async getChapters(mangaId) {
         const options = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.ChapterDetailQuery)(mangaId)
+            data: (0, VoyceMEGraphQL_1.ChaptersQuery)(Number(mangaId))
         });
         const response = await this.requestManager.schedule(options, 1);
         let data;
@@ -10033,29 +9980,34 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        if (!data.data?.voyce_series[0])
-            throw new Error(`Failed to parse manga property from data object mangaId:${mangaId}`);
-        if (data.data?.manga?.voyce_series[0]?.length == 0)
-            throw new Error(`Failed to parse chapters property from manga object mangaId:${mangaId}`);
+        if (data.data?.series?.isEmpty())
+            throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`);
+        if (data.data?.series?.first()?.chapters?.isEmpty())
+            throw new Error(`Failed to parse chapters property from manga object mangaId: ${mangaId}`);
         return this.parser.parseChapters(data, mangaId);
     }
     async getChapterDetails(mangaId, chapterId) {
         const options = createRequestObject({
-            url: `${VoyceME_Base}/series/${chapterId}`,
-            method: 'GET'
+            url: this.graphqlURL,
+            method: 'POST',
+            data: (0, VoyceMEGraphQL_1.ChapterDetailsQuery)(Number(chapterId))
         });
         const response = await this.requestManager.schedule(options, 1);
-        const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapterDetails($, mangaId, chapterId, this);
+        let data;
+        try {
+            data = JSON.parse(response.data);
+        }
+        catch (e) {
+            throw new Error(`${e}`);
+        }
+        return this.parser.parseChapterDetails(data, mangaId, chapterId);
     }
     async getSearchResults(query, metadata) {
-        if (!query.title)
-            return createPagedResults({ results: [], metadata: undefined });
-        const page = metadata?.page ?? 1;
+        const page = metadata?.page ?? 0;
         const request = createRequestObject({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.SearchQuery)(query.title.replace(/%20/g, ' ').replace(/_/g, ' ') ?? '', page, this)
+            data: (0, VoyceMEGraphQL_1.SearchQuery)(query, metadata, this)
         });
         const response = await this.requestManager.schedule(request, 2);
         let data;
@@ -10065,12 +10017,540 @@ class VoyceME extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = this.parser.parseHomeSections(data);
+        const manga = this.parser.parseSearch(data);
         metadata = manga.length == this.popularPerPage ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
             metadata
         });
+    }
+    async getSearchTags() {
+        const request = createRequestObject({
+            url: this.graphqlURL,
+            method: 'POST',
+            data: (0, VoyceMEGraphQL_1.FiltersQuery)()
+        });
+        const response = await this.requestManager.schedule(request, 2);
+        let data;
+        try {
+            data = JSON.parse(response.data);
+        }
+        catch (e) {
+            throw new Error(`${e}`);
+        }
+        return this.parser.parseTags(data);
+    }
+    async supportsSearchOperators() {
+        return true;
+    }
+    async getSearchFields() {
+        return [
+            createSearchField({ id: 'author', placeholder: '', name: 'Author' }),
+            createSearchField({ id: 'description', placeholder: '', name: 'Description' })
+        ];
+    }
+}
+exports.VoyceME = VoyceME;
+
+},{"./VoyceMEGraphQL":103,"./VoyceMEParser":104,"paperback-extensions-common":56}],103:[function(require,module,exports){
+"use strict";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FiltersQuery = exports.ChapterDetailsQuery = exports.ChaptersQuery = exports.MangaDetailQuery = exports.SearchQuery = exports.HomePageQuery = void 0;
+require("../scopes");
+const HomePageQuery = (page, source) => ({
+    query: `query ($offset: Int, $limit: Int) {
+      featured: voyce_series(
+        where: {
+          publish: { _eq: 1 }
+          type: { id: { _in: [2, 4] } }
+          feature: { _eq: "1" }
+          id: { _is_null: false }
+        }
+        order_by: { views_counts: { count: desc_nulls_last } }
+        limit: 10
+      ) {
+        ...info
+      }
+      popular: voyce_series(
+        where: {
+          publish: { _eq: 1 }
+          type: { id: { _in: [2, 4] } }
+          id: { _is_null: false }
+        }
+        order_by: { views_counts: { count: desc_nulls_last } }
+        limit: $limit
+        offset: $offset
+      ) {
+        ...info
+      }
+      trending: voyce_series(
+        where: {
+          publish: { _eq: 1 }
+          type: { id: { _in: [2, 4] } }
+          id: { _is_null: false }
+        }
+        order_by: { trending: desc_nulls_last }
+        limit: $limit
+        offset: $offset
+      ) {
+        ...info
+      }
+      recommended: voyce_series(
+        where: {
+          publish: { _eq: 1 }
+          type: { id: { _in: [2, 4] } }
+          id: { _is_null: false }
+        }
+        order_by: { is_recommended: desc_nulls_last }
+        limit: $limit
+        offset: $offset
+      ) {
+        ...info
+      }
+      recent: voyce_series(
+        where: {
+          publish: { _eq: 1 }
+          id: { _is_null: false }
+          type: { id: { _in: [2, 4] } }
+        }
+        order_by: { updated_at: desc_nulls_last }
+        limit: $limit
+        offset: $offset
+      ) {
+        ...info
+      }
+      fresh: voyce_series(
+        limit: $limit
+        offset: $offset
+        where: {
+          publish: { _eq: 1 }
+          id: { _is_null: false }
+          type: { id: { _in: [2, 4] } }
+        }
+        order_by: { created_at: desc_nulls_last }
+      ) {
+        ...info
+      }
+    }
+    
+    fragment info on voyce_series {
+      id
+      thumbnail
+      title
+      chapter_count
+    }`,
+    variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
+});
+exports.HomePageQuery = HomePageQuery;
+const SearchQuery = (query, metadata, source) => {
+    const page = metadata?.page ?? 0;
+    const Genres = [];
+    const Types = [];
+    const Status = [];
+    let Category = false;
+    query.includedTags?.map(x => {
+        const id = x?.id ?? '';
+        const SplittedID = id?.split('.')?.pop() ?? '';
+        if (id.includes('genre.')) {
+            Genres.push(Number(SplittedID));
+        }
+        if (id.includes('types.')) {
+            Types.push(Number(SplittedID));
+        }
+        if (id.includes('category.')) {
+            Category = true;
+        }
+        if (id.includes('status.')) {
+            Status.push(SplittedID);
+        }
+    });
+    const title = query?.title ?? '';
+    const description = query?.parameters?.['description'] ?? '';
+    const author = query?.parameters?.['author'] ?? '';
+    return {
+        query: `query($limit: Int, $offset: Int) {
+            voyce_series(
+                where: {
+                    ${title || description || author ? `_or: [
+                        ${title ? `{ title: { _ilike: "%${title}%" } }` : ''}
+                        ${description ? `{ description: { _ilike: "%${description}%" } }` : ''}
+                        ${author ? `{ author: { username: { _ilike: "%${author}%" } } }` : ''}
+                        ]` : ''}
+                    publish: { _eq: 1 },
+                    ${Category ? 'is_original: {_eq: 1}' : ''}
+                    type: { id: { _in: ${Types.isNotEmpty() ? `${JSON.stringify(Types)}` : '[2, 4]'} } }
+                    ${Status.isNotEmpty() ? `status: { _in: ${JSON.stringify(Status)} }` : ''}
+                    ${Genres.isNotEmpty() ? `genres: { genre_id: { _in: ${JSON.stringify(Genres)} } }` : ''}
+                },
+                order_by: [{ views_counts: { count: desc_nulls_last } }],
+                limit: $limit,
+                offset: $offset
+            ) {
+                id
+                slug
+                thumbnail
+                title
+            }
+        }`,
+        variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
+    };
+};
+exports.SearchQuery = SearchQuery;
+const MangaDetailQuery = (id) => ({
+    query: `query($id: Int!) {
+        series: voyce_series(
+            where: { 
+              id: { _eq: $id }
+              publish: { _eq: 1 },
+              type: { id: { _in: [2, 4] } },
+          }, 
+            limit: 1
+            ) {
+                  id
+                  slug
+                  thumbnail
+                  title
+                  description
+                  status
+                  author { username }
+                  genres(order_by: [{ genre: { title: asc } }]) {
+                      genre { 
+                        title
+                        id 
+                    }
+                  }
+              }
+      }`,
+    variables: { 'id': id }
+});
+exports.MangaDetailQuery = MangaDetailQuery;
+const ChaptersQuery = (id) => ({
+    query: `query ($id: Int!) {
+        series: voyce_series(
+          where: {
+            id: { _eq: $id }
+            publish: { _eq: 1 }
+            type: { id: { _in: [2, 4] } }
+          }
+          limit: 1
+        ) {
+          chapters(order_by: [{ created_at: desc }]) {
+            id
+            title
+            created_at
+          }
+        }
+      }`,
+    variables: { 'id': id }
+});
+exports.ChaptersQuery = ChaptersQuery;
+const ChapterDetailsQuery = (chapterId) => ({
+    query: `query($chapterId: Int!) {
+        images: voyce_chapter_images(
+          where: { chapter_id: { _eq: $chapterId } }
+          order_by: [{ sort_order: asc }, { id: asc }]
+        ) {
+          image
+          id
+          sort_order
+        }
+      }`,
+    variables: { 'chapterId': chapterId }
+});
+exports.ChapterDetailsQuery = ChapterDetailsQuery;
+const FiltersQuery = () => ({
+    query: `query filterTypes {
+        types: voyce_comic_types {
+          title
+          id
+        }
+        genres: voyce_genres {
+          title
+          id
+        }
+      }`,
+    variables: {}
+});
+exports.FiltersQuery = FiltersQuery;
+
+},{"../scopes":105}],104:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Parser = void 0;
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const paperback_extensions_common_1 = require("paperback-extensions-common");
+const entities_1 = require("entities");
+const html_to_text_1 = require("html-to-text");
+require("../scopes");
+class Parser {
+    constructor() {
+        this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net';
+    }
+    decodeHTMLEntity(str) {
+        return str.replace(/&#(\d+)/g, (_match, dec) => {
+            return String.fromCharCode(dec);
+        });
+    }
+    parseSearch(VoyceD) {
+        const items = [];
+        for (const data of VoyceD?.data?.voyce_series) {
+            const id = data?.id ?? '';
+            const title = data?.title?.trim() ?? '';
+            const image = data?.thumbnail ? encodeURI(`${this.staticURL}/${data?.thumbnail}`) : '';
+            if (!id)
+                continue;
+            items.push(createMangaTile({
+                id: `${id}`,
+                image,
+                title: createIconText({ text: title })
+            }));
+        }
+        return items;
+    }
+    parseHomeSections(data, sectionCallback) {
+        const sections = [
+            {
+                data: data.data.featured,
+                section: createHomeSection({
+                    id: 'featured',
+                    title: 'Featured Series',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.featured
+                })
+            },
+            {
+                data: data.data.popular,
+                section: createHomeSection({
+                    id: 'popular',
+                    title: 'Popular Series',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowNormal
+                })
+            },
+            {
+                data: data.data.trending,
+                section: createHomeSection({
+                    id: 'trending',
+                    title: 'Trending Series',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowNormal
+                })
+            },
+            {
+                data: data.data.recommended,
+                section: createHomeSection({
+                    id: 'recommended',
+                    title: 'Recommended Series',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowNormal
+                })
+            },
+            {
+                data: data.data.recent,
+                section: createHomeSection({
+                    id: 'recent',
+                    title: 'Recent Episodes',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowNormal
+                })
+            },
+            {
+                data: data.data.fresh,
+                section: createHomeSection({
+                    id: 'fresh',
+                    title: 'Fresh Series',
+                    view_more: true,
+                    type: paperback_extensions_common_1.HomeSectionType.singleRowNormal
+                })
+            }
+        ];
+        for (const section of sections) {
+            const mangaItemsArray = [];
+            const collectedIds = [];
+            for (const manga of section.data) {
+                const title = manga?.title ?? '';
+                const id = manga?.id ?? '';
+                const image = manga?.thumbnail ? encodeURI(`${this.staticURL}/${manga.thumbnail}`) : '';
+                const subtitle = manga?.chapter_count ? `${manga?.chapter_count} Chapters` : '';
+                if (!id || collectedIds.includes(id))
+                    continue;
+                mangaItemsArray.push(createMangaTile({
+                    id: `${id}`,
+                    title: createIconText({ text: title }),
+                    subtitleText: createIconText({ text: subtitle }),
+                    image: image
+                }));
+                collectedIds.push(id);
+            }
+            section.section.items = mangaItemsArray;
+            sectionCallback(section.section);
+        }
+    }
+    parseViewMore(homepageSectionId, data) {
+        const collectedIds = [];
+        const mangaItemsArray = [];
+        let mangaData;
+        switch (homepageSectionId) {
+            case 'popular':
+                mangaData = data.data.popular;
+                break;
+            case 'trending':
+                mangaData = data.data.trending;
+                break;
+            case 'recommended':
+                mangaData = data.data.recommended;
+                break;
+            case 'recent':
+                mangaData = data.data.recent;
+                break;
+            case 'fresh':
+                mangaData = data.data.fresh;
+                break;
+        }
+        if (mangaData) {
+            for (const manga of mangaData) {
+                const title = manga?.title ?? '';
+                const id = manga?.id ?? '';
+                const image = manga?.thumbnail ? encodeURI(`${this.staticURL}/${manga.thumbnail}`) : '';
+                const subtitle = manga?.chapter_count ? `${manga?.chapter_count} Chapters` : '';
+                if (!id || collectedIds.includes(id))
+                    continue;
+                mangaItemsArray.push(createMangaTile({
+                    id: `${id}`,
+                    title: createIconText({ text: title }),
+                    subtitleText: createIconText({ text: subtitle }),
+                    image: image
+                }));
+                collectedIds.push(id);
+            }
+        }
+        return mangaItemsArray;
+    }
+    parseMangaDetails(VoyceD, mangaId) {
+        const details = VoyceD.data.series.first();
+        const title = details?.title.trim() ?? '';
+        const image = details?.thumbnail ? encodeURI(`${this.staticURL}/${details?.thumbnail}`) : '';
+        let desc = details?.description ?? '';
+        if (desc == '')
+            desc = 'No Decscription provided by the source (VoyceME)';
+        const author = details?.author?.username ?? '';
+        const status = details?.status ?? '';
+        const arrayTags = [];
+        for (const obj of details?.genres ?? []) {
+            const id = obj.genre.id ?? '';
+            const title = obj?.genre.title.trim() ?? '';
+            if (!id || !title)
+                continue;
+            arrayTags.push({
+                id: `genre.${id}`,
+                label: title
+            });
+        }
+        const tagSections = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })];
+        return createManga({
+            id: mangaId,
+            titles: [this.decodeHTMLEntity(title)],
+            image,
+            status: this.parseStatus(status),
+            author: this.decodeHTMLEntity(author),
+            tags: tagSections,
+            desc: (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(desc), { wordwrap: 130 }),
+        });
+    }
+    parseChapters(VoyceD, mangaId) {
+        const chapters = [];
+        const data = VoyceD?.data?.series?.first();
+        let sortingIndex = 0;
+        for (const obj of data?.chapters ?? []) {
+            const id = obj.id ?? '';
+            const name = obj.title ?? 'No Chpater Name';
+            const release_date = obj.created_at;
+            const chapNum = Number(name.match(/\d+/)?.pop()?.replace(/-/g, '.'));
+            if (!id)
+                continue;
+            chapters.push(createChapter({
+                id: `${id}`,
+                mangaId: mangaId,
+                name: name,
+                chapNum: isNaN(chapNum) ? 0 : chapNum,
+                time: new Date(release_date),
+                langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
+                // @ts-ignore
+                sortingIndex
+            }));
+            sortingIndex--;
+        }
+        const key = 'name';
+        const arrayUniqueByKey = [...new Map(chapters.map(item => [item[key], item])).values()];
+        return arrayUniqueByKey;
+    }
+    async parseChapterDetails(data, mangaId, chapterId) {
+        const pages = [];
+        for (const page of data.data.images) {
+            const url = page?.image ?? '';
+            if (!url)
+                continue;
+            pages.push(encodeURI(`${this.staticURL}/${url}`));
+        }
+        return createChapterDetails({
+            id: chapterId,
+            mangaId: mangaId,
+            pages: pages,
+            longStrip: true
+        });
+    }
+    parseTags(data) {
+        const Genres = [];
+        for (const genre of data?.data?.genres) {
+            const id = genre?.id ?? '';
+            const label = genre?.title ?? '';
+            if (!id || !label)
+                continue;
+            Genres.push({
+                id: `genre.${id}`,
+                label
+            });
+        }
+        const Types = [];
+        for (const type of data?.data?.types) {
+            const id = type?.id ?? '';
+            const label = type?.title ?? '';
+            if (!id || !label)
+                continue;
+            if (label.toLowerCase().includes('novel'))
+                continue;
+            Types.push({
+                id: `types.${id}`,
+                label
+            });
+        }
+        const Category = [
+            {
+                id: 'category.1',
+                label: 'Originals'
+            }
+        ];
+        const Status = [
+            {
+                id: 'status.ongoing',
+                label: 'Ongoing'
+            },
+            {
+                id: 'status.completed',
+                label: 'Completed'
+            }
+        ];
+        return [
+            createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map((x) => createTag(x)) }),
+            createTagSection({ id: 'category', label: 'Category', tags: Category.map((x) => createTag(x)) }),
+            createTagSection({ id: 'types', label: 'Types', tags: Types.map((x) => createTag(x)) }),
+            createTagSection({ id: 'status', label: 'Status', tags: Status.map((x) => createTag(x)) })
+        ];
     }
     parseStatus(str) {
         let status = paperback_extensions_common_1.MangaStatus.UNKNOWN;
@@ -10086,314 +10566,62 @@ class VoyceME extends paperback_extensions_common_1.Source {
         return status;
     }
 }
-exports.VoyceME = VoyceME;
-
-},{"./VoyceMEGraphQL":103,"./VoyceMEParser":104,"paperback-extensions-common":56}],103:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChapterDetailQuery = exports.MangaDetailQuery = exports.SearchQuery = exports.Top5Query = exports.popularQuery = exports.LatestQuery = void 0;
-const LatestQuery = (page, source) => ({
-    query: `query($limit: Int, $offset: Int) {
-        voyce_series(
-            where: {
-                publish: { _eq: 1 },
-                type: { id: { _in: [2, 4] } }
-            },
-            order_by: [{ updated_at: desc }],
-            limit: $limit,
-            offset: $offset
-        ) {
-            id
-            slug
-            thumbnail
-            title
-        }
-    }`,
-    variables: { 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
-});
-exports.LatestQuery = LatestQuery;
-const popularQuery = (page, source) => ({
-    query: `query($limit: Int!, $offset: Int!) {
-        voyce_series(
-            where: {
-                publish: { _eq: 1 },
-                type: { id: { _in: [2, 4] } }
-            },
-            order_by: [{ views_counts: { count: desc_nulls_last } }],
-            limit: $limit,
-            offset: $offset
-        ) {
-            id
-            slug
-            thumbnail
-            title
-        }
-    }`,
-    variables: { 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
-});
-exports.popularQuery = popularQuery;
-const Top5Query = () => ({
-    query: `query{
-        voyce_series(
-          where: {
-            series_tags_junctions: {
-              series_tag: { name: { _eq: "originals_top_voyceme" } }
-            }
-          }
-          limit: 5
-        ) {
-                  id
-                  slug
-                  thumbnail
-                  title
-        }
-      }`,
-    variables: {}
-});
-exports.Top5Query = Top5Query;
-const SearchQuery = (query, page, source) => ({
-    query: `query($searchTerm: String!, $limit: Int, $offset: Int) {
-    voyce_series(
-        where: {
-            publish: { _eq: 1 },
-            type: { id: { _in: [2, 4] } },
-            title: { _ilike: $searchTerm }
-        },
-        order_by: [{ views_counts: { count: desc_nulls_last } }],
-        limit: $limit,
-        offset: $offset
-    ) {
-        id
-        slug
-        thumbnail
-        title
-    }
-}`,
-    variables: { 'searchTerm': `%${query}%`, 'offset': (page - 1) * source.popularPerPage, 'limit': source.popularPerPage }
-});
-exports.SearchQuery = SearchQuery;
-const MangaDetailQuery = (slug) => ({
-    query: `query($slug: String!) {
-        voyce_series(
-            where: {
-                publish: { _eq: 1 },
-                type: { id: { _in: [2, 4] } },
-                slug: { _eq: $slug }
-            },
-            limit: 1,
-        ) {
-            id
-            slug
-            thumbnail
-            title
-            description
-            status
-            author { username }
-            genres(order_by: [{ genre: { title: asc } }]) {
-                genre { title }
-            }
-        }
-    }`,
-    variables: { 'slug': slug }
-});
-exports.MangaDetailQuery = MangaDetailQuery;
-const ChapterDetailQuery = (slug) => ({
-    query: `query($slug: String!) {
-        voyce_series(
-            where: {
-                publish: { _eq: 1 },
-                type: { id: { _in: [2, 4] } },
-                slug: { _eq: $slug }
-            },
-            limit: 1,
-        ) {
-            slug
-            chapters(order_by: [{ created_at: desc }]) {
-                id
-                title
-                created_at
-            }
-        }
-    }`,
-    variables: { 'slug': slug }
-});
-exports.ChapterDetailQuery = ChapterDetailQuery;
-
-},{}],104:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Parser = void 0;
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable no-useless-escape */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const paperback_extensions_common_1 = require("paperback-extensions-common");
-const entities_1 = require("entities");
-const html_to_text_1 = require("html-to-text");
-require("../scopes");
-class Parser {
-    constructor() {
-        this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net/';
-        this.baseUrl = 'http://voyce.me';
-    }
-    decodeHTMLEntity(str) {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec);
-        });
-    }
-    parseHomeSections(VoyceD) {
-        const items = [];
-        for (const data of VoyceD.data.voyce_series) {
-            const id = data.slug.trim() ?? '';
-            const image = encodeURI(`${this.staticURL}${data.thumbnail}`) ?? '';
-            const title = data.title.trim() ?? '';
-            if (!id || !title)
-                continue;
-            items.push(createMangaTile({
-                id,
-                image,
-                title: createIconText({
-                    text: title
-                })
-            }));
-        }
-        return items;
-    }
-    async parseChapterDetails($, mangaId, chapterId, source) {
-        const pages = [];
-        const nextData = $('script#__NEXT_DATA__').get(0).children[0].data;
-        const nextJson = JSON.parse(nextData);
-        const buildId = nextJson.buildId;
-        const dataResponse = await this.ChapterDetailsApiRequest(buildId, mangaId, chapterId, source);
-        const dataJson = JSON.parse(dataResponse);
-        const comic = dataJson.pageProps.series;
-        const chapterIdV = chapterId.substringAfterLast('/').substringBeforeFirst('#');
-        const chapter = comic.chapters.map((x) => {
-            if (x.id == chapterIdV)
-                return x;
-        });
-        if (!chapter)
-            throw new Error('Chapter data not found in website.');
-        const info = JSON.parse(JSON.stringify(chapter), (_k, v) => Array.isArray(v) ? v.filter(e => e !== null) : v);
-        for (const page of info[0].images) {
-            pages.push(this.staticURL + page.image);
-        }
-        return createChapterDetails({
-            id: chapterId,
-            mangaId: mangaId,
-            pages: pages,
-            longStrip: true
-        });
-    }
-    async ChapterDetailsApiRequest(buildId, mangaId, chapterI, source) {
-        const chapterId = chapterI.substringAfterLast('/').substringBeforeFirst('#');
-        const options = createRequestObject({
-            url: `${this.baseUrl}/_next/data/${buildId}/series/${mangaId}/${chapterId}.json`,
-            method: 'GET'
-        });
-        const response = await source.requestManager.schedule(options, 1);
-        if (response.status == 500)
-            throw Error('Chapter Does not info doest not exist on the site');
-        return response.data;
-    }
-    parseChapters(VoyceD, mangaId) {
-        const data = VoyceD.data.voyce_series[0];
-        const chapters = [];
-        let sortingIndex = 0;
-        for (const obj of data?.chapters ?? []) {
-            const url = `${data?.slug}/${obj.id}#comic` ?? '';
-            const name = obj.title ?? 'No Chpater Name';
-            const release_date = obj.created_at;
-            if (!url)
-                continue;
-            const chapNum = Number(name.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'));
-            chapters.push(createChapter({
-                id: url,
-                mangaId: mangaId,
-                name: name,
-                chapNum: isNaN(chapNum) ? 0 : chapNum,
-                time: new Date(release_date),
-                langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
-                // @ts-ignore
-                sortingIndex
-            }));
-            sortingIndex--;
-        }
-        const key = 'name';
-        const arrayUniqueByKey = [...new Map(chapters.map(item => [item[key], item])).values()];
-        return arrayUniqueByKey;
-    }
-    parseMangaDetails(VoyceD, mangaId, source) {
-        const details = VoyceD.data.voyce_series[0];
-        const title = details?.title.trim() ?? '';
-        const image = encodeURI(this.staticURL + details?.thumbnail) ?? 'https://paperback.moe/icons/logo-alt.svg';
-        let desc = details?.description ?? '';
-        if (desc == '')
-            desc = 'No Decscription provided by the source (VoyceME)';
-        const author = details?.author?.username ?? '';
-        const status = details?.status ?? '';
-        const arrayTags = [];
-        for (const obj of details?.genres ?? []) {
-            const id = encodeURI(obj?.genre.title?.toLocaleLowerCase().trim()) ?? '';
-            const title = obj?.genre.title.trim() ?? '';
-            if (!id || !title)
-                continue;
-            arrayTags.push({
-                id: id,
-                label: title
-            });
-        }
-        const tagSections = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })];
-        return createManga({
-            id: mangaId,
-            titles: [this.decodeHTMLEntity(title)],
-            image,
-            status: source.parseStatus(status),
-            author: this.decodeHTMLEntity(author),
-            tags: tagSections,
-            desc: (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(desc), { wordwrap: 130 }),
-        });
-    }
-}
 exports.Parser = Parser;
 
 },{"../scopes":105,"entities":14,"html-to-text":16,"paperback-extensions-common":56}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-String.prototype.substringAfterLast = function (string) {
-    const lastIndexOfCharacter = this.lastIndexOf(string);
-    return this.substring(lastIndexOfCharacter + 1, this.length + 1);
+String.prototype.substringAfterLast = function (substring) {
+    const lastIndexOfCharacter = this?.lastIndexOf(substring);
+    return this?.substring(lastIndexOfCharacter + 1, this?.length + 1);
 };
-String.prototype.substringBeforeLast = function (string) {
-    const lastIndexOfCharacter = this.lastIndexOf(string);
-    return this.substring(0, lastIndexOfCharacter);
+String.prototype.substringBeforeLast = function (substring) {
+    const lastIndexOfCharacter = this?.lastIndexOf(substring);
+    return this?.substring(0, lastIndexOfCharacter);
 };
-String.prototype.substringAfterFirst = function (string) {
-    const startingIndexOfSubstring = this.indexOf(string);
-    const endIndexOfSubstring = startingIndexOfSubstring + string.length - 1;
-    return this.substring(endIndexOfSubstring + 1, this.length);
+String.prototype.substringAfterFirst = function (substring) {
+    const startingIndexOfSubstring = this?.indexOf(substring);
+    const endIndexOfSubstring = startingIndexOfSubstring + substring?.length - 1;
+    return this?.substring(endIndexOfSubstring + 1, this?.length);
 };
-String.prototype.substringBeforeFirst = function (string) {
-    const startingIndexOfSubstring = this.indexOf(string);
-    return this.substring(0, startingIndexOfSubstring);
+String.prototype.substringBeforeFirst = function (substring) {
+    const startingIndexOfSubstring = this?.indexOf(substring);
+    return this?.substring(0, startingIndexOfSubstring);
 };
 String.prototype.removePrefix = function (prefix) {
-    if (this.startsWith(prefix)) {
-        return this.substring(prefix.length, this.length);
+    if (this?.startsWith(prefix)) {
+        return this?.substring(prefix?.length, this?.length);
     }
-    return this.substring(0, this.length);
+    return this?.substring(0, this?.length);
 };
 String.prototype.removeSuffix = function (suffix) {
-    if (this.endsWith(suffix)) {
-        return this.substring(0, this.length - suffix.length);
+    if (this?.endsWith(suffix)) {
+        return this?.substring(0, this?.length - suffix?.length);
     }
-    return this.substring(0, this.length);
+    return this?.substring(0, this?.length);
 };
 String.prototype.removeSurrounding = function (prefix, suffix) {
-    if ((this.length >= prefix.length + suffix.length) && this.startsWith(prefix) && this.endsWith(suffix)) {
-        return this.substring(prefix.length, this.length - suffix.length);
+    if ((this?.length >= prefix?.length + suffix?.length) && this?.startsWith(prefix) && this?.endsWith(suffix)) {
+        return this?.substring(prefix?.length, this?.length - suffix?.length);
     }
-    return this.substring(0, this.length);
+    return this?.substring(0, this?.length);
+};
+String.prototype.isEmpty = function () {
+    return this?.length == 0;
+};
+String.prototype.isNotEmpty = function () {
+    return this?.length > 0;
+};
+Array.prototype.isEmpty = function () {
+    return this?.length == 0;
+};
+Array.prototype.isNotEmpty = function () {
+    return this?.length > 0;
+};
+Array.prototype.first = function () {
+    if (this?.isEmpty())
+        throw new Error('List is empty');
+    return this?.[0];
 };
 
 },{}]},{},[102])(102)
