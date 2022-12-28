@@ -383,7 +383,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaFreak = exports.MangaFreakInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MangaFreakParser_1 = require("./MangaFreakParser");
-const MangaFreak_BASE = 'https://w13.mangafreak.net';
+const MangaFreak_BASE = 'https://w14.mangafreak.net';
 const MangaFreak_CDN = 'https://images.mangafreak.net';
 const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15';
 exports.MangaFreakInfo = {
@@ -391,7 +391,7 @@ exports.MangaFreakInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.3',
+    version: '1.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
