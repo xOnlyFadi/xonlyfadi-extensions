@@ -20,14 +20,14 @@ import {
 
 import {Parser} from './VyvyMangaParser'
 
-const VyvyManga_Base = 'https://vyvymanga.com'
+const VyvyManga_Base = 'https://vyvymanga.net'
 
 export const VyvyMangaInfo: SourceInfo = {
     author: 'xOnlyFadi',
-    description: 'Extension that pulls manga from VyvyMangas.com',
+    description: 'Extension that pulls manga from vyvymanga.net',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.6',
+    version: '1.0.7',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: ContentRating.ADULT,
