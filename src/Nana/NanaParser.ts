@@ -52,9 +52,9 @@ export class Parser {
             const filterSplitted = filteredTagsArray[1].split(',')
             for(const tagsArray of filterSplitted) {
                 const label = tagsArray.trim()
-                const id = encodeURI('details.' + tagsArray.trim())
+                const id = encodeURI('details.' + tagsArray.trim()?.replace(/ /g, '+')?.replace(/%20/g, '+'))
 
-                if(!label || !id ) continue
+                if (!label || !id) continue
                 
                 arrayTags.push({label,id})
             }

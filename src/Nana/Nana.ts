@@ -29,7 +29,7 @@ export const NanaInfo: SourceInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: ContentRating.ADULT,
