@@ -390,7 +390,7 @@ exports.NanaInfo = {
     description: 'Extension that pulls manga from nana.my.id',
     icon: 'icon.png',
     name: 'Nana',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: Nana_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -594,7 +594,7 @@ class Parser {
             const filterSplitted = filteredTagsArray[1].split(',');
             for (const tagsArray of filterSplitted) {
                 const label = tagsArray.trim();
-                const id = encodeURI('details.' + tagsArray.trim());
+                const id = encodeURI('details.' + tagsArray.trim()?.replace(/ /g, '+')?.replace(/%20/g, '+'));
                 if (!label || !id)
                     continue;
                 arrayTags.push({ label, id });
