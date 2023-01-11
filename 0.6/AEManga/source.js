@@ -391,7 +391,7 @@ exports.AEMangaInfo = {
     description: 'Extension that pulls comics from manga.ae.',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     websiteBaseURL: AEManga_DOMAIN,
-    language: 'العربية',
+    language: 'Arabic',
     sourceTags: [
         {
             text: 'Cloudflare',

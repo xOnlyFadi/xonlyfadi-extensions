@@ -13497,7 +13497,7 @@ exports.GMangaInfo = {
     description: 'Extension that pulls from gmanga.org.',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
     websiteBaseURL: GMANGA_BASE,
-    language: 'العربية',
+    language: 'Arabic',
     sourceTags: [
         {
             text: 'العربية',
