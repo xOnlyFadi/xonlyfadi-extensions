@@ -391,10 +391,10 @@ exports.TuMangaOnlineInfo = {
     description: 'Extensión que extrae el manga de lectortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
-    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
+    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
     language: paperback_extensions_common_1.LanguageCode.SPANISH,
     sourceTags: [
         {
