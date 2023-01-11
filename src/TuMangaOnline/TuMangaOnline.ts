@@ -34,10 +34,10 @@ export const TuMangaOnlineInfo: SourceInfo = {
     description: 'Extensión que extrae el manga de lectortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '1.0.2',
+    version: '1.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.ADULT,
     language: LanguageCode.SPANISH,
     sourceTags: [
         {
