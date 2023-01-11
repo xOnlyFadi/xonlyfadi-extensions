@@ -53,7 +53,7 @@ export const GMangaInfo: SourceInfo = {
     description: 'Extension that pulls from gmanga.org.',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: GMANGA_BASE,
-    language: 'العربية',
+    language: 'Arabic',
     sourceTags: [
         {
             text: 'العربية',
