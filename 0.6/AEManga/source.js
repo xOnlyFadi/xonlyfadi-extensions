@@ -398,7 +398,7 @@ exports.AEMangaInfo = {
             type: paperback_extensions_common_1.TagType.RED
         },
         {
-            text: 'العربية',
+            text: 'Arabic',
             type: paperback_extensions_common_1.TagType.GREY
         }
     ]

@@ -13500,7 +13500,7 @@ exports.GMangaInfo = {
     language: 'Arabic',
     sourceTags: [
         {
-            text: 'العربية',
+            text: 'Arabic',
             type: paperback_extensions_common_1.TagType.GREY
         },
         {
