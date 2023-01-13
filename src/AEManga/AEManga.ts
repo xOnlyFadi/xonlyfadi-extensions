@@ -44,7 +44,7 @@ export const AEMangaInfo: SourceInfo = {
             type: TagType.RED
         },
         {
-            text: 'العربية',
+            text: 'Arabic',
             type: TagType.GREY
         }
     ]

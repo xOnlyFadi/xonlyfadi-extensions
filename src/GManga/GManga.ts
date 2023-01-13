@@ -56,7 +56,7 @@ export const GMangaInfo: SourceInfo = {
     language: 'Arabic',
     sourceTags: [
         {
-            text: 'العربية',
+            text: 'Arabic',
             type: TagType.GREY
         },
         {
