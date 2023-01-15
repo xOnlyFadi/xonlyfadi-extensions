@@ -29,8 +29,8 @@ import {
 const AEManga_DOMAIN = 'https://manga.ae'
 
 export const AEMangaInfo: SourceInfo = {
-    version: '1.0.1',
-    name: 'MangaAE',
+    version: '1.0.2',
+    name: 'AEManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
