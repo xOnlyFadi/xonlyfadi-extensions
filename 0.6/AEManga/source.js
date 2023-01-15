@@ -383,8 +383,8 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const AEMangaParser_1 = require("./AEMangaParser");
 const AEManga_DOMAIN = 'https://manga.ae';
 exports.AEMangaInfo = {
-    version: '1.0.1',
-    name: 'MangaAE',
+    version: '1.0.2',
+    name: 'AEManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
