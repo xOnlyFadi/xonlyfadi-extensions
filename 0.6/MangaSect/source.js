@@ -385,7 +385,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MangaSectParser_1 = require("./MangaSectParser");
 const DOMAIN = 'https://mangasect.com';
 exports.MangaSectInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'MangaSect',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -609,11 +609,10 @@ const parseChapters = ($, mangaId) => {
         const time = $('.timeago', chapter)?.attr('datetime') ?? '';
         if (!chapterId)
             continue;
-        const chapNR = AElement.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? '';
-        const numRegex = chapNR.match(/chapter-([\d.]+)?/);
+        const numRegex = title.match(/Chapter\s+(\d+(?:\.\d+)?)(?::\s+)?\w*/);
         let chapNum;
         if (numRegex && numRegex[1])
-            chapNum = numRegex[1]?.replace(/-/g, '.');
+            chapNum = numRegex[1];
         chapters.push(createChapter({
             id: chapterId,
             mangaId,
