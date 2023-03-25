@@ -9869,7 +9869,7 @@ const COMICK_DOMAIN = 'https://comick.fun';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '1.0.3',
+    version: '1.0.4',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -9942,22 +9942,10 @@ class ComicK extends paperback_extensions_common_1.Source {
         const showVol = await (0, ComicKSettings_1.getShowChapterVolume)(this.stateManager);
         const showTitle = await (0, ComicKSettings_1.getShowChapterTitle)(this.stateManager);
         const chapters = [];
-        const request = createRequestObject({
-            url: `${COMICK_API}/comic/${mangaId}?tachiyomi=true`,
-            method: 'GET',
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        let data;
-        try {
-            data = JSON.parse(response.data);
-        }
-        catch (e) {
-            throw new Error(`${e}`);
-        }
         let page = 1;
         let json = null;
         do {
-            json = await this.createChapterRequest(data.comic.id, page);
+            json = await this.createChapterRequest(mangaId, page);
             chapters.push(...(0, ComicKParser_1.parseChapters)(json, mangaId, { show_title: showTitle, show_volume: showVol }));
             page += 1;
         } while (json.chapters.length === SEARCH_PAGE_LIMIT);
@@ -9966,7 +9954,7 @@ class ComicK extends paperback_extensions_common_1.Source {
     async createChapterRequest(mangaId, page) {
         const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
         const request = createRequestObject({
-            url: `${COMICK_API}/comic/${mangaId}/chapter?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET',
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -10013,60 +10001,37 @@ class ComicK extends paperback_extensions_common_1.Source {
         return true;
     }
     async getHomePageSections(sectionCallback) {
-        const HomeFilter = await (0, ComicKSettings_1.getHomeFilter)(this.stateManager);
-        const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
-        let filterLang = [];
-        for (const lang of Languages) {
-            if (lang === 'all') {
-                filterLang = [];
-                break;
-            }
-            filterLang.push(`&lang=${lang}`);
-        }
         const sections = [
             {
                 request: createRequestObject({
-                    url: `${COMICK_API}/search?page=1&limit=10&tachiyomi=true`,
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`,
                     method: 'GET'
                 }),
                 section: createHomeSection({
-                    id: 'top10',
-                    title: 'Top 10',
-                    type: paperback_extensions_common_1.HomeSectionType.featured
-                }),
-                usesSearch: true
-            },
-            {
-                request: createRequestObject({
-                    url: `${COMICK_API}/search?page=1&limit=100&tachiyomi=true`,
-                    method: 'GET'
-                }),
-                section: createHomeSection({
-                    id: 'popular',
-                    title: 'Popular',
-                    view_more: true,
-                }),
-                usesSearch: true
-            },
-            {
-                request: createRequestObject({
-                    url: `${COMICK_API}/chapter?page=1&order=hot${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`,
-                    method: 'GET'
-                }),
-                section: createHomeSection({
-                    id: 'hot',
-                    title: 'Hot',
+                    id: 'views',
+                    title: 'Most Viewed',
                     view_more: true,
                 }),
             },
             {
                 request: createRequestObject({
-                    url: `${COMICK_API}/chapter?page=1&order=new${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`,
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`,
                     method: 'GET'
                 }),
                 section: createHomeSection({
-                    id: 'new',
-                    title: 'New',
+                    id: 'follow',
+                    title: 'Most Follows',
+                    view_more: true,
+                }),
+            },
+            {
+                request: createRequestObject({
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`,
+                    method: 'GET'
+                }),
+                section: createHomeSection({
+                    id: 'latest',
+                    title: 'Latest Uploads',
                     view_more: true,
                 }),
             }
@@ -10082,7 +10047,7 @@ class ComicK extends paperback_extensions_common_1.Source {
                 catch (e) {
                     throw new Error(`${e}`);
                 }
-                section.section.items = (0, ComicKParser_1.parseSearch)(data, section.usesSearch);
+                section.section.items = (0, ComicKParser_1.parseSearch)(data);
                 sectionCallback(section.section);
             }));
         }
@@ -10090,28 +10055,16 @@ class ComicK extends paperback_extensions_common_1.Source {
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
-        let param = '';
-        let usesSearch = false;
-        const HomeFilter = await (0, ComicKSettings_1.getHomeFilter)(this.stateManager);
-        const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
-        let filterLang = [];
-        for (const lang of Languages) {
-            if (lang === 'all') {
-                filterLang = [];
-                break;
-            }
-            filterLang.push(`&lang=${lang}`);
-        }
+        let param;
         switch (homepageSectionId) {
-            case 'popular':
-                param = `/search/?page=${page}&limit=${SEARCH_PAGE_LIMIT}&tachiyomi=true`;
-                usesSearch = true;
+            case 'views':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`;
                 break;
-            case 'hot':
-                param = `/chapter/?page=${page}&order=hot${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`;
+            case 'follow':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`;
                 break;
-            case 'new':
-                param = `/chapter/?page=${page}&order=new${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`;
+            case 'latest':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`;
                 break;
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist');
@@ -10128,8 +10081,8 @@ class ComicK extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = (0, ComicKParser_1.parseSearch)(data, usesSearch);
-        metadata = usesSearch ? data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined : { page: page + 1 };
+        const manga = (0, ComicKParser_1.parseSearch)(data);
+        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
             metadata
@@ -10163,7 +10116,7 @@ class ComicK extends paperback_extensions_common_1.Source {
             }
             const mangaToUpdate = [];
             for (const chapter of data) {
-                const mangaId = chapter.md_comics.slug;
+                const mangaId = chapter.md_comics.hid;
                 const mangaTime = new Date(chapter.updated_at ?? '');
                 if (mangaTime <= time) {
                     if (ids.includes(mangaId) && !updatedManga.includes(mangaId)) {
@@ -10182,42 +10135,38 @@ class ComicK extends paperback_extensions_common_1.Source {
     }
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
-        const includedGenres = query.includedTags?.map((x) => {
-            if (x.id.includes('genre.')) {
-                return `&genres=${x.id?.split('.')?.pop()}`;
+        const includedGenres = [];
+        const excludedGenres = [];
+        const Sort = [];
+        const CreatedAt = [];
+        const Type = [];
+        const Demographic = [];
+        query.includedTags?.map((x) => {
+            const id = x.id;
+            const SplittedID = id?.split('.')?.pop() ?? '';
+            if (id.includes('genre.')) {
+                includedGenres.push(`&genres=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const excludedGenres = query.excludedTags?.map((x) => {
-            if (x.id.includes('genre.')) {
-                return `&excludes=${x.id?.split('.')?.pop()}`;
+            if (id.includes('sort.')) {
+                Sort.push(`&sort=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const Sort = query.includedTags?.map((x) => {
-            if (x.id.includes('sort.')) {
-                return `&sort=${x.id?.split('.')?.pop()}`;
+            if (id.includes('createdat.')) {
+                CreatedAt.push(`&time=${SplittedID}`);
             }
-            return undefined;
-        })[0] ?? '';
-        const CreatedAt = query.includedTags?.map((x) => {
-            if (x.id.includes('createdat.')) {
-                return `&time=${x.id?.split('.')?.pop()}`;
+            if (id.includes('type.')) {
+                Type.push(`&country=${SplittedID}`);
             }
-            return undefined;
-        })[0] ?? '';
-        const Type = query.includedTags?.map((x) => {
-            if (x.id.includes('type.')) {
-                return `&country=${x.id?.split('.')?.pop()}`;
+            if (id.includes('demographic.')) {
+                Demographic.push(`&demographic=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const Demographic = query.includedTags?.map((x) => {
-            if (x.id.includes('demographic.')) {
-                return `&demographic=${x.id?.split('.')?.pop()}`;
+        });
+        query.excludedTags?.map((x) => {
+            const id = x.id;
+            const SplittedID = id?.split('.')?.pop() ?? '';
+            if (id.includes('genre.')) {
+                excludedGenres.push(`&excludes=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
+        });
         let request;
         if (query.title) {
             request = createRequestObject({
@@ -10227,7 +10176,7 @@ class ComicK extends paperback_extensions_common_1.Source {
         }
         else {
             request = createRequestObject({
-                url: `${COMICK_API}/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres}${excludedGenres}${Sort}${CreatedAt}${Type}${Demographic}&tachiyomi=true`,
+                url: `${COMICK_API}/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
                 method: 'GET',
             });
         }
@@ -10239,7 +10188,7 @@ class ComicK extends paperback_extensions_common_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = (0, ComicKParser_1.parseSearch)(data, true);
+        const manga = (0, ComicKParser_1.parseSearch)(data);
         metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
         return createPagedResults({
             results: manga,
@@ -10493,37 +10442,37 @@ const ComicKHelper_1 = require("./ComicKHelper");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
 const parseMangaDetails = (data, mangaId) => {
-    const comic = data.comic;
+    const comic = data?.comic;
     const titles = [];
-    titles.push(comic.title);
-    if (comic.md_titles) {
-        for (const altTitles of comic.md_titles) {
+    titles.push(comic?.title);
+    if (comic?.md_titles) {
+        for (const altTitles of comic?.md_titles) {
             titles.push(altTitles.title);
         }
     }
-    const image = comic.cover_url;
+    const image = comic?.cover_url;
     const author = [];
-    if (data.authors) {
-        for (const authors of data.authors) {
-            author.push(authors.name);
+    if (data?.authors) {
+        for (const authors of data?.authors) {
+            author.push(authors?.name);
         }
     }
     const artist = [];
-    if (data.artists) {
-        for (const authors of data.artists) {
-            artist.push(authors.name);
+    if (data?.artists) {
+        for (const authors of data?.artists) {
+            artist.push(authors?.name);
         }
     }
-    const description = (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic.desc), { wordwrap: 130 });
+    const description = (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic?.desc), { wordwrap: 130 });
     const arrayTags = [];
     const countryConvert = {
         kr: 'Manhwa',
         jp: 'Manga',
         cn: 'Manhua',
     };
-    if (comic.country) {
-        const id = `type.${comic.country}`;
-        const label = countryConvert[comic.country];
+    if (comic?.country) {
+        const id = `type.${comic?.country}`;
+        const label = countryConvert[comic?.country];
         if (id && label) {
             arrayTags.push({
                 id,
@@ -10531,10 +10480,10 @@ const parseMangaDetails = (data, mangaId) => {
             });
         }
     }
-    if (data.genres) {
-        for (const tag of data.genres) {
-            const label = tag.name;
-            const id = `genre.${tag.slug}`;
+    if (data?.genres) {
+        for (const tag of data?.genres) {
+            const label = tag?.name;
+            const id = `genre.${tag?.slug}`;
             if (!id || !label)
                 continue;
             arrayTags.push({ id: id, label: label });
@@ -10542,8 +10491,8 @@ const parseMangaDetails = (data, mangaId) => {
     }
     const tagSections = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })];
     let status = paperback_extensions_common_1.MangaStatus.UNKNOWN;
-    if (comic.status) {
-        switch (comic.status) {
+    if (comic?.status) {
+        switch (comic?.status) {
             case 1:
                 status = paperback_extensions_common_1.MangaStatus.ONGOING;
                 break;
@@ -10556,7 +10505,7 @@ const parseMangaDetails = (data, mangaId) => {
         id: mangaId,
         titles: titles,
         image: image,
-        hentai: comic.hentai,
+        hentai: comic?.hentai,
         status: status,
         author: author.join(','),
         artist: artist.join(','),
@@ -10567,25 +10516,30 @@ const parseMangaDetails = (data, mangaId) => {
 exports.parseMangaDetails = parseMangaDetails;
 const parseChapters = (data, mangaId, chapSettings) => {
     const chapters = [];
-    for (const chapter of data.chapters) {
-        const chapNum = Number(chapter.chap);
-        const volume = Number(chapter.vol);
+    for (const chapter of data?.chapters) {
+        const id = chapter?.hid ?? '';
+        const chap = chapter?.chap;
+        const vol = chapter?.vol;
+        const chapNum = Number(chap);
+        const volume = Number(vol);
         const groups = [];
-        if (chapter.group_name) {
-            for (const group of chapter.group_name) {
+        if (chapter?.group_name) {
+            for (const group of chapter?.group_name) {
                 groups.push(group);
             }
         }
+        if (!id)
+            continue;
         chapters.push(createChapter({
-            id: chapter.hid,
+            id,
             mangaId,
-            name: `Chapter ${chapter.chap}${chapSettings.show_title ? chapter.title ? `: ${chapter.title}` : '' : ''}`,
+            name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
             chapNum: !isNaN(chapNum) ? chapNum : NaN,
-            volume: chapSettings.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
-            time: new Date(chapter.created_at),
-            group: groups.length !== 0 ? groups.join(',') : '',
+            volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
+            time: new Date(chapter?.created_at),
+            group: groups?.length !== 0 ? groups?.join(',') : '',
             // @ts-ignore
-            langCode: ComicKHelper_1.CMLanguages.getName(chapter.lang)
+            langCode: ComicKHelper_1.CMLanguages?.getName(chapter?.lang)
         }));
     }
     return chapters;
@@ -10593,8 +10547,8 @@ const parseChapters = (data, mangaId, chapSettings) => {
 exports.parseChapters = parseChapters;
 const parseChapterDetails = (data, mangaId, chapterId) => {
     const pages = [];
-    for (const images of data.chapter.images) {
-        pages.push(images.url);
+    for (const images of data?.chapter?.images) {
+        pages.push(images?.url);
     }
     const chapterDetails = createChapterDetails({
         id: chapterId,
@@ -10608,8 +10562,8 @@ exports.parseChapterDetails = parseChapterDetails;
 const parseTags = (data) => {
     const arrayTags = [];
     for (const tag of data) {
-        const label = tag.name;
-        const id = tag.slug;
+        const label = tag?.name;
+        const id = tag?.slug;
         if (!id || !label)
             continue;
         arrayTags.push({ id: `genre.${id}`, label: label });
@@ -10692,13 +10646,13 @@ const parseTags = (data) => {
     ];
 };
 exports.parseTags = parseTags;
-const parseSearch = (data, usesSearch) => {
+const parseSearch = (data) => {
     const results = [];
     for (const manga of data) {
-        const id = usesSearch ? manga.slug : manga.md_comics.slug;
-        const title = usesSearch ? manga.title : manga.md_comics.title;
-        const image = usesSearch ? manga.cover_url : manga.md_comics.cover_url;
-        const subtitle = usesSearch ? manga.last_chapter : manga.md_comics.last_chapter;
+        const id = manga?.hid ?? '';
+        const title = manga?.title ?? '';
+        const image = manga?.cover_url ?? '';
+        const subtitle = manga?.last_chapter ?? '';
         if (!id)
             continue;
         results.push(createMangaTile({
