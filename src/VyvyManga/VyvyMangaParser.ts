@@ -30,24 +30,24 @@ export class Parser {
         const latest     : MangaTile[] = []
         const newManga: MangaTile[] = []
 
-        const arrPopular = $('.slick-manga .comic-item').toArray()
-        const arrLatest = $('.comic-item',$('.col-lg-8 h4.home-title:contains(\'Lastest Update\')').next()).toArray()
-        const arrNewRel = $('.comic-item',$('.col-lg-8 h4.home-title:contains(\'New Release\')').next()).toArray()
+        const arrPopular = $('.weekly-book .slick-detail a').toArray()
+        const arrLatest = $('.comic-item',$('.latest-update h4.home-title:contains(\'Latest Update\')').next()).toArray()
+        const arrNewRel = $('.comic-item',$('.latest-update h4.home-title:contains(\'New Release\')').next()).toArray()
 
 
 
         for (const obj of arrPopular) {
-            const id = $('a',obj).attr('href')?.split('/')?.pop() ?? ''
-            const title = this.decodeHTMLEntity($('.comic-title',obj).text().trim()) ?? ''
-            const image = $('.comic-image', obj).attr('data-background-image') ?? ''
-            const subTitle = $('.tray-item', obj).text().trim() ?? ''
+            const id = $(obj).attr('href')?.split('/')?.pop() ?? ''
+            const title = this.decodeHTMLEntity($('h1.title',obj).text().trim()) ?? ''
+            const image = $('.img-manga img', obj)?.attr('src') ?? $('.img-manga img', obj)?.attr('data-background-image') ?? ''
+
+            if (!id) continue
 
             popular.push(
                 createMangaTile({
                     id,
                     image,
                     title: createIconText({ text:  this.decodeHTMLEntity(title) }),
-                    subtitleText: createIconText({ text: subTitle }),
                 })
             )
         }
@@ -59,6 +59,8 @@ export class Parser {
             const title = this.decodeHTMLEntity($('.comic-title',obj).text().trim()) ?? ''
             const image = $('.comic-image', obj).attr('data-background-image') ?? ''
             const subTitle = $('.tray-item', obj).text().trim() ?? ''
+
+            if (!id) continue
 
             latest.push(
                 createMangaTile({
@@ -77,6 +79,8 @@ export class Parser {
             const title = this.decodeHTMLEntity($('.comic-title',obj).text().trim()) ?? ''
             const image = $('.comic-image', obj).attr('data-background-image') ?? ''
             const subTitle = $('.tray-item', obj).text().trim() ?? ''
+
+            if (!id) continue
 
             newManga.push(
                 createMangaTile({
