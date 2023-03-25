@@ -390,7 +390,7 @@ exports.VyvyMangaInfo = {
     description: 'Extension that pulls manga from vyvymanga.net',
     icon: 'icon.png',
     name: 'VyvyManga',
-    version: '1.0.7',
+    version: '1.0.8',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VyvyManga_Base,
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -609,19 +609,19 @@ class Parser {
         const popular = [];
         const latest = [];
         const newManga = [];
-        const arrPopular = $('.slick-manga .comic-item').toArray();
-        const arrLatest = $('.comic-item', $('.col-lg-8 h4.home-title:contains(\'Lastest Update\')').next()).toArray();
-        const arrNewRel = $('.comic-item', $('.col-lg-8 h4.home-title:contains(\'New Release\')').next()).toArray();
+        const arrPopular = $('.weekly-book .slick-detail a').toArray();
+        const arrLatest = $('.comic-item', $('.latest-update h4.home-title:contains(\'Latest Update\')').next()).toArray();
+        const arrNewRel = $('.comic-item', $('.latest-update h4.home-title:contains(\'New Release\')').next()).toArray();
         for (const obj of arrPopular) {
-            const id = $('a', obj).attr('href')?.split('/')?.pop() ?? '';
-            const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
-            const image = $('.comic-image', obj).attr('data-background-image') ?? '';
-            const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            const id = $(obj).attr('href')?.split('/')?.pop() ?? '';
+            const title = this.decodeHTMLEntity($('h1.title', obj).text().trim()) ?? '';
+            const image = $('.img-manga img', obj)?.attr('src') ?? $('.img-manga img', obj)?.attr('data-background-image') ?? '';
+            if (!id)
+                continue;
             popular.push(createMangaTile({
                 id,
                 image,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
-                subtitleText: createIconText({ text: subTitle }),
             }));
         }
         section1.items = popular;
@@ -631,6 +631,8 @@ class Parser {
             const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
             const image = $('.comic-image', obj).attr('data-background-image') ?? '';
             const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            if (!id)
+                continue;
             latest.push(createMangaTile({
                 id,
                 image,
@@ -645,6 +647,8 @@ class Parser {
             const title = this.decodeHTMLEntity($('.comic-title', obj).text().trim()) ?? '';
             const image = $('.comic-image', obj).attr('data-background-image') ?? '';
             const subTitle = $('.tray-item', obj).text().trim() ?? '';
+            if (!id)
+                continue;
             newManga.push(createMangaTile({
                 id,
                 image,
