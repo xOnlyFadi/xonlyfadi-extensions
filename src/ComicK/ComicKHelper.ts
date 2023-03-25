@@ -63,7 +63,7 @@ export interface PageList {
 }
 
 export interface SearchData {
-    slug:                  string
+    hid:                  string
     title:                 string
     cover_url:             string
     last_chapter:          string
@@ -71,7 +71,7 @@ export interface SearchData {
     md_comics:{
         cover_url:                    string
         title:                 string
-        slug:                  string
+        hid:                  string
         last_chapter:         string
     }
 }
