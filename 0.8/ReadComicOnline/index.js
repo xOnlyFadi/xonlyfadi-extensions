@@ -29,12 +29,19 @@ var HomeSectionType;
 
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],5:[function(require,module,exports){
+"use strict";
 /**
  * Request objects hold information for a particular source (see sources for example)
  * This allows us to to use a generic api to make the calls against any source
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlEncodeObject = exports.convertTime = exports.Source = void 0;
+/**
+* @deprecated Use {@link PaperbackExtensionBase}
+*/
 class Source {
     constructor(cheerio) {
         this.cheerio = cheerio;
@@ -91,7 +98,7 @@ function urlEncodeObject(obj) {
 }
 exports.urlEncodeObject = urlEncodeObject;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentRating = exports.SourceIntents = void 0;
@@ -114,17 +121,6 @@ var ContentRating;
     ContentRating["ADULT"] = "ADULT";
 })(ContentRating = exports.ContentRating || (exports.ContentRating = {}));
 
-},{}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracker = void 0;
-class Tracker {
-    constructor(cheerio) {
-        this.cheerio = cheerio;
-    }
-}
-exports.Tracker = Tracker;
-
 },{}],7:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -143,14 +139,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Source"), exports);
-__exportStar(require("./Tracker"), exports);
 __exportStar(require("./ByteArray"), exports);
 __exportStar(require("./Badge"), exports);
 __exportStar(require("./interfaces"), exports);
 __exportStar(require("./SourceInfo"), exports);
 __exportStar(require("./HomeSectionType"), exports);
+__exportStar(require("./PaperbackExtensionBase"), exports);
 
-},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./Source":4,"./SourceInfo":5,"./Tracker":6,"./interfaces":12}],8:[function(require,module,exports){
+},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./PaperbackExtensionBase":4,"./Source":5,"./SourceInfo":6,"./interfaces":15}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -168,6 +164,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],15:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -184,23 +192,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./ChapterProviding"), exports);
-__exportStar(require("./Searchable"), exports);
-__exportStar(require("./Requestable"), exports);
+__exportStar(require("./CloudflareBypassRequestProviding"), exports);
+__exportStar(require("./HomePageSectionsProviding"), exports);
+__exportStar(require("./MangaProgressProviding"), exports);
 __exportStar(require("./MangaProviding"), exports);
+__exportStar(require("./RequestManagerProviding"), exports);
+__exportStar(require("./SearchResultsProviding"), exports);
 
-},{"./ChapterProviding":8,"./MangaProviding":9,"./Requestable":10,"./Searchable":11}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],14:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],15:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],16:[function(require,module,exports){
+},{"./ChapterProviding":8,"./CloudflareBypassRequestProviding":9,"./HomePageSectionsProviding":10,"./MangaProgressProviding":11,"./MangaProviding":12,"./RequestManagerProviding":13,"./SearchResultsProviding":14}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -366,6 +365,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],57:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],58:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],59:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],60:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -403,6 +414,7 @@ __exportStar(require("./Exports/Cookie"), exports);
 __exportStar(require("./Exports/HomeSection"), exports);
 __exportStar(require("./Exports/IconText"), exports);
 __exportStar(require("./Exports/MangaInfo"), exports);
+__exportStar(require("./Exports/MangaProgress"), exports);
 __exportStar(require("./Exports/PartialSourceManga"), exports);
 __exportStar(require("./Exports/MangaUpdates"), exports);
 __exportStar(require("./Exports/PBCanvas"), exports);
@@ -422,10 +434,9 @@ __exportStar(require("./Exports/SourceStateManager"), exports);
 __exportStar(require("./Exports/Tag"), exports);
 __exportStar(require("./Exports/TagSection"), exports);
 __exportStar(require("./Exports/TrackedMangaChapterReadAction"), exports);
-__exportStar(require("./Exports/TrackedManga"), exports);
 __exportStar(require("./Exports/TrackerActionQueue"), exports);
 
-},{"./DynamicUI/Exports/DUIBinding":14,"./DynamicUI/Exports/DUIForm":15,"./DynamicUI/Exports/DUIFormRow":16,"./DynamicUI/Exports/DUISection":17,"./DynamicUI/Rows/Exports/DUIButton":18,"./DynamicUI/Rows/Exports/DUIHeader":19,"./DynamicUI/Rows/Exports/DUIInputField":20,"./DynamicUI/Rows/Exports/DUILabel":21,"./DynamicUI/Rows/Exports/DUILink":22,"./DynamicUI/Rows/Exports/DUIMultilineLabel":23,"./DynamicUI/Rows/Exports/DUINavigationButton":24,"./DynamicUI/Rows/Exports/DUIOAuthButton":25,"./DynamicUI/Rows/Exports/DUISecureInputField":26,"./DynamicUI/Rows/Exports/DUISelect":27,"./DynamicUI/Rows/Exports/DUIStepper":28,"./DynamicUI/Rows/Exports/DUISwitch":29,"./Exports/Chapter":30,"./Exports/ChapterDetails":31,"./Exports/Cookie":32,"./Exports/HomeSection":33,"./Exports/IconText":34,"./Exports/MangaInfo":35,"./Exports/MangaUpdates":36,"./Exports/PBCanvas":37,"./Exports/PBImage":38,"./Exports/PagedResults":39,"./Exports/PartialSourceManga":40,"./Exports/RawData":41,"./Exports/Request":42,"./Exports/RequestManager":43,"./Exports/Response":44,"./Exports/SearchField":45,"./Exports/SearchRequest":46,"./Exports/SecureStateManager":47,"./Exports/SourceCookieStore":48,"./Exports/SourceInterceptor":49,"./Exports/SourceManga":50,"./Exports/SourceStateManager":51,"./Exports/Tag":52,"./Exports/TagSection":53,"./Exports/TrackedManga":54,"./Exports/TrackedMangaChapterReadAction":55,"./Exports/TrackerActionQueue":56}],58:[function(require,module,exports){
+},{"./DynamicUI/Exports/DUIBinding":17,"./DynamicUI/Exports/DUIForm":18,"./DynamicUI/Exports/DUIFormRow":19,"./DynamicUI/Exports/DUISection":20,"./DynamicUI/Rows/Exports/DUIButton":21,"./DynamicUI/Rows/Exports/DUIHeader":22,"./DynamicUI/Rows/Exports/DUIInputField":23,"./DynamicUI/Rows/Exports/DUILabel":24,"./DynamicUI/Rows/Exports/DUILink":25,"./DynamicUI/Rows/Exports/DUIMultilineLabel":26,"./DynamicUI/Rows/Exports/DUINavigationButton":27,"./DynamicUI/Rows/Exports/DUIOAuthButton":28,"./DynamicUI/Rows/Exports/DUISecureInputField":29,"./DynamicUI/Rows/Exports/DUISelect":30,"./DynamicUI/Rows/Exports/DUIStepper":31,"./DynamicUI/Rows/Exports/DUISwitch":32,"./Exports/Chapter":33,"./Exports/ChapterDetails":34,"./Exports/Cookie":35,"./Exports/HomeSection":36,"./Exports/IconText":37,"./Exports/MangaInfo":38,"./Exports/MangaProgress":39,"./Exports/MangaUpdates":40,"./Exports/PBCanvas":41,"./Exports/PBImage":42,"./Exports/PagedResults":43,"./Exports/PartialSourceManga":44,"./Exports/RawData":45,"./Exports/Request":46,"./Exports/RequestManager":47,"./Exports/Response":48,"./Exports/SearchField":49,"./Exports/SearchRequest":50,"./Exports/SecureStateManager":51,"./Exports/SourceCookieStore":52,"./Exports/SourceInterceptor":53,"./Exports/SourceManga":54,"./Exports/SourceStateManager":55,"./Exports/Tag":56,"./Exports/TagSection":57,"./Exports/TrackedMangaChapterReadAction":58,"./Exports/TrackerActionQueue":59}],61:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -446,7 +457,7 @@ __exportStar(require("./generated/_exports"), exports);
 __exportStar(require("./base/index"), exports);
 __exportStar(require("./compat/DyamicUI"), exports);
 
-},{"./base/index":7,"./compat/DyamicUI":13,"./generated/_exports":57}],59:[function(require,module,exports){
+},{"./base/index":7,"./compat/DyamicUI":16,"./generated/_exports":60}],62:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -598,7 +609,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2379,7 +2390,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":59,"buffer":60,"ieee754":61}],61:[function(require,module,exports){
+},{"base64-js":62,"buffer":63,"ieee754":64}],64:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -2466,25 +2477,25 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadComicOnline = exports.ReadComicOnlineInfo = void 0;
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '2.0.8',
+    version: '2.0.0',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls comics from ReadComicOnline.li.',
+    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: RCO_DOMAIN,
-    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: [
         {
             text: 'Cloudflare',
@@ -2492,10 +2503,9 @@ exports.ReadComicOnlineInfo = {
         }
     ]
 };
-const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15';
-class ReadComicOnline extends types_1.Source {
-    constructor() {
-        super(...arguments);
+class ReadComicOnline {
+    constructor(cheerio) {
+        this.cheerio = cheerio;
         this.requestManager = App.createRequestManager({
             requestsPerSecond: 2,
             requestTimeout: 15000,
@@ -2504,8 +2514,8 @@ class ReadComicOnline extends types_1.Source {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
-                            'user-agent': userAgent,
-                            'referer': `${RCO_DOMAIN}/`
+                            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+                            'referer': `${RCO_DOMAIN}/`,
                         }
                     };
                     return request;
@@ -2513,6 +2523,16 @@ class ReadComicOnline extends types_1.Source {
                 interceptResponse: async (response) => {
                     return response;
                 }
+            }
+        });
+    }
+    async getCloudflareBypassRequestAsync() {
+        return App.createRequest({
+            url: RCO_DOMAIN,
+            method: 'GET',
+            headers: {
+                'referer': `${RCO_DOMAIN}/`,
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
             }
         });
     }
@@ -2531,7 +2551,7 @@ class ReadComicOnline extends types_1.Source {
         const request = App.createRequest({
             url: `${RCO_DOMAIN}/Comic/`,
             method: 'GET',
-            param: mangaId,
+            param: mangaId
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
@@ -2546,21 +2566,23 @@ class ReadComicOnline extends types_1.Source {
         const response = await this.requestManager.schedule(request, 1);
         return (0, ReadComicOnlineParser_1.parseChapterDetails)(response.data, mangaId, chapterId);
     }
-    async getTags() {
+    async getSearchTags() {
         const request = App.createRequest({
             url: `${RCO_DOMAIN}/ComicList`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
         return (0, ReadComicOnlineParser_1.parseTags)($);
     }
     async getHomePageSections(sectionCallback) {
         const request = App.createRequest({
             url: RCO_DOMAIN,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
         (0, ReadComicOnlineParser_1.parseHomeSections)($, sectionCallback);
     }
@@ -2583,9 +2605,10 @@ class ReadComicOnline extends types_1.Source {
         const request = App.createRequest({
             url: `${RCO_DOMAIN}/ComicList`,
             method: 'GET',
-            param,
+            param
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
         const manga = (0, ReadComicOnlineParser_1.parseViewMore)($);
         metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
@@ -2597,18 +2620,16 @@ class ReadComicOnline extends types_1.Source {
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
         let request;
-        //Regular search
         if (query.title) {
             request = App.createRequest({
                 url: `${RCO_DOMAIN}/Search/Comic`,
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Content-type': 'application/x-www-form-urlencoded',
+                    'Content-type': 'application/x-www-form-urlencoded'
                 },
                 data: `keyword=${encodeURI(query.title ?? '')}`
             });
-            //Tag Search
         }
         else {
             request = App.createRequest({
@@ -2618,6 +2639,7 @@ class ReadComicOnline extends types_1.Source {
             });
         }
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
         const manga = (0, ReadComicOnlineParser_1.parseSearch)($);
         metadata = !(0, ReadComicOnlineParser_1.isLastPage)($) ? { page: page + 1 } : undefined;
@@ -2626,28 +2648,26 @@ class ReadComicOnline extends types_1.Source {
             metadata
         });
     }
-    async getCloudflareBypassRequestAsync() {
-        return App.createRequest({
-            url: RCO_DOMAIN,
-            method: 'GET',
-            headers: {
-                'user-agent': userAgent,
-            }
-        });
+    CloudFlareError(status) {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${exports.ReadComicOnlineInfo.name} and press Cloudflare Bypass`);
+        }
     }
 }
 exports.ReadComicOnline = ReadComicOnline;
 
-},{"./ReadComicOnlineParser":63,"@paperback/types":58}],63:[function(require,module,exports){
+},{"./ReadComicOnlineParser":66,"@paperback/types":61}],66:[function(require,module,exports){
 (function (Buffer){(function (){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLastPage = exports.parseSearch = exports.parseTags = exports.parseViewMore = exports.parseHomeSections = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const types_1 = require("@paperback/types");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 const parseMangaDetails = ($, mangaId) => {
     const contentSection = $('div.barContent').first();
-    const titles = [];
-    titles.push(decodeHTMLEntity($('a.bigChar').text().trim()));
+    const titles = [decodeHTMLEntity($('a.bigChar').text().trim())];
     let image = $('img', $('.rightBox')).attr('src') ?? 'https://i.imgur.com/GYUxEX8.png';
     image = image.startsWith('/') ? RCO_DOMAIN + image : image;
     const author = $('a', $('span:contains(Writer)', contentSection).parent()).text().trim() ?? '';
@@ -2664,11 +2684,7 @@ const parseMangaDetails = ($, mangaId) => {
             hentai = true;
         arrayTags.push({ id: id, label: label });
     }
-    const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-    const rawStatus = $('span:contains(Status)', contentSection).parent().text().trim().toLowerCase();
-    let status = 'ONGOING';
-    if (rawStatus.includes('COMPLETED'))
-        status = 'COMPLETED';
+    const status = $('span:contains(Status)', contentSection).parent().text().trim().toLowerCase();
     return App.createSourceManga({
         id: mangaId,
         mangaInfo: App.createMangaInfo({
@@ -2678,8 +2694,8 @@ const parseMangaDetails = ($, mangaId) => {
             status: status,
             author: author,
             artist: artist,
-            tags: tagSections,
-            desc: description,
+            tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })],
+            desc: description
         })
     });
 };
@@ -2701,9 +2717,9 @@ const parseChapters = ($) => {
         chapters.push(App.createChapter({
             id: chapterId,
             name: decodeHTMLEntity(title),
-            langCode: 'English',
+            langCode: '🇬🇧',
             chapNum: isNaN(chapNum) ? 0 : chapNum,
-            time: date,
+            time: date
         }));
     }
     return chapters;
@@ -2729,21 +2745,20 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
             pages.push(`https://2.bp.blogspot.com/${url + sliced}`);
         }
     }
-    const chapterDetails = App.createChapterDetails({
+    return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
         pages: pages
     });
-    return chapterDetails;
 };
 exports.parseChapterDetails = parseChapterDetails;
 const parseHomeSections = ($, sectionCallback) => {
-    const latestSection = App.createHomeSection({ id: 'latest_comic', title: 'Latest Updated Comics', containsMoreItems: true, type: 'singleRowNormal' });
-    const newSection = App.createHomeSection({ id: 'new_comic', title: 'New Comics', containsMoreItems: true, type: 'singleRowNormal' });
-    const popularSection = App.createHomeSection({ id: 'popular_comic', title: 'Most Popular Comics', containsMoreItems: true, type: 'singleRowNormal' });
-    const TopDaySection = App.createHomeSection({ id: 'top_day_comic', title: 'Top Day Comics', containsMoreItems: false, type: 'singleRowNormal' });
-    const TopWeekSection = App.createHomeSection({ id: 'top_week_comic', title: 'Top Week Comics', containsMoreItems: false, type: 'singleRowNormal' });
-    const TopMonthSection = App.createHomeSection({ id: 'top_month_comic', title: 'Top Month Comics', containsMoreItems: false, type: 'singleRowNormal' });
+    const latestSection = App.createHomeSection({ id: 'latest_comic', title: 'Latest Updated Comics', containsMoreItems: true, type: types_1.HomeSectionType.singleRowNormal });
+    const newSection = App.createHomeSection({ id: 'new_comic', title: 'New Comics', containsMoreItems: true, type: types_1.HomeSectionType.singleRowNormal });
+    const popularSection = App.createHomeSection({ id: 'popular_comic', title: 'Most Popular Comics', containsMoreItems: true, type: types_1.HomeSectionType.singleRowNormal });
+    const TopDaySection = App.createHomeSection({ id: 'top_day_comic', title: 'Top Day Comics', containsMoreItems: false, type: types_1.HomeSectionType.singleRowNormal });
+    const TopWeekSection = App.createHomeSection({ id: 'top_week_comic', title: 'Top Week Comics', containsMoreItems: false, type: types_1.HomeSectionType.singleRowNormal });
+    const TopMonthSection = App.createHomeSection({ id: 'top_month_comic', title: 'Top Month Comics', containsMoreItems: false, type: types_1.HomeSectionType.singleRowNormal });
     //Latest Updated Comic
     const latestSection_Array = [];
     for (const comic of $('a', $('div.items', 'div.bigBarContainer')).toArray()) {
@@ -2757,10 +2772,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         latestSection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     latestSection.items = latestSection_Array;
@@ -2776,10 +2791,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         newSection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     newSection.items = newSection_Array;
@@ -2795,10 +2810,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         popularSection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     popularSection.items = popularSection_Array;
@@ -2814,10 +2829,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         TopDaySection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     TopDaySection.items = TopDaySection_Array;
@@ -2833,10 +2848,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         TopWeekSection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     TopWeekSection.items = TopWeekSection_Array;
@@ -2852,10 +2867,10 @@ const parseHomeSections = ($, sectionCallback) => {
         if (!id || !title)
             continue;
         TopMonthSection_Array.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image,
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
     }
     TopMonthSection.items = TopMonthSection_Array;
@@ -2876,10 +2891,10 @@ const parseViewMore = ($) => {
         if (collectedIds.includes(id))
             continue;
         comics.push(App.createPartialSourceManga({
-            mangaId: id,
-            image: image,
+            image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             title: decodeHTMLEntity(title),
-            subtitle: subtitle,
+            mangaId: id,
+            subtitle: subtitle
         }));
         collectedIds.push(id);
     }
@@ -2888,7 +2903,7 @@ const parseViewMore = ($) => {
 exports.parseViewMore = parseViewMore;
 const parseTags = ($) => {
     const arrayTags = [];
-    const rightBox = $('div.barContent').get(1);
+    const rightBox = $('#rightside div.barContent').get(1);
     for (const tag of $('a', rightBox).toArray()) {
         const label = $(tag).text().trim();
         const id = $(tag).attr('href')?.replace(/\/genre\//i, '') ?? '';
@@ -2896,8 +2911,7 @@ const parseTags = ($) => {
             continue;
         arrayTags.push({ id: id, label: label });
     }
-    const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-    return tagSections;
+    return [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
 };
 exports.parseTags = parseTags;
 const parseSearch = ($) => {
@@ -2914,9 +2928,9 @@ const parseSearch = ($) => {
         if (!id || !title)
             throw new Error(`Unable to parse title: ${title} or id: ${id}!`);
         comics.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             title: decodeHTMLEntity(title),
+            mangaId: id
         }));
     }
     else {
@@ -2932,10 +2946,10 @@ const parseSearch = ($) => {
             if (collectedIds.includes(id))
                 continue;
             comics.push(App.createPartialSourceManga({
-                mangaId: id,
-                image: image,
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
                 title: decodeHTMLEntity(title),
-                subtitle: subtitle,
+                mangaId: id,
+                subtitle: subtitle
             }));
             collectedIds.push(id);
         }
@@ -2955,5 +2969,5 @@ const isLastPage = ($) => {
 exports.isLastPage = isLastPage;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":60}]},{},[62])(62)
+},{"@paperback/types":61,"buffer":63}]},{},[65])(65)
 });

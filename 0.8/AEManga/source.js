@@ -29,12 +29,19 @@ var HomeSectionType;
 
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],5:[function(require,module,exports){
+"use strict";
 /**
  * Request objects hold information for a particular source (see sources for example)
  * This allows us to to use a generic api to make the calls against any source
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlEncodeObject = exports.convertTime = exports.Source = void 0;
+/**
+* @deprecated Use {@link PaperbackExtensionBase}
+*/
 class Source {
     constructor(cheerio) {
         this.cheerio = cheerio;
@@ -91,7 +98,7 @@ function urlEncodeObject(obj) {
 }
 exports.urlEncodeObject = urlEncodeObject;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentRating = exports.SourceIntents = void 0;
@@ -114,17 +121,6 @@ var ContentRating;
     ContentRating["ADULT"] = "ADULT";
 })(ContentRating = exports.ContentRating || (exports.ContentRating = {}));
 
-},{}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracker = void 0;
-class Tracker {
-    constructor(cheerio) {
-        this.cheerio = cheerio;
-    }
-}
-exports.Tracker = Tracker;
-
 },{}],7:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -143,14 +139,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Source"), exports);
-__exportStar(require("./Tracker"), exports);
 __exportStar(require("./ByteArray"), exports);
 __exportStar(require("./Badge"), exports);
 __exportStar(require("./interfaces"), exports);
 __exportStar(require("./SourceInfo"), exports);
 __exportStar(require("./HomeSectionType"), exports);
+__exportStar(require("./PaperbackExtensionBase"), exports);
 
-},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./Source":4,"./SourceInfo":5,"./Tracker":6,"./interfaces":12}],8:[function(require,module,exports){
+},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./PaperbackExtensionBase":4,"./Source":5,"./SourceInfo":6,"./interfaces":15}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -168,6 +164,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],15:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -184,23 +192,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./ChapterProviding"), exports);
-__exportStar(require("./Searchable"), exports);
-__exportStar(require("./Requestable"), exports);
+__exportStar(require("./CloudflareBypassRequestProviding"), exports);
+__exportStar(require("./HomePageSectionsProviding"), exports);
+__exportStar(require("./MangaProgressProviding"), exports);
 __exportStar(require("./MangaProviding"), exports);
+__exportStar(require("./RequestManagerProviding"), exports);
+__exportStar(require("./SearchResultsProviding"), exports);
 
-},{"./ChapterProviding":8,"./MangaProviding":9,"./Requestable":10,"./Searchable":11}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],14:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],15:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],16:[function(require,module,exports){
+},{"./ChapterProviding":8,"./CloudflareBypassRequestProviding":9,"./HomePageSectionsProviding":10,"./MangaProgressProviding":11,"./MangaProviding":12,"./RequestManagerProviding":13,"./SearchResultsProviding":14}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -366,6 +365,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],57:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],58:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],59:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],60:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -403,6 +414,7 @@ __exportStar(require("./Exports/Cookie"), exports);
 __exportStar(require("./Exports/HomeSection"), exports);
 __exportStar(require("./Exports/IconText"), exports);
 __exportStar(require("./Exports/MangaInfo"), exports);
+__exportStar(require("./Exports/MangaProgress"), exports);
 __exportStar(require("./Exports/PartialSourceManga"), exports);
 __exportStar(require("./Exports/MangaUpdates"), exports);
 __exportStar(require("./Exports/PBCanvas"), exports);
@@ -422,10 +434,9 @@ __exportStar(require("./Exports/SourceStateManager"), exports);
 __exportStar(require("./Exports/Tag"), exports);
 __exportStar(require("./Exports/TagSection"), exports);
 __exportStar(require("./Exports/TrackedMangaChapterReadAction"), exports);
-__exportStar(require("./Exports/TrackedManga"), exports);
 __exportStar(require("./Exports/TrackerActionQueue"), exports);
 
-},{"./DynamicUI/Exports/DUIBinding":14,"./DynamicUI/Exports/DUIForm":15,"./DynamicUI/Exports/DUIFormRow":16,"./DynamicUI/Exports/DUISection":17,"./DynamicUI/Rows/Exports/DUIButton":18,"./DynamicUI/Rows/Exports/DUIHeader":19,"./DynamicUI/Rows/Exports/DUIInputField":20,"./DynamicUI/Rows/Exports/DUILabel":21,"./DynamicUI/Rows/Exports/DUILink":22,"./DynamicUI/Rows/Exports/DUIMultilineLabel":23,"./DynamicUI/Rows/Exports/DUINavigationButton":24,"./DynamicUI/Rows/Exports/DUIOAuthButton":25,"./DynamicUI/Rows/Exports/DUISecureInputField":26,"./DynamicUI/Rows/Exports/DUISelect":27,"./DynamicUI/Rows/Exports/DUIStepper":28,"./DynamicUI/Rows/Exports/DUISwitch":29,"./Exports/Chapter":30,"./Exports/ChapterDetails":31,"./Exports/Cookie":32,"./Exports/HomeSection":33,"./Exports/IconText":34,"./Exports/MangaInfo":35,"./Exports/MangaUpdates":36,"./Exports/PBCanvas":37,"./Exports/PBImage":38,"./Exports/PagedResults":39,"./Exports/PartialSourceManga":40,"./Exports/RawData":41,"./Exports/Request":42,"./Exports/RequestManager":43,"./Exports/Response":44,"./Exports/SearchField":45,"./Exports/SearchRequest":46,"./Exports/SecureStateManager":47,"./Exports/SourceCookieStore":48,"./Exports/SourceInterceptor":49,"./Exports/SourceManga":50,"./Exports/SourceStateManager":51,"./Exports/Tag":52,"./Exports/TagSection":53,"./Exports/TrackedManga":54,"./Exports/TrackedMangaChapterReadAction":55,"./Exports/TrackerActionQueue":56}],58:[function(require,module,exports){
+},{"./DynamicUI/Exports/DUIBinding":17,"./DynamicUI/Exports/DUIForm":18,"./DynamicUI/Exports/DUIFormRow":19,"./DynamicUI/Exports/DUISection":20,"./DynamicUI/Rows/Exports/DUIButton":21,"./DynamicUI/Rows/Exports/DUIHeader":22,"./DynamicUI/Rows/Exports/DUIInputField":23,"./DynamicUI/Rows/Exports/DUILabel":24,"./DynamicUI/Rows/Exports/DUILink":25,"./DynamicUI/Rows/Exports/DUIMultilineLabel":26,"./DynamicUI/Rows/Exports/DUINavigationButton":27,"./DynamicUI/Rows/Exports/DUIOAuthButton":28,"./DynamicUI/Rows/Exports/DUISecureInputField":29,"./DynamicUI/Rows/Exports/DUISelect":30,"./DynamicUI/Rows/Exports/DUIStepper":31,"./DynamicUI/Rows/Exports/DUISwitch":32,"./Exports/Chapter":33,"./Exports/ChapterDetails":34,"./Exports/Cookie":35,"./Exports/HomeSection":36,"./Exports/IconText":37,"./Exports/MangaInfo":38,"./Exports/MangaProgress":39,"./Exports/MangaUpdates":40,"./Exports/PBCanvas":41,"./Exports/PBImage":42,"./Exports/PagedResults":43,"./Exports/PartialSourceManga":44,"./Exports/RawData":45,"./Exports/Request":46,"./Exports/RequestManager":47,"./Exports/Response":48,"./Exports/SearchField":49,"./Exports/SearchRequest":50,"./Exports/SecureStateManager":51,"./Exports/SourceCookieStore":52,"./Exports/SourceInterceptor":53,"./Exports/SourceManga":54,"./Exports/SourceStateManager":55,"./Exports/Tag":56,"./Exports/TagSection":57,"./Exports/TrackedMangaChapterReadAction":58,"./Exports/TrackerActionQueue":59}],61:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -446,7 +457,7 @@ __exportStar(require("./generated/_exports"), exports);
 __exportStar(require("./base/index"), exports);
 __exportStar(require("./compat/DyamicUI"), exports);
 
-},{"./base/index":7,"./compat/DyamicUI":13,"./generated/_exports":57}],59:[function(require,module,exports){
+},{"./base/index":7,"./compat/DyamicUI":16,"./generated/_exports":60}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AEManga = exports.AEMangaInfo = void 0;
@@ -455,29 +466,29 @@ const AEMangaParser_1 = require("./AEMangaParser");
 const AEManga_DOMAIN = 'https://manga.ae';
 exports.AEMangaInfo = {
     version: '2.0.0',
-    name: 'MangaAE',
+    name: 'AEManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls comics from manga.ae.',
     contentRating: types_1.ContentRating.EVERYONE,
     websiteBaseURL: AEManga_DOMAIN,
-    language: 'العربية',
-    intents: types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS,
+    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+    language: 'Arabic',
     sourceTags: [
         {
             text: 'Cloudflare',
             type: types_1.BadgeColor.RED
         },
         {
-            text: 'العربية',
+            text: 'Arabic',
             type: types_1.BadgeColor.GREY
         }
     ]
 };
-class AEManga extends types_1.Source {
-    constructor() {
-        super(...arguments);
+class AEManga {
+    constructor(cheerio) {
+        this.cheerio = cheerio;
         this.baseUrl = AEManga_DOMAIN;
         this.requestManager = App.createRequestManager({
             requestsPerSecond: 2,
@@ -488,7 +499,7 @@ class AEManga extends types_1.Source {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${AEManga_DOMAIN}/`
+                            'referer': `${this.baseUrl}/`,
                         }
                     };
                     return request;
@@ -505,62 +516,62 @@ class AEManga extends types_1.Source {
             {
                 request: App.createRequest({
                     url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:views`),
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 section: App.createHomeSection({
                     id: 'views',
                     title: 'المانجا المشهورة',
                     containsMoreItems: true,
                     type: 'singleRowNormal'
-                }),
+                })
             },
             {
                 request: App.createRequest({
                     url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:updated_at`),
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 section: App.createHomeSection({
                     id: 'updated_at',
                     title: 'المانجا المحدثه',
                     containsMoreItems: true,
                     type: 'singleRowNormal'
-                }),
+                })
             },
             {
                 request: App.createRequest({
                     url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:release_date`),
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 section: App.createHomeSection({
                     id: 'release_date',
                     title: 'تاريخ النشر',
                     containsMoreItems: true,
                     type: 'singleRowNormal'
-                }),
+                })
             },
             {
                 request: App.createRequest({
                     url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:chapter_count`),
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 section: App.createHomeSection({
                     id: 'chapter_count',
                     title: 'عدد الفصول',
                     containsMoreItems: true,
                     type: 'singleRowNormal'
-                }),
+                })
             },
             {
                 request: App.createRequest({
                     url: encodeURI(`${AEManga_DOMAIN}/manga/page:1|order:status`),
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 section: App.createHomeSection({
                     id: 'status',
                     title: 'الحالة',
                     containsMoreItems: true,
                     type: 'singleRowNormal'
-                }),
+                })
             },
         ];
         const promises = [];
@@ -579,7 +590,7 @@ class AEManga extends types_1.Source {
         const page = metadata?.page ?? 1;
         const request = App.createRequest({
             url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}|order:${homepageSectionId}`),
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
@@ -611,13 +622,13 @@ class AEManga extends types_1.Source {
         if (query.title) {
             request = App.createRequest({
                 url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}|search:${query.title.replace(/ /g, '%20')}${Order.length !== 0 ? Order[0] : ''}${Sort.length !== 0 ? Sort[0] : ''}`),
-                method: 'GET',
+                method: 'GET'
             });
         }
         else {
             request = App.createRequest({
                 url: encodeURI(`${AEManga_DOMAIN}/manga/page:${page}${Genres.length !== 0 ? Genres[0] : ''}${Order.length !== 0 ? Order[0] : ''}${Sort.length !== 0 ? Sort[0] : ''}`),
-                method: 'GET',
+                method: 'GET'
             });
         }
         const response = await this.requestManager.schedule(request, 1);
@@ -630,10 +641,10 @@ class AEManga extends types_1.Source {
             metadata
         });
     }
-    async getTags() {
+    async getSearchTags() {
         const request = App.createRequest({
             url: `${AEManga_DOMAIN}/manga/`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
@@ -643,7 +654,7 @@ class AEManga extends types_1.Source {
     async getMangaDetails(mangaId) {
         const request = App.createRequest({
             url: `${AEManga_DOMAIN}/${mangaId}`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
@@ -653,7 +664,7 @@ class AEManga extends types_1.Source {
     async getChapters(mangaId) {
         const request = App.createRequest({
             url: `${AEManga_DOMAIN}/${mangaId}`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
@@ -663,7 +674,7 @@ class AEManga extends types_1.Source {
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
             url: `${AEManga_DOMAIN}/${mangaId}/${chapterId}`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
@@ -675,27 +686,26 @@ class AEManga extends types_1.Source {
             url: AEManga_DOMAIN,
             method: 'GET',
             headers: {
+                'referer': `${this.baseUrl}/`,
                 'user-agent': await this.requestManager.getDefaultUserAgent(),
-                'referer': `${AEManga_DOMAIN}/`
             }
         });
     }
     CloudFlareError(status) {
-        if (status == 503) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${AEManga.name}> and press the cloud icon.`);
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${exports.AEMangaInfo.name} and press Cloudflare Bypass`);
         }
     }
 }
 exports.AEManga = AEManga;
 
-},{"./AEMangaParser":60,"@paperback/types":58}],60:[function(require,module,exports){
+},{"./AEMangaParser":63,"@paperback/types":61}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NextPage = exports.parseSearch = exports.parseTags = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
 const parseMangaDetails = ($, mangaId) => {
     const contentSection = $('.indexcontainer').first();
-    const titles = [];
-    titles.push(decodeHTMLEntity($('h1.EnglishName', contentSection).text().trim().replace('(', '').replace(')', '')));
+    const titles = [decodeHTMLEntity($('h1.EnglishName', contentSection).text().trim().replace('(', '').replace(')', ''))];
     const image = $('img.manga-cover', contentSection).attr('src') ?? '';
     const authors = [];
     for (const obj of $('div.manga-details-author h4', contentSection).toArray()) {
@@ -730,7 +740,7 @@ const parseMangaDetails = ($, mangaId) => {
             status: status,
             author: authors.length !== 0 ? authors.join(', ') : '',
             tags: tagSections,
-            desc: description,
+            desc: description
         })
     });
 };
@@ -753,7 +763,7 @@ const parseChapters = ($) => {
             name: decodeHTMLEntity(title),
             chapNum: isNaN(chapNum) ? 0 : chapNum,
             time: new Date(LastUpdated),
-            langCode: 'العربية'
+            langCode: '🇸🇦'
         }));
     }
     return chapters;
@@ -770,7 +780,7 @@ const parseChapterDetails = ($, mangaId, chapterId) => {
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
-        pages: pages,
+        pages: pages
     });
 };
 exports.parseChapterDetails = parseChapterDetails;
@@ -838,10 +848,10 @@ const parseSearch = ($, source) => {
         if (!id || !title)
             continue;
         results.push(App.createPartialSourceManga({
-            mangaId: id,
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             title: decodeHTMLEntity(title),
-            subtitle: subtitle ? `أخر فصل : ${subtitle}` : '',
+            mangaId: id,
+            subtitle: subtitle ? `أخر فصل : ${subtitle}` : ''
         }));
     }
     return results;
@@ -863,5 +873,5 @@ const NextPage = ($) => {
 };
 exports.NextPage = NextPage;
 
-},{}]},{},[59])(59)
+},{}]},{},[62])(62)
 });

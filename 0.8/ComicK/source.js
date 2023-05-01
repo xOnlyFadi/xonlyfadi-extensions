@@ -29,12 +29,19 @@ var HomeSectionType;
 
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],5:[function(require,module,exports){
+"use strict";
 /**
  * Request objects hold information for a particular source (see sources for example)
  * This allows us to to use a generic api to make the calls against any source
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlEncodeObject = exports.convertTime = exports.Source = void 0;
+/**
+* @deprecated Use {@link PaperbackExtensionBase}
+*/
 class Source {
     constructor(cheerio) {
         this.cheerio = cheerio;
@@ -91,7 +98,7 @@ function urlEncodeObject(obj) {
 }
 exports.urlEncodeObject = urlEncodeObject;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentRating = exports.SourceIntents = void 0;
@@ -114,17 +121,6 @@ var ContentRating;
     ContentRating["ADULT"] = "ADULT";
 })(ContentRating = exports.ContentRating || (exports.ContentRating = {}));
 
-},{}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracker = void 0;
-class Tracker {
-    constructor(cheerio) {
-        this.cheerio = cheerio;
-    }
-}
-exports.Tracker = Tracker;
-
 },{}],7:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -143,14 +139,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Source"), exports);
-__exportStar(require("./Tracker"), exports);
 __exportStar(require("./ByteArray"), exports);
 __exportStar(require("./Badge"), exports);
 __exportStar(require("./interfaces"), exports);
 __exportStar(require("./SourceInfo"), exports);
 __exportStar(require("./HomeSectionType"), exports);
+__exportStar(require("./PaperbackExtensionBase"), exports);
 
-},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./Source":4,"./SourceInfo":5,"./Tracker":6,"./interfaces":12}],8:[function(require,module,exports){
+},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./PaperbackExtensionBase":4,"./Source":5,"./SourceInfo":6,"./interfaces":15}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -168,6 +164,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],15:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -184,23 +192,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./ChapterProviding"), exports);
-__exportStar(require("./Searchable"), exports);
-__exportStar(require("./Requestable"), exports);
+__exportStar(require("./CloudflareBypassRequestProviding"), exports);
+__exportStar(require("./HomePageSectionsProviding"), exports);
+__exportStar(require("./MangaProgressProviding"), exports);
 __exportStar(require("./MangaProviding"), exports);
+__exportStar(require("./RequestManagerProviding"), exports);
+__exportStar(require("./SearchResultsProviding"), exports);
 
-},{"./ChapterProviding":8,"./MangaProviding":9,"./Requestable":10,"./Searchable":11}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],14:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],15:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],16:[function(require,module,exports){
+},{"./ChapterProviding":8,"./CloudflareBypassRequestProviding":9,"./HomePageSectionsProviding":10,"./MangaProgressProviding":11,"./MangaProviding":12,"./RequestManagerProviding":13,"./SearchResultsProviding":14}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -366,6 +365,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],57:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],58:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],59:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],60:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -403,6 +414,7 @@ __exportStar(require("./Exports/Cookie"), exports);
 __exportStar(require("./Exports/HomeSection"), exports);
 __exportStar(require("./Exports/IconText"), exports);
 __exportStar(require("./Exports/MangaInfo"), exports);
+__exportStar(require("./Exports/MangaProgress"), exports);
 __exportStar(require("./Exports/PartialSourceManga"), exports);
 __exportStar(require("./Exports/MangaUpdates"), exports);
 __exportStar(require("./Exports/PBCanvas"), exports);
@@ -422,10 +434,9 @@ __exportStar(require("./Exports/SourceStateManager"), exports);
 __exportStar(require("./Exports/Tag"), exports);
 __exportStar(require("./Exports/TagSection"), exports);
 __exportStar(require("./Exports/TrackedMangaChapterReadAction"), exports);
-__exportStar(require("./Exports/TrackedManga"), exports);
 __exportStar(require("./Exports/TrackerActionQueue"), exports);
 
-},{"./DynamicUI/Exports/DUIBinding":14,"./DynamicUI/Exports/DUIForm":15,"./DynamicUI/Exports/DUIFormRow":16,"./DynamicUI/Exports/DUISection":17,"./DynamicUI/Rows/Exports/DUIButton":18,"./DynamicUI/Rows/Exports/DUIHeader":19,"./DynamicUI/Rows/Exports/DUIInputField":20,"./DynamicUI/Rows/Exports/DUILabel":21,"./DynamicUI/Rows/Exports/DUILink":22,"./DynamicUI/Rows/Exports/DUIMultilineLabel":23,"./DynamicUI/Rows/Exports/DUINavigationButton":24,"./DynamicUI/Rows/Exports/DUIOAuthButton":25,"./DynamicUI/Rows/Exports/DUISecureInputField":26,"./DynamicUI/Rows/Exports/DUISelect":27,"./DynamicUI/Rows/Exports/DUIStepper":28,"./DynamicUI/Rows/Exports/DUISwitch":29,"./Exports/Chapter":30,"./Exports/ChapterDetails":31,"./Exports/Cookie":32,"./Exports/HomeSection":33,"./Exports/IconText":34,"./Exports/MangaInfo":35,"./Exports/MangaUpdates":36,"./Exports/PBCanvas":37,"./Exports/PBImage":38,"./Exports/PagedResults":39,"./Exports/PartialSourceManga":40,"./Exports/RawData":41,"./Exports/Request":42,"./Exports/RequestManager":43,"./Exports/Response":44,"./Exports/SearchField":45,"./Exports/SearchRequest":46,"./Exports/SecureStateManager":47,"./Exports/SourceCookieStore":48,"./Exports/SourceInterceptor":49,"./Exports/SourceManga":50,"./Exports/SourceStateManager":51,"./Exports/Tag":52,"./Exports/TagSection":53,"./Exports/TrackedManga":54,"./Exports/TrackedMangaChapterReadAction":55,"./Exports/TrackerActionQueue":56}],58:[function(require,module,exports){
+},{"./DynamicUI/Exports/DUIBinding":17,"./DynamicUI/Exports/DUIForm":18,"./DynamicUI/Exports/DUIFormRow":19,"./DynamicUI/Exports/DUISection":20,"./DynamicUI/Rows/Exports/DUIButton":21,"./DynamicUI/Rows/Exports/DUIHeader":22,"./DynamicUI/Rows/Exports/DUIInputField":23,"./DynamicUI/Rows/Exports/DUILabel":24,"./DynamicUI/Rows/Exports/DUILink":25,"./DynamicUI/Rows/Exports/DUIMultilineLabel":26,"./DynamicUI/Rows/Exports/DUINavigationButton":27,"./DynamicUI/Rows/Exports/DUIOAuthButton":28,"./DynamicUI/Rows/Exports/DUISecureInputField":29,"./DynamicUI/Rows/Exports/DUISelect":30,"./DynamicUI/Rows/Exports/DUIStepper":31,"./DynamicUI/Rows/Exports/DUISwitch":32,"./Exports/Chapter":33,"./Exports/ChapterDetails":34,"./Exports/Cookie":35,"./Exports/HomeSection":36,"./Exports/IconText":37,"./Exports/MangaInfo":38,"./Exports/MangaProgress":39,"./Exports/MangaUpdates":40,"./Exports/PBCanvas":41,"./Exports/PBImage":42,"./Exports/PagedResults":43,"./Exports/PartialSourceManga":44,"./Exports/RawData":45,"./Exports/Request":46,"./Exports/RequestManager":47,"./Exports/Response":48,"./Exports/SearchField":49,"./Exports/SearchRequest":50,"./Exports/SecureStateManager":51,"./Exports/SourceCookieStore":52,"./Exports/SourceInterceptor":53,"./Exports/SourceManga":54,"./Exports/SourceStateManager":55,"./Exports/Tag":56,"./Exports/TagSection":57,"./Exports/TrackedMangaChapterReadAction":58,"./Exports/TrackerActionQueue":59}],61:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -446,7 +457,7 @@ __exportStar(require("./generated/_exports"), exports);
 __exportStar(require("./base/index"), exports);
 __exportStar(require("./compat/DyamicUI"), exports);
 
-},{"./base/index":7,"./compat/DyamicUI":13,"./generated/_exports":57}],59:[function(require,module,exports){
+},{"./base/index":7,"./compat/DyamicUI":16,"./generated/_exports":60}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -568,7 +579,64 @@ function amap(items, mapper) {
 
 exports.hp2Builder = hp2Builder;
 
-},{"domhandler":60,"selderee":111}],60:[function(require,module,exports){
+},{"domhandler":64,"selderee":115}],63:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Doctype = exports.CDATA = exports.Tag = exports.Style = exports.Script = exports.Comment = exports.Directive = exports.Text = exports.Root = exports.isTag = exports.ElementType = void 0;
+/** Types of elements found in htmlparser2's DOM */
+var ElementType;
+(function (ElementType) {
+    /** Type for the root element of a document */
+    ElementType["Root"] = "root";
+    /** Type for Text */
+    ElementType["Text"] = "text";
+    /** Type for <? ... ?> */
+    ElementType["Directive"] = "directive";
+    /** Type for <!-- ... --> */
+    ElementType["Comment"] = "comment";
+    /** Type for <script> tags */
+    ElementType["Script"] = "script";
+    /** Type for <style> tags */
+    ElementType["Style"] = "style";
+    /** Type for Any tag */
+    ElementType["Tag"] = "tag";
+    /** Type for <![CDATA[ ... ]]> */
+    ElementType["CDATA"] = "cdata";
+    /** Type for <!doctype ...> */
+    ElementType["Doctype"] = "doctype";
+})(ElementType = exports.ElementType || (exports.ElementType = {}));
+/**
+ * Tests whether an element is a tag or not.
+ *
+ * @param elem Element to test
+ */
+function isTag(elem) {
+    return (elem.type === ElementType.Tag ||
+        elem.type === ElementType.Script ||
+        elem.type === ElementType.Style);
+}
+exports.isTag = isTag;
+// Exports for backwards compatibility
+/** Type for the root element of a document */
+exports.Root = ElementType.Root;
+/** Type for Text */
+exports.Text = ElementType.Text;
+/** Type for <? ... ?> */
+exports.Directive = ElementType.Directive;
+/** Type for <!-- ... --> */
+exports.Comment = ElementType.Comment;
+/** Type for <script> tags */
+exports.Script = ElementType.Script;
+/** Type for <style> tags */
+exports.Style = ElementType.Style;
+/** Type for Any tag */
+exports.Tag = ElementType.Tag;
+/** Type for <![CDATA[ ... ]]> */
+exports.CDATA = ElementType.CDATA;
+/** Type for <!doctype ...> */
+exports.Doctype = ElementType.Doctype;
+
+},{}],64:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -746,7 +814,7 @@ var DomHandler = /** @class */ (function () {
 exports.DomHandler = DomHandler;
 exports.default = DomHandler;
 
-},{"./node":61,"domelementtype":63}],61:[function(require,module,exports){
+},{"./node":65,"domelementtype":63}],65:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1192,7 +1260,7 @@ function cloneChildren(childs) {
     return children;
 }
 
-},{"domelementtype":63}],62:[function(require,module,exports){
+},{"domelementtype":63}],66:[function(require,module,exports){
 'use strict';
 
 var isMergeableObject = function isMergeableObject(value) {
@@ -1327,75 +1395,41 @@ var deepmerge_1 = deepmerge;
 
 module.exports = deepmerge_1;
 
-},{}],63:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Doctype = exports.CDATA = exports.Tag = exports.Style = exports.Script = exports.Comment = exports.Directive = exports.Text = exports.Root = exports.isTag = exports.ElementType = void 0;
-/** Types of elements found in htmlparser2's DOM */
-var ElementType;
-(function (ElementType) {
-    /** Type for the root element of a document */
-    ElementType["Root"] = "root";
-    /** Type for Text */
-    ElementType["Text"] = "text";
-    /** Type for <? ... ?> */
-    ElementType["Directive"] = "directive";
-    /** Type for <!-- ... --> */
-    ElementType["Comment"] = "comment";
-    /** Type for <script> tags */
-    ElementType["Script"] = "script";
-    /** Type for <style> tags */
-    ElementType["Style"] = "style";
-    /** Type for Any tag */
-    ElementType["Tag"] = "tag";
-    /** Type for <![CDATA[ ... ]]> */
-    ElementType["CDATA"] = "cdata";
-    /** Type for <!doctype ...> */
-    ElementType["Doctype"] = "doctype";
-})(ElementType = exports.ElementType || (exports.ElementType = {}));
-/**
- * Tests whether an element is a tag or not.
- *
- * @param elem Element to test
- */
-function isTag(elem) {
-    return (elem.type === ElementType.Tag ||
-        elem.type === ElementType.Script ||
-        elem.type === ElementType.Style);
-}
-exports.isTag = isTag;
-// Exports for backwards compatibility
-/** Type for the root element of a document */
-exports.Root = ElementType.Root;
-/** Type for Text */
-exports.Text = ElementType.Text;
-/** Type for <? ... ?> */
-exports.Directive = ElementType.Directive;
-/** Type for <!-- ... --> */
-exports.Comment = ElementType.Comment;
-/** Type for <script> tags */
-exports.Script = ElementType.Script;
-/** Type for <style> tags */
-exports.Style = ElementType.Style;
-/** Type for Any tag */
-exports.Tag = ElementType.Tag;
-/** Type for <![CDATA[ ... ]]> */
-exports.CDATA = ElementType.CDATA;
-/** Type for <!doctype ...> */
-exports.Doctype = ElementType.Doctype;
-
-},{}],64:[function(require,module,exports){
-"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeXML = exports.decodeHTMLStrict = exports.decodeHTML = exports.determineBranch = exports.BinTrieFlags = exports.fromCodePoint = exports.replaceCodePoint = exports.decodeCodePoint = exports.xmlDecodeTree = exports.htmlDecodeTree = void 0;
+exports.decodeXML = exports.decodeHTMLStrict = exports.decodeHTMLAttribute = exports.decodeHTML = exports.determineBranch = exports.EntityDecoder = exports.DecodingMode = exports.BinTrieFlags = exports.fromCodePoint = exports.replaceCodePoint = exports.decodeCodePoint = exports.xmlDecodeTree = exports.htmlDecodeTree = void 0;
 var decode_data_html_js_1 = __importDefault(require("./generated/decode-data-html.js"));
 exports.htmlDecodeTree = decode_data_html_js_1.default;
 var decode_data_xml_js_1 = __importDefault(require("./generated/decode-data-xml.js"));
 exports.xmlDecodeTree = decode_data_xml_js_1.default;
-var decode_codepoint_js_1 = __importDefault(require("./decode_codepoint.js"));
+var decode_codepoint_js_1 = __importStar(require("./decode_codepoint.js"));
 exports.decodeCodePoint = decode_codepoint_js_1.default;
 var decode_codepoint_js_2 = require("./decode_codepoint.js");
 Object.defineProperty(exports, "replaceCodePoint", { enumerable: true, get: function () { return decode_codepoint_js_2.replaceCodePoint; } });
@@ -1404,99 +1438,421 @@ var CharCodes;
 (function (CharCodes) {
     CharCodes[CharCodes["NUM"] = 35] = "NUM";
     CharCodes[CharCodes["SEMI"] = 59] = "SEMI";
+    CharCodes[CharCodes["EQUALS"] = 61] = "EQUALS";
     CharCodes[CharCodes["ZERO"] = 48] = "ZERO";
     CharCodes[CharCodes["NINE"] = 57] = "NINE";
     CharCodes[CharCodes["LOWER_A"] = 97] = "LOWER_A";
     CharCodes[CharCodes["LOWER_F"] = 102] = "LOWER_F";
     CharCodes[CharCodes["LOWER_X"] = 120] = "LOWER_X";
-    /** Bit that needs to be set to convert an upper case ASCII character to lower case */
-    CharCodes[CharCodes["To_LOWER_BIT"] = 32] = "To_LOWER_BIT";
+    CharCodes[CharCodes["LOWER_Z"] = 122] = "LOWER_Z";
+    CharCodes[CharCodes["UPPER_A"] = 65] = "UPPER_A";
+    CharCodes[CharCodes["UPPER_F"] = 70] = "UPPER_F";
+    CharCodes[CharCodes["UPPER_Z"] = 90] = "UPPER_Z";
 })(CharCodes || (CharCodes = {}));
+/** Bit that needs to be set to convert an upper case ASCII character to lower case */
+var TO_LOWER_BIT = 32;
 var BinTrieFlags;
 (function (BinTrieFlags) {
     BinTrieFlags[BinTrieFlags["VALUE_LENGTH"] = 49152] = "VALUE_LENGTH";
     BinTrieFlags[BinTrieFlags["BRANCH_LENGTH"] = 16256] = "BRANCH_LENGTH";
     BinTrieFlags[BinTrieFlags["JUMP_TABLE"] = 127] = "JUMP_TABLE";
 })(BinTrieFlags = exports.BinTrieFlags || (exports.BinTrieFlags = {}));
-function getDecoder(decodeTree) {
-    return function decodeHTMLBinary(str, strict) {
-        var ret = "";
-        var lastIdx = 0;
-        var strIdx = 0;
-        while ((strIdx = str.indexOf("&", strIdx)) >= 0) {
-            ret += str.slice(lastIdx, strIdx);
-            lastIdx = strIdx;
-            // Skip the "&"
-            strIdx += 1;
-            // If we have a numeric entity, handle this separately.
-            if (str.charCodeAt(strIdx) === CharCodes.NUM) {
-                // Skip the leading "&#". For hex entities, also skip the leading "x".
-                var start = strIdx + 1;
-                var base = 10;
-                var cp = str.charCodeAt(start);
-                if ((cp | CharCodes.To_LOWER_BIT) === CharCodes.LOWER_X) {
-                    base = 16;
-                    strIdx += 1;
-                    start += 1;
+function isNumber(code) {
+    return code >= CharCodes.ZERO && code <= CharCodes.NINE;
+}
+function isHexadecimalCharacter(code) {
+    return ((code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_F) ||
+        (code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_F));
+}
+function isAsciiAlphaNumeric(code) {
+    return ((code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_Z) ||
+        (code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_Z) ||
+        isNumber(code));
+}
+/**
+ * Checks if the given character is a valid end character for an entity in an attribute.
+ *
+ * Attribute values that aren't terminated properly aren't parsed, and shouldn't lead to a parser error.
+ * See the example in https://html.spec.whatwg.org/multipage/parsing.html#named-character-reference-state
+ */
+function isEntityInAttributeInvalidEnd(code) {
+    return code === CharCodes.EQUALS || isAsciiAlphaNumeric(code);
+}
+var EntityDecoderState;
+(function (EntityDecoderState) {
+    EntityDecoderState[EntityDecoderState["EntityStart"] = 0] = "EntityStart";
+    EntityDecoderState[EntityDecoderState["NumericStart"] = 1] = "NumericStart";
+    EntityDecoderState[EntityDecoderState["NumericDecimal"] = 2] = "NumericDecimal";
+    EntityDecoderState[EntityDecoderState["NumericHex"] = 3] = "NumericHex";
+    EntityDecoderState[EntityDecoderState["NamedEntity"] = 4] = "NamedEntity";
+})(EntityDecoderState || (EntityDecoderState = {}));
+var DecodingMode;
+(function (DecodingMode) {
+    /** Entities in text nodes that can end with any character. */
+    DecodingMode[DecodingMode["Legacy"] = 0] = "Legacy";
+    /** Only allow entities terminated with a semicolon. */
+    DecodingMode[DecodingMode["Strict"] = 1] = "Strict";
+    /** Entities in attributes have limitations on ending characters. */
+    DecodingMode[DecodingMode["Attribute"] = 2] = "Attribute";
+})(DecodingMode = exports.DecodingMode || (exports.DecodingMode = {}));
+/**
+ * Token decoder with support of writing partial entities.
+ */
+var EntityDecoder = /** @class */ (function () {
+    function EntityDecoder(
+    /** The tree used to decode entities. */
+    decodeTree, 
+    /**
+     * The function that is called when a codepoint is decoded.
+     *
+     * For multi-byte named entities, this will be called multiple times,
+     * with the second codepoint, and the same `consumed` value.
+     *
+     * @param codepoint The decoded codepoint.
+     * @param consumed The number of bytes consumed by the decoder.
+     */
+    emitCodePoint, 
+    /** An object that is used to produce errors. */
+    errors) {
+        this.decodeTree = decodeTree;
+        this.emitCodePoint = emitCodePoint;
+        this.errors = errors;
+        /** The current state of the decoder. */
+        this.state = EntityDecoderState.EntityStart;
+        /** Characters that were consumed while parsing an entity. */
+        this.consumed = 1;
+        /**
+         * The result of the entity.
+         *
+         * Either the result index of a numeric entity, or the codepoint of a
+         * numeric entity.
+         */
+        this.result = 0;
+        /** The current index in the decode tree. */
+        this.treeIndex = 0;
+        /** The number of characters that were consumed in excess. */
+        this.excess = 1;
+        /** The mode in which the decoder is operating. */
+        this.decodeMode = DecodingMode.Strict;
+    }
+    /** Resets the instance to make it reusable. */
+    EntityDecoder.prototype.startEntity = function (decodeMode) {
+        this.decodeMode = decodeMode;
+        this.state = EntityDecoderState.EntityStart;
+        this.result = 0;
+        this.treeIndex = 0;
+        this.excess = 1;
+        this.consumed = 1;
+    };
+    /**
+     * Write an entity to the decoder. This can be called multiple times with partial entities.
+     * If the entity is incomplete, the decoder will return -1.
+     *
+     * Mirrors the implementation of `getDecoder`, but with the ability to stop decoding if the
+     * entity is incomplete, and resume when the next string is written.
+     *
+     * @param string The string containing the entity (or a continuation of the entity).
+     * @param offset The offset at which the entity begins. Should be 0 if this is not the first call.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.write = function (str, offset) {
+        switch (this.state) {
+            case EntityDecoderState.EntityStart: {
+                if (str.charCodeAt(offset) === CharCodes.NUM) {
+                    this.state = EntityDecoderState.NumericStart;
+                    this.consumed += 1;
+                    return this.stateNumericStart(str, offset + 1);
                 }
-                do
-                    cp = str.charCodeAt(++strIdx);
-                while ((cp >= CharCodes.ZERO && cp <= CharCodes.NINE) ||
-                    (base === 16 &&
-                        (cp | CharCodes.To_LOWER_BIT) >= CharCodes.LOWER_A &&
-                        (cp | CharCodes.To_LOWER_BIT) <= CharCodes.LOWER_F));
-                if (start !== strIdx) {
-                    var entity = str.substring(start, strIdx);
-                    var parsed = parseInt(entity, base);
-                    if (str.charCodeAt(strIdx) === CharCodes.SEMI) {
-                        strIdx += 1;
-                    }
-                    else if (strict) {
-                        continue;
-                    }
-                    ret += (0, decode_codepoint_js_1.default)(parsed);
-                    lastIdx = strIdx;
-                }
-                continue;
+                this.state = EntityDecoderState.NamedEntity;
+                return this.stateNamedEntity(str, offset);
             }
-            var resultIdx = 0;
-            var excess = 1;
-            var treeIdx = 0;
-            var current = decodeTree[treeIdx];
-            for (; strIdx < str.length; strIdx++, excess++) {
-                treeIdx = determineBranch(decodeTree, current, treeIdx + 1, str.charCodeAt(strIdx));
-                if (treeIdx < 0)
-                    break;
-                current = decodeTree[treeIdx];
-                var masked = current & BinTrieFlags.VALUE_LENGTH;
-                // If the branch is a value, store it and continue
-                if (masked) {
-                    // If we have a legacy entity while parsing strictly, just skip the number of bytes
-                    if (!strict || str.charCodeAt(strIdx) === CharCodes.SEMI) {
-                        resultIdx = treeIdx;
-                        excess = 0;
-                    }
-                    // The mask is the number of bytes of the value, including the current byte.
-                    var valueLength = (masked >> 14) - 1;
-                    if (valueLength === 0)
-                        break;
-                    treeIdx += valueLength;
-                }
+            case EntityDecoderState.NumericStart: {
+                return this.stateNumericStart(str, offset);
             }
-            if (resultIdx !== 0) {
-                var valueLength = (decodeTree[resultIdx] & BinTrieFlags.VALUE_LENGTH) >> 14;
-                ret +=
-                    valueLength === 1
-                        ? String.fromCharCode(decodeTree[resultIdx] & ~BinTrieFlags.VALUE_LENGTH)
-                        : valueLength === 2
-                            ? String.fromCharCode(decodeTree[resultIdx + 1])
-                            : String.fromCharCode(decodeTree[resultIdx + 1], decodeTree[resultIdx + 2]);
-                lastIdx = strIdx - excess + 1;
+            case EntityDecoderState.NumericDecimal: {
+                return this.stateNumericDecimal(str, offset);
+            }
+            case EntityDecoderState.NumericHex: {
+                return this.stateNumericHex(str, offset);
+            }
+            case EntityDecoderState.NamedEntity: {
+                return this.stateNamedEntity(str, offset);
             }
         }
-        return ret + str.slice(lastIdx);
+    };
+    /**
+     * Switches between the numeric decimal and hexadecimal states.
+     *
+     * Equivalent to the `Numeric character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericStart = function (str, offset) {
+        if (offset >= str.length) {
+            return -1;
+        }
+        if ((str.charCodeAt(offset) | TO_LOWER_BIT) === CharCodes.LOWER_X) {
+            this.state = EntityDecoderState.NumericHex;
+            this.consumed += 1;
+            return this.stateNumericHex(str, offset + 1);
+        }
+        this.state = EntityDecoderState.NumericDecimal;
+        return this.stateNumericDecimal(str, offset);
+    };
+    EntityDecoder.prototype.addToNumericResult = function (str, start, end, base) {
+        if (start !== end) {
+            var digitCount = end - start;
+            this.result =
+                this.result * Math.pow(base, digitCount) +
+                    parseInt(str.substr(start, digitCount), base);
+            this.consumed += digitCount;
+        }
+    };
+    /**
+     * Parses a hexadecimal numeric entity.
+     *
+     * Equivalent to the `Hexademical character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericHex = function (str, offset) {
+        var startIdx = offset;
+        while (offset < str.length) {
+            var char = str.charCodeAt(offset);
+            if (isNumber(char) || isHexadecimalCharacter(char)) {
+                offset += 1;
+            }
+            else {
+                this.addToNumericResult(str, startIdx, offset, 16);
+                return this.emitNumericEntity(char, 3);
+            }
+        }
+        this.addToNumericResult(str, startIdx, offset, 16);
+        return -1;
+    };
+    /**
+     * Parses a decimal numeric entity.
+     *
+     * Equivalent to the `Decimal character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericDecimal = function (str, offset) {
+        var startIdx = offset;
+        while (offset < str.length) {
+            var char = str.charCodeAt(offset);
+            if (isNumber(char)) {
+                offset += 1;
+            }
+            else {
+                this.addToNumericResult(str, startIdx, offset, 10);
+                return this.emitNumericEntity(char, 2);
+            }
+        }
+        this.addToNumericResult(str, startIdx, offset, 10);
+        return -1;
+    };
+    /**
+     * Validate and emit a numeric entity.
+     *
+     * Implements the logic from the `Hexademical character reference start
+     * state` and `Numeric character reference end state` in the HTML spec.
+     *
+     * @param lastCp The last code point of the entity. Used to see if the
+     *               entity was terminated with a semicolon.
+     * @param expectedLength The minimum number of characters that should be
+     *                       consumed. Used to validate that at least one digit
+     *                       was consumed.
+     * @returns The number of characters that were consumed.
+     */
+    EntityDecoder.prototype.emitNumericEntity = function (lastCp, expectedLength) {
+        var _a;
+        // Ensure we consumed at least one digit.
+        if (this.consumed <= expectedLength) {
+            (_a = this.errors) === null || _a === void 0 ? void 0 : _a.absenceOfDigitsInNumericCharacterReference(this.consumed);
+            return 0;
+        }
+        // Figure out if this is a legit end of the entity
+        if (lastCp === CharCodes.SEMI) {
+            this.consumed += 1;
+        }
+        else if (this.decodeMode === DecodingMode.Strict) {
+            return 0;
+        }
+        this.emitCodePoint((0, decode_codepoint_js_1.replaceCodePoint)(this.result), this.consumed);
+        if (this.errors) {
+            if (lastCp !== CharCodes.SEMI) {
+                this.errors.missingSemicolonAfterCharacterReference();
+            }
+            this.errors.validateNumericCharacterReference(this.result);
+        }
+        return this.consumed;
+    };
+    /**
+     * Parses a named entity.
+     *
+     * Equivalent to the `Named character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNamedEntity = function (str, offset) {
+        var decodeTree = this.decodeTree;
+        var current = decodeTree[this.treeIndex];
+        // The mask is the number of bytes of the value, including the current byte.
+        var valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+        for (; offset < str.length; offset++, this.excess++) {
+            var char = str.charCodeAt(offset);
+            this.treeIndex = determineBranch(decodeTree, current, this.treeIndex + Math.max(1, valueLength), char);
+            if (this.treeIndex < 0) {
+                return this.result === 0 ||
+                    // If we are parsing an attribute
+                    (this.decodeMode === DecodingMode.Attribute &&
+                        // We shouldn't have consumed any characters after the entity,
+                        (valueLength === 0 ||
+                            // And there should be no invalid characters.
+                            isEntityInAttributeInvalidEnd(char)))
+                    ? 0
+                    : this.emitNotTerminatedNamedEntity();
+            }
+            current = decodeTree[this.treeIndex];
+            valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+            // If the branch is a value, store it and continue
+            if (valueLength !== 0) {
+                // If the entity is terminated by a semicolon, we are done.
+                if (char === CharCodes.SEMI) {
+                    return this.emitNamedEntityData(this.treeIndex, valueLength, this.consumed + this.excess);
+                }
+                // If we encounter a non-terminated (legacy) entity while parsing strictly, then ignore it.
+                if (this.decodeMode !== DecodingMode.Strict) {
+                    this.result = this.treeIndex;
+                    this.consumed += this.excess;
+                    this.excess = 0;
+                }
+            }
+        }
+        return -1;
+    };
+    /**
+     * Emit a named entity that was not terminated with a semicolon.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.emitNotTerminatedNamedEntity = function () {
+        var _a;
+        var _b = this, result = _b.result, decodeTree = _b.decodeTree;
+        var valueLength = (decodeTree[result] & BinTrieFlags.VALUE_LENGTH) >> 14;
+        this.emitNamedEntityData(result, valueLength, this.consumed);
+        (_a = this.errors) === null || _a === void 0 ? void 0 : _a.missingSemicolonAfterCharacterReference();
+        return this.consumed;
+    };
+    /**
+     * Emit a named entity.
+     *
+     * @param result The index of the entity in the decode tree.
+     * @param valueLength The number of bytes in the entity.
+     * @param consumed The number of characters consumed.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.emitNamedEntityData = function (result, valueLength, consumed) {
+        var decodeTree = this.decodeTree;
+        this.emitCodePoint(valueLength === 1
+            ? decodeTree[result] & ~BinTrieFlags.VALUE_LENGTH
+            : decodeTree[result + 1], consumed);
+        if (valueLength === 3) {
+            // For multi-byte values, we need to emit the second byte.
+            this.emitCodePoint(decodeTree[result + 2], consumed);
+        }
+        return consumed;
+    };
+    /**
+     * Signal to the parser that the end of the input was reached.
+     *
+     * Remaining data will be emitted and relevant errors will be produced.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.end = function () {
+        var _a;
+        switch (this.state) {
+            case EntityDecoderState.NamedEntity: {
+                // Emit a named entity if we have one.
+                return this.result !== 0 &&
+                    (this.decodeMode !== DecodingMode.Attribute ||
+                        this.result === this.treeIndex)
+                    ? this.emitNotTerminatedNamedEntity()
+                    : 0;
+            }
+            // Otherwise, emit a numeric entity if we have one.
+            case EntityDecoderState.NumericDecimal: {
+                return this.emitNumericEntity(0, 2);
+            }
+            case EntityDecoderState.NumericHex: {
+                return this.emitNumericEntity(0, 3);
+            }
+            case EntityDecoderState.NumericStart: {
+                (_a = this.errors) === null || _a === void 0 ? void 0 : _a.absenceOfDigitsInNumericCharacterReference(this.consumed);
+                return 0;
+            }
+            case EntityDecoderState.EntityStart: {
+                // Return 0 if we have no entity.
+                return 0;
+            }
+        }
+    };
+    return EntityDecoder;
+}());
+exports.EntityDecoder = EntityDecoder;
+/**
+ * Creates a function that decodes entities in a string.
+ *
+ * @param decodeTree The decode tree.
+ * @returns A function that decodes entities in a string.
+ */
+function getDecoder(decodeTree) {
+    var ret = "";
+    var decoder = new EntityDecoder(decodeTree, function (str) { return (ret += (0, decode_codepoint_js_1.fromCodePoint)(str)); });
+    return function decodeWithTrie(str, decodeMode) {
+        var lastIndex = 0;
+        var offset = 0;
+        while ((offset = str.indexOf("&", offset)) >= 0) {
+            ret += str.slice(lastIndex, offset);
+            decoder.startEntity(decodeMode);
+            var len = decoder.write(str, 
+            // Skip the "&"
+            offset + 1);
+            if (len < 0) {
+                lastIndex = offset + decoder.end();
+                break;
+            }
+            lastIndex = offset + len;
+            // If `len` is 0, skip the current `&` and continue.
+            offset = len === 0 ? lastIndex + 1 : lastIndex;
+        }
+        var result = ret + str.slice(lastIndex);
+        // Make sure we don't keep a reference to the final string.
+        ret = "";
+        return result;
     };
 }
+/**
+ * Determines the branch of the current node that is taken given the current
+ * character. This function is used to traverse the trie.
+ *
+ * @param decodeTree The trie.
+ * @param current The current node.
+ * @param nodeIdx The index right after the current node and its value.
+ * @param char The current character.
+ * @returns The index of the next node, or -1 if no branch is taken.
+ */
 function determineBranch(decodeTree, current, nodeIdx, char) {
     var branchCount = (current & BinTrieFlags.BRANCH_LENGTH) >> 7;
     var jumpOffset = current & BinTrieFlags.JUMP_TABLE;
@@ -1534,37 +1890,49 @@ exports.determineBranch = determineBranch;
 var htmlDecoder = getDecoder(decode_data_html_js_1.default);
 var xmlDecoder = getDecoder(decode_data_xml_js_1.default);
 /**
- * Decodes an HTML string, allowing for entities not terminated by a semi-colon.
+ * Decodes an HTML string.
+ *
+ * @param str The string to decode.
+ * @param mode The decoding mode.
+ * @returns The decoded string.
+ */
+function decodeHTML(str, mode) {
+    if (mode === void 0) { mode = DecodingMode.Legacy; }
+    return htmlDecoder(str, mode);
+}
+exports.decodeHTML = decodeHTML;
+/**
+ * Decodes an HTML string in an attribute.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
-function decodeHTML(str) {
-    return htmlDecoder(str, false);
+function decodeHTMLAttribute(str) {
+    return htmlDecoder(str, DecodingMode.Attribute);
 }
-exports.decodeHTML = decodeHTML;
+exports.decodeHTMLAttribute = decodeHTMLAttribute;
 /**
- * Decodes an HTML string, requiring all entities to be terminated by a semi-colon.
+ * Decodes an HTML string, requiring all entities to be terminated by a semicolon.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
 function decodeHTMLStrict(str) {
-    return htmlDecoder(str, true);
+    return htmlDecoder(str, DecodingMode.Strict);
 }
 exports.decodeHTMLStrict = decodeHTMLStrict;
 /**
- * Decodes an XML string, requiring all entities to be terminated by a semi-colon.
+ * Decodes an XML string, requiring all entities to be terminated by a semicolon.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
 function decodeXML(str) {
-    return xmlDecoder(str, true);
+    return xmlDecoder(str, DecodingMode.Strict);
 }
 exports.decodeXML = decodeXML;
 
-},{"./decode_codepoint.js":65,"./generated/decode-data-html.js":68,"./generated/decode-data-xml.js":69}],65:[function(require,module,exports){
+},{"./decode_codepoint.js":68,"./generated/decode-data-html.js":71,"./generated/decode-data-xml.js":72}],68:[function(require,module,exports){
 "use strict";
 // Adapted from https://github.com/mathiasbynens/he/blob/36afe179392226cf1b6ccdb16ebbb7a5a844d93a/src/he.js#L106-L134
 var _a;
@@ -1572,6 +1940,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.replaceCodePoint = exports.fromCodePoint = void 0;
 var decodeMap = new Map([
     [0, 65533],
+    // C1 Unicode control character reference replacements
     [128, 8364],
     [130, 8218],
     [131, 402],
@@ -1600,6 +1969,9 @@ var decodeMap = new Map([
     [158, 382],
     [159, 376],
 ]);
+/**
+ * Polyfill for `String.fromCodePoint`. It is used to create a string from a Unicode code point.
+ */
 exports.fromCodePoint = 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, node/no-unsupported-features/es-builtins
 (_a = String.fromCodePoint) !== null && _a !== void 0 ? _a : function (codePoint) {
@@ -1612,6 +1984,11 @@ exports.fromCodePoint =
     output += String.fromCharCode(codePoint);
     return output;
 };
+/**
+ * Replace the given code point with a replacement character if it is a
+ * surrogate or is outside the valid range. Otherwise return the code
+ * point unchanged.
+ */
 function replaceCodePoint(codePoint) {
     var _a;
     if ((codePoint >= 0xd800 && codePoint <= 0xdfff) || codePoint > 0x10ffff) {
@@ -1620,12 +1997,19 @@ function replaceCodePoint(codePoint) {
     return (_a = decodeMap.get(codePoint)) !== null && _a !== void 0 ? _a : codePoint;
 }
 exports.replaceCodePoint = replaceCodePoint;
+/**
+ * Replace the code point if relevant, then convert it to a string.
+ *
+ * @deprecated Use `fromCodePoint(replaceCodePoint(codePoint))` instead.
+ * @param codePoint The code point to decode.
+ * @returns The decoded code point.
+ */
 function decodeCodePoint(codePoint) {
     return (0, exports.fromCodePoint)(replaceCodePoint(codePoint));
 }
 exports.default = decodeCodePoint;
 
-},{}],66:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -1688,7 +2072,7 @@ function encodeHTMLTrieRe(regExp, str) {
             }
             next = next.v;
         }
-        // We might have a tree node without a value; skip and use a numeric entitiy.
+        // We might have a tree node without a value; skip and use a numeric entity.
         if (next !== undefined) {
             ret += next;
             lastIdx = i + 1;
@@ -1703,7 +2087,7 @@ function encodeHTMLTrieRe(regExp, str) {
     return ret + str.substr(lastIdx);
 }
 
-},{"./escape.js":67,"./generated/encode-html.js":70}],67:[function(require,module,exports){
+},{"./escape.js":70,"./generated/encode-html.js":73}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.escapeText = exports.escapeAttribute = exports.escapeUTF8 = exports.escape = exports.encodeXML = exports.getCodePoint = exports.xmlReplacer = void 0;
@@ -1767,6 +2151,16 @@ exports.encodeXML = encodeXML;
  * @param data String to escape.
  */
 exports.escape = encodeXML;
+/**
+ * Creates a function that escapes all characters matched by the given regular
+ * expression using the given map of characters to escape to their entities.
+ *
+ * @param regex Regular expression to match characters to escape.
+ * @param map Map of characters to escape to their entities.
+ *
+ * @returns Function that escapes all characters matched by the given regular
+ * expression using the given map of characters to escape to their entities.
+ */
 function getEscaper(regex, map) {
     return function escape(data) {
         var match;
@@ -1776,7 +2170,7 @@ function getEscaper(regex, map) {
             if (lastIdx !== match.index) {
                 result += data.substring(lastIdx, match.index);
             }
-            // We know that this chararcter will be in the map.
+            // We know that this character will be in the map.
             result += map.get(match[0].charCodeAt(0));
             // Every match will be of length 1
             lastIdx = match.index + 1;
@@ -1816,7 +2210,7 @@ exports.escapeText = getEscaper(/[&<>\u00A0]/g, new Map([
     [160, "&nbsp;"],
 ]));
 
-},{}],68:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 // Generated using scripts/write-decode-map.ts
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1826,7 +2220,7 @@ exports.default = new Uint16Array(
     .split("")
     .map(function (c) { return c.charCodeAt(0); }));
 
-},{}],69:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 // Generated using scripts/write-decode-map.ts
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1836,7 +2230,7 @@ exports.default = new Uint16Array(
     .split("")
     .map(function (c) { return c.charCodeAt(0); }));
 
-},{}],70:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 // Generated using scripts/write-encode-map.ts
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1849,10 +2243,10 @@ function restoreDiff(arr) {
 // prettier-ignore
 exports.default = new Map(/* #__PURE__ */ restoreDiff([[9, "&Tab;"], [0, "&NewLine;"], [22, "&excl;"], [0, "&quot;"], [0, "&num;"], [0, "&dollar;"], [0, "&percnt;"], [0, "&amp;"], [0, "&apos;"], [0, "&lpar;"], [0, "&rpar;"], [0, "&ast;"], [0, "&plus;"], [0, "&comma;"], [1, "&period;"], [0, "&sol;"], [10, "&colon;"], [0, "&semi;"], [0, { v: "&lt;", n: 8402, o: "&nvlt;" }], [0, { v: "&equals;", n: 8421, o: "&bne;" }], [0, { v: "&gt;", n: 8402, o: "&nvgt;" }], [0, "&quest;"], [0, "&commat;"], [26, "&lbrack;"], [0, "&bsol;"], [0, "&rbrack;"], [0, "&Hat;"], [0, "&lowbar;"], [0, "&DiacriticalGrave;"], [5, { n: 106, o: "&fjlig;" }], [20, "&lbrace;"], [0, "&verbar;"], [0, "&rbrace;"], [34, "&nbsp;"], [0, "&iexcl;"], [0, "&cent;"], [0, "&pound;"], [0, "&curren;"], [0, "&yen;"], [0, "&brvbar;"], [0, "&sect;"], [0, "&die;"], [0, "&copy;"], [0, "&ordf;"], [0, "&laquo;"], [0, "&not;"], [0, "&shy;"], [0, "&circledR;"], [0, "&macr;"], [0, "&deg;"], [0, "&PlusMinus;"], [0, "&sup2;"], [0, "&sup3;"], [0, "&acute;"], [0, "&micro;"], [0, "&para;"], [0, "&centerdot;"], [0, "&cedil;"], [0, "&sup1;"], [0, "&ordm;"], [0, "&raquo;"], [0, "&frac14;"], [0, "&frac12;"], [0, "&frac34;"], [0, "&iquest;"], [0, "&Agrave;"], [0, "&Aacute;"], [0, "&Acirc;"], [0, "&Atilde;"], [0, "&Auml;"], [0, "&angst;"], [0, "&AElig;"], [0, "&Ccedil;"], [0, "&Egrave;"], [0, "&Eacute;"], [0, "&Ecirc;"], [0, "&Euml;"], [0, "&Igrave;"], [0, "&Iacute;"], [0, "&Icirc;"], [0, "&Iuml;"], [0, "&ETH;"], [0, "&Ntilde;"], [0, "&Ograve;"], [0, "&Oacute;"], [0, "&Ocirc;"], [0, "&Otilde;"], [0, "&Ouml;"], [0, "&times;"], [0, "&Oslash;"], [0, "&Ugrave;"], [0, "&Uacute;"], [0, "&Ucirc;"], [0, "&Uuml;"], [0, "&Yacute;"], [0, "&THORN;"], [0, "&szlig;"], [0, "&agrave;"], [0, "&aacute;"], [0, "&acirc;"], [0, "&atilde;"], [0, "&auml;"], [0, "&aring;"], [0, "&aelig;"], [0, "&ccedil;"], [0, "&egrave;"], [0, "&eacute;"], [0, "&ecirc;"], [0, "&euml;"], [0, "&igrave;"], [0, "&iacute;"], [0, "&icirc;"], [0, "&iuml;"], [0, "&eth;"], [0, "&ntilde;"], [0, "&ograve;"], [0, "&oacute;"], [0, "&ocirc;"], [0, "&otilde;"], [0, "&ouml;"], [0, "&div;"], [0, "&oslash;"], [0, "&ugrave;"], [0, "&uacute;"], [0, "&ucirc;"], [0, "&uuml;"], [0, "&yacute;"], [0, "&thorn;"], [0, "&yuml;"], [0, "&Amacr;"], [0, "&amacr;"], [0, "&Abreve;"], [0, "&abreve;"], [0, "&Aogon;"], [0, "&aogon;"], [0, "&Cacute;"], [0, "&cacute;"], [0, "&Ccirc;"], [0, "&ccirc;"], [0, "&Cdot;"], [0, "&cdot;"], [0, "&Ccaron;"], [0, "&ccaron;"], [0, "&Dcaron;"], [0, "&dcaron;"], [0, "&Dstrok;"], [0, "&dstrok;"], [0, "&Emacr;"], [0, "&emacr;"], [2, "&Edot;"], [0, "&edot;"], [0, "&Eogon;"], [0, "&eogon;"], [0, "&Ecaron;"], [0, "&ecaron;"], [0, "&Gcirc;"], [0, "&gcirc;"], [0, "&Gbreve;"], [0, "&gbreve;"], [0, "&Gdot;"], [0, "&gdot;"], [0, "&Gcedil;"], [1, "&Hcirc;"], [0, "&hcirc;"], [0, "&Hstrok;"], [0, "&hstrok;"], [0, "&Itilde;"], [0, "&itilde;"], [0, "&Imacr;"], [0, "&imacr;"], [2, "&Iogon;"], [0, "&iogon;"], [0, "&Idot;"], [0, "&imath;"], [0, "&IJlig;"], [0, "&ijlig;"], [0, "&Jcirc;"], [0, "&jcirc;"], [0, "&Kcedil;"], [0, "&kcedil;"], [0, "&kgreen;"], [0, "&Lacute;"], [0, "&lacute;"], [0, "&Lcedil;"], [0, "&lcedil;"], [0, "&Lcaron;"], [0, "&lcaron;"], [0, "&Lmidot;"], [0, "&lmidot;"], [0, "&Lstrok;"], [0, "&lstrok;"], [0, "&Nacute;"], [0, "&nacute;"], [0, "&Ncedil;"], [0, "&ncedil;"], [0, "&Ncaron;"], [0, "&ncaron;"], [0, "&napos;"], [0, "&ENG;"], [0, "&eng;"], [0, "&Omacr;"], [0, "&omacr;"], [2, "&Odblac;"], [0, "&odblac;"], [0, "&OElig;"], [0, "&oelig;"], [0, "&Racute;"], [0, "&racute;"], [0, "&Rcedil;"], [0, "&rcedil;"], [0, "&Rcaron;"], [0, "&rcaron;"], [0, "&Sacute;"], [0, "&sacute;"], [0, "&Scirc;"], [0, "&scirc;"], [0, "&Scedil;"], [0, "&scedil;"], [0, "&Scaron;"], [0, "&scaron;"], [0, "&Tcedil;"], [0, "&tcedil;"], [0, "&Tcaron;"], [0, "&tcaron;"], [0, "&Tstrok;"], [0, "&tstrok;"], [0, "&Utilde;"], [0, "&utilde;"], [0, "&Umacr;"], [0, "&umacr;"], [0, "&Ubreve;"], [0, "&ubreve;"], [0, "&Uring;"], [0, "&uring;"], [0, "&Udblac;"], [0, "&udblac;"], [0, "&Uogon;"], [0, "&uogon;"], [0, "&Wcirc;"], [0, "&wcirc;"], [0, "&Ycirc;"], [0, "&ycirc;"], [0, "&Yuml;"], [0, "&Zacute;"], [0, "&zacute;"], [0, "&Zdot;"], [0, "&zdot;"], [0, "&Zcaron;"], [0, "&zcaron;"], [19, "&fnof;"], [34, "&imped;"], [63, "&gacute;"], [65, "&jmath;"], [142, "&circ;"], [0, "&caron;"], [16, "&breve;"], [0, "&DiacriticalDot;"], [0, "&ring;"], [0, "&ogon;"], [0, "&DiacriticalTilde;"], [0, "&dblac;"], [51, "&DownBreve;"], [127, "&Alpha;"], [0, "&Beta;"], [0, "&Gamma;"], [0, "&Delta;"], [0, "&Epsilon;"], [0, "&Zeta;"], [0, "&Eta;"], [0, "&Theta;"], [0, "&Iota;"], [0, "&Kappa;"], [0, "&Lambda;"], [0, "&Mu;"], [0, "&Nu;"], [0, "&Xi;"], [0, "&Omicron;"], [0, "&Pi;"], [0, "&Rho;"], [1, "&Sigma;"], [0, "&Tau;"], [0, "&Upsilon;"], [0, "&Phi;"], [0, "&Chi;"], [0, "&Psi;"], [0, "&ohm;"], [7, "&alpha;"], [0, "&beta;"], [0, "&gamma;"], [0, "&delta;"], [0, "&epsi;"], [0, "&zeta;"], [0, "&eta;"], [0, "&theta;"], [0, "&iota;"], [0, "&kappa;"], [0, "&lambda;"], [0, "&mu;"], [0, "&nu;"], [0, "&xi;"], [0, "&omicron;"], [0, "&pi;"], [0, "&rho;"], [0, "&sigmaf;"], [0, "&sigma;"], [0, "&tau;"], [0, "&upsi;"], [0, "&phi;"], [0, "&chi;"], [0, "&psi;"], [0, "&omega;"], [7, "&thetasym;"], [0, "&Upsi;"], [2, "&phiv;"], [0, "&piv;"], [5, "&Gammad;"], [0, "&digamma;"], [18, "&kappav;"], [0, "&rhov;"], [3, "&epsiv;"], [0, "&backepsilon;"], [10, "&IOcy;"], [0, "&DJcy;"], [0, "&GJcy;"], [0, "&Jukcy;"], [0, "&DScy;"], [0, "&Iukcy;"], [0, "&YIcy;"], [0, "&Jsercy;"], [0, "&LJcy;"], [0, "&NJcy;"], [0, "&TSHcy;"], [0, "&KJcy;"], [1, "&Ubrcy;"], [0, "&DZcy;"], [0, "&Acy;"], [0, "&Bcy;"], [0, "&Vcy;"], [0, "&Gcy;"], [0, "&Dcy;"], [0, "&IEcy;"], [0, "&ZHcy;"], [0, "&Zcy;"], [0, "&Icy;"], [0, "&Jcy;"], [0, "&Kcy;"], [0, "&Lcy;"], [0, "&Mcy;"], [0, "&Ncy;"], [0, "&Ocy;"], [0, "&Pcy;"], [0, "&Rcy;"], [0, "&Scy;"], [0, "&Tcy;"], [0, "&Ucy;"], [0, "&Fcy;"], [0, "&KHcy;"], [0, "&TScy;"], [0, "&CHcy;"], [0, "&SHcy;"], [0, "&SHCHcy;"], [0, "&HARDcy;"], [0, "&Ycy;"], [0, "&SOFTcy;"], [0, "&Ecy;"], [0, "&YUcy;"], [0, "&YAcy;"], [0, "&acy;"], [0, "&bcy;"], [0, "&vcy;"], [0, "&gcy;"], [0, "&dcy;"], [0, "&iecy;"], [0, "&zhcy;"], [0, "&zcy;"], [0, "&icy;"], [0, "&jcy;"], [0, "&kcy;"], [0, "&lcy;"], [0, "&mcy;"], [0, "&ncy;"], [0, "&ocy;"], [0, "&pcy;"], [0, "&rcy;"], [0, "&scy;"], [0, "&tcy;"], [0, "&ucy;"], [0, "&fcy;"], [0, "&khcy;"], [0, "&tscy;"], [0, "&chcy;"], [0, "&shcy;"], [0, "&shchcy;"], [0, "&hardcy;"], [0, "&ycy;"], [0, "&softcy;"], [0, "&ecy;"], [0, "&yucy;"], [0, "&yacy;"], [1, "&iocy;"], [0, "&djcy;"], [0, "&gjcy;"], [0, "&jukcy;"], [0, "&dscy;"], [0, "&iukcy;"], [0, "&yicy;"], [0, "&jsercy;"], [0, "&ljcy;"], [0, "&njcy;"], [0, "&tshcy;"], [0, "&kjcy;"], [1, "&ubrcy;"], [0, "&dzcy;"], [7074, "&ensp;"], [0, "&emsp;"], [0, "&emsp13;"], [0, "&emsp14;"], [1, "&numsp;"], [0, "&puncsp;"], [0, "&ThinSpace;"], [0, "&hairsp;"], [0, "&NegativeMediumSpace;"], [0, "&zwnj;"], [0, "&zwj;"], [0, "&lrm;"], [0, "&rlm;"], [0, "&dash;"], [2, "&ndash;"], [0, "&mdash;"], [0, "&horbar;"], [0, "&Verbar;"], [1, "&lsquo;"], [0, "&CloseCurlyQuote;"], [0, "&lsquor;"], [1, "&ldquo;"], [0, "&CloseCurlyDoubleQuote;"], [0, "&bdquo;"], [1, "&dagger;"], [0, "&Dagger;"], [0, "&bull;"], [2, "&nldr;"], [0, "&hellip;"], [9, "&permil;"], [0, "&pertenk;"], [0, "&prime;"], [0, "&Prime;"], [0, "&tprime;"], [0, "&backprime;"], [3, "&lsaquo;"], [0, "&rsaquo;"], [3, "&oline;"], [2, "&caret;"], [1, "&hybull;"], [0, "&frasl;"], [10, "&bsemi;"], [7, "&qprime;"], [7, { v: "&MediumSpace;", n: 8202, o: "&ThickSpace;" }], [0, "&NoBreak;"], [0, "&af;"], [0, "&InvisibleTimes;"], [0, "&ic;"], [72, "&euro;"], [46, "&tdot;"], [0, "&DotDot;"], [37, "&complexes;"], [2, "&incare;"], [4, "&gscr;"], [0, "&hamilt;"], [0, "&Hfr;"], [0, "&Hopf;"], [0, "&planckh;"], [0, "&hbar;"], [0, "&imagline;"], [0, "&Ifr;"], [0, "&lagran;"], [0, "&ell;"], [1, "&naturals;"], [0, "&numero;"], [0, "&copysr;"], [0, "&weierp;"], [0, "&Popf;"], [0, "&Qopf;"], [0, "&realine;"], [0, "&real;"], [0, "&reals;"], [0, "&rx;"], [3, "&trade;"], [1, "&integers;"], [2, "&mho;"], [0, "&zeetrf;"], [0, "&iiota;"], [2, "&bernou;"], [0, "&Cayleys;"], [1, "&escr;"], [0, "&Escr;"], [0, "&Fouriertrf;"], [1, "&Mellintrf;"], [0, "&order;"], [0, "&alefsym;"], [0, "&beth;"], [0, "&gimel;"], [0, "&daleth;"], [12, "&CapitalDifferentialD;"], [0, "&dd;"], [0, "&ee;"], [0, "&ii;"], [10, "&frac13;"], [0, "&frac23;"], [0, "&frac15;"], [0, "&frac25;"], [0, "&frac35;"], [0, "&frac45;"], [0, "&frac16;"], [0, "&frac56;"], [0, "&frac18;"], [0, "&frac38;"], [0, "&frac58;"], [0, "&frac78;"], [49, "&larr;"], [0, "&ShortUpArrow;"], [0, "&rarr;"], [0, "&darr;"], [0, "&harr;"], [0, "&updownarrow;"], [0, "&nwarr;"], [0, "&nearr;"], [0, "&LowerRightArrow;"], [0, "&LowerLeftArrow;"], [0, "&nlarr;"], [0, "&nrarr;"], [1, { v: "&rarrw;", n: 824, o: "&nrarrw;" }], [0, "&Larr;"], [0, "&Uarr;"], [0, "&Rarr;"], [0, "&Darr;"], [0, "&larrtl;"], [0, "&rarrtl;"], [0, "&LeftTeeArrow;"], [0, "&mapstoup;"], [0, "&map;"], [0, "&DownTeeArrow;"], [1, "&hookleftarrow;"], [0, "&hookrightarrow;"], [0, "&larrlp;"], [0, "&looparrowright;"], [0, "&harrw;"], [0, "&nharr;"], [1, "&lsh;"], [0, "&rsh;"], [0, "&ldsh;"], [0, "&rdsh;"], [1, "&crarr;"], [0, "&cularr;"], [0, "&curarr;"], [2, "&circlearrowleft;"], [0, "&circlearrowright;"], [0, "&leftharpoonup;"], [0, "&DownLeftVector;"], [0, "&RightUpVector;"], [0, "&LeftUpVector;"], [0, "&rharu;"], [0, "&DownRightVector;"], [0, "&dharr;"], [0, "&dharl;"], [0, "&RightArrowLeftArrow;"], [0, "&udarr;"], [0, "&LeftArrowRightArrow;"], [0, "&leftleftarrows;"], [0, "&upuparrows;"], [0, "&rightrightarrows;"], [0, "&ddarr;"], [0, "&leftrightharpoons;"], [0, "&Equilibrium;"], [0, "&nlArr;"], [0, "&nhArr;"], [0, "&nrArr;"], [0, "&DoubleLeftArrow;"], [0, "&DoubleUpArrow;"], [0, "&DoubleRightArrow;"], [0, "&dArr;"], [0, "&DoubleLeftRightArrow;"], [0, "&DoubleUpDownArrow;"], [0, "&nwArr;"], [0, "&neArr;"], [0, "&seArr;"], [0, "&swArr;"], [0, "&lAarr;"], [0, "&rAarr;"], [1, "&zigrarr;"], [6, "&larrb;"], [0, "&rarrb;"], [15, "&DownArrowUpArrow;"], [7, "&loarr;"], [0, "&roarr;"], [0, "&hoarr;"], [0, "&forall;"], [0, "&comp;"], [0, { v: "&part;", n: 824, o: "&npart;" }], [0, "&exist;"], [0, "&nexist;"], [0, "&empty;"], [1, "&Del;"], [0, "&Element;"], [0, "&NotElement;"], [1, "&ni;"], [0, "&notni;"], [2, "&prod;"], [0, "&coprod;"], [0, "&sum;"], [0, "&minus;"], [0, "&MinusPlus;"], [0, "&dotplus;"], [1, "&Backslash;"], [0, "&lowast;"], [0, "&compfn;"], [1, "&radic;"], [2, "&prop;"], [0, "&infin;"], [0, "&angrt;"], [0, { v: "&ang;", n: 8402, o: "&nang;" }], [0, "&angmsd;"], [0, "&angsph;"], [0, "&mid;"], [0, "&nmid;"], [0, "&DoubleVerticalBar;"], [0, "&NotDoubleVerticalBar;"], [0, "&and;"], [0, "&or;"], [0, { v: "&cap;", n: 65024, o: "&caps;" }], [0, { v: "&cup;", n: 65024, o: "&cups;" }], [0, "&int;"], [0, "&Int;"], [0, "&iiint;"], [0, "&conint;"], [0, "&Conint;"], [0, "&Cconint;"], [0, "&cwint;"], [0, "&ClockwiseContourIntegral;"], [0, "&awconint;"], [0, "&there4;"], [0, "&becaus;"], [0, "&ratio;"], [0, "&Colon;"], [0, "&dotminus;"], [1, "&mDDot;"], [0, "&homtht;"], [0, { v: "&sim;", n: 8402, o: "&nvsim;" }], [0, { v: "&backsim;", n: 817, o: "&race;" }], [0, { v: "&ac;", n: 819, o: "&acE;" }], [0, "&acd;"], [0, "&VerticalTilde;"], [0, "&NotTilde;"], [0, { v: "&eqsim;", n: 824, o: "&nesim;" }], [0, "&sime;"], [0, "&NotTildeEqual;"], [0, "&cong;"], [0, "&simne;"], [0, "&ncong;"], [0, "&ap;"], [0, "&nap;"], [0, "&ape;"], [0, { v: "&apid;", n: 824, o: "&napid;" }], [0, "&backcong;"], [0, { v: "&asympeq;", n: 8402, o: "&nvap;" }], [0, { v: "&bump;", n: 824, o: "&nbump;" }], [0, { v: "&bumpe;", n: 824, o: "&nbumpe;" }], [0, { v: "&doteq;", n: 824, o: "&nedot;" }], [0, "&doteqdot;"], [0, "&efDot;"], [0, "&erDot;"], [0, "&Assign;"], [0, "&ecolon;"], [0, "&ecir;"], [0, "&circeq;"], [1, "&wedgeq;"], [0, "&veeeq;"], [1, "&triangleq;"], [2, "&equest;"], [0, "&ne;"], [0, { v: "&Congruent;", n: 8421, o: "&bnequiv;" }], [0, "&nequiv;"], [1, { v: "&le;", n: 8402, o: "&nvle;" }], [0, { v: "&ge;", n: 8402, o: "&nvge;" }], [0, { v: "&lE;", n: 824, o: "&nlE;" }], [0, { v: "&gE;", n: 824, o: "&ngE;" }], [0, { v: "&lnE;", n: 65024, o: "&lvertneqq;" }], [0, { v: "&gnE;", n: 65024, o: "&gvertneqq;" }], [0, { v: "&ll;", n: new Map(/* #__PURE__ */ restoreDiff([[824, "&nLtv;"], [7577, "&nLt;"]])) }], [0, { v: "&gg;", n: new Map(/* #__PURE__ */ restoreDiff([[824, "&nGtv;"], [7577, "&nGt;"]])) }], [0, "&between;"], [0, "&NotCupCap;"], [0, "&nless;"], [0, "&ngt;"], [0, "&nle;"], [0, "&nge;"], [0, "&lesssim;"], [0, "&GreaterTilde;"], [0, "&nlsim;"], [0, "&ngsim;"], [0, "&LessGreater;"], [0, "&gl;"], [0, "&NotLessGreater;"], [0, "&NotGreaterLess;"], [0, "&pr;"], [0, "&sc;"], [0, "&prcue;"], [0, "&sccue;"], [0, "&PrecedesTilde;"], [0, { v: "&scsim;", n: 824, o: "&NotSucceedsTilde;" }], [0, "&NotPrecedes;"], [0, "&NotSucceeds;"], [0, { v: "&sub;", n: 8402, o: "&NotSubset;" }], [0, { v: "&sup;", n: 8402, o: "&NotSuperset;" }], [0, "&nsub;"], [0, "&nsup;"], [0, "&sube;"], [0, "&supe;"], [0, "&NotSubsetEqual;"], [0, "&NotSupersetEqual;"], [0, { v: "&subne;", n: 65024, o: "&varsubsetneq;" }], [0, { v: "&supne;", n: 65024, o: "&varsupsetneq;" }], [1, "&cupdot;"], [0, "&UnionPlus;"], [0, { v: "&sqsub;", n: 824, o: "&NotSquareSubset;" }], [0, { v: "&sqsup;", n: 824, o: "&NotSquareSuperset;" }], [0, "&sqsube;"], [0, "&sqsupe;"], [0, { v: "&sqcap;", n: 65024, o: "&sqcaps;" }], [0, { v: "&sqcup;", n: 65024, o: "&sqcups;" }], [0, "&CirclePlus;"], [0, "&CircleMinus;"], [0, "&CircleTimes;"], [0, "&osol;"], [0, "&CircleDot;"], [0, "&circledcirc;"], [0, "&circledast;"], [1, "&circleddash;"], [0, "&boxplus;"], [0, "&boxminus;"], [0, "&boxtimes;"], [0, "&dotsquare;"], [0, "&RightTee;"], [0, "&dashv;"], [0, "&DownTee;"], [0, "&bot;"], [1, "&models;"], [0, "&DoubleRightTee;"], [0, "&Vdash;"], [0, "&Vvdash;"], [0, "&VDash;"], [0, "&nvdash;"], [0, "&nvDash;"], [0, "&nVdash;"], [0, "&nVDash;"], [0, "&prurel;"], [1, "&LeftTriangle;"], [0, "&RightTriangle;"], [0, { v: "&LeftTriangleEqual;", n: 8402, o: "&nvltrie;" }], [0, { v: "&RightTriangleEqual;", n: 8402, o: "&nvrtrie;" }], [0, "&origof;"], [0, "&imof;"], [0, "&multimap;"], [0, "&hercon;"], [0, "&intcal;"], [0, "&veebar;"], [1, "&barvee;"], [0, "&angrtvb;"], [0, "&lrtri;"], [0, "&bigwedge;"], [0, "&bigvee;"], [0, "&bigcap;"], [0, "&bigcup;"], [0, "&diam;"], [0, "&sdot;"], [0, "&sstarf;"], [0, "&divideontimes;"], [0, "&bowtie;"], [0, "&ltimes;"], [0, "&rtimes;"], [0, "&leftthreetimes;"], [0, "&rightthreetimes;"], [0, "&backsimeq;"], [0, "&curlyvee;"], [0, "&curlywedge;"], [0, "&Sub;"], [0, "&Sup;"], [0, "&Cap;"], [0, "&Cup;"], [0, "&fork;"], [0, "&epar;"], [0, "&lessdot;"], [0, "&gtdot;"], [0, { v: "&Ll;", n: 824, o: "&nLl;" }], [0, { v: "&Gg;", n: 824, o: "&nGg;" }], [0, { v: "&leg;", n: 65024, o: "&lesg;" }], [0, { v: "&gel;", n: 65024, o: "&gesl;" }], [2, "&cuepr;"], [0, "&cuesc;"], [0, "&NotPrecedesSlantEqual;"], [0, "&NotSucceedsSlantEqual;"], [0, "&NotSquareSubsetEqual;"], [0, "&NotSquareSupersetEqual;"], [2, "&lnsim;"], [0, "&gnsim;"], [0, "&precnsim;"], [0, "&scnsim;"], [0, "&nltri;"], [0, "&NotRightTriangle;"], [0, "&nltrie;"], [0, "&NotRightTriangleEqual;"], [0, "&vellip;"], [0, "&ctdot;"], [0, "&utdot;"], [0, "&dtdot;"], [0, "&disin;"], [0, "&isinsv;"], [0, "&isins;"], [0, { v: "&isindot;", n: 824, o: "&notindot;" }], [0, "&notinvc;"], [0, "&notinvb;"], [1, { v: "&isinE;", n: 824, o: "&notinE;" }], [0, "&nisd;"], [0, "&xnis;"], [0, "&nis;"], [0, "&notnivc;"], [0, "&notnivb;"], [6, "&barwed;"], [0, "&Barwed;"], [1, "&lceil;"], [0, "&rceil;"], [0, "&LeftFloor;"], [0, "&rfloor;"], [0, "&drcrop;"], [0, "&dlcrop;"], [0, "&urcrop;"], [0, "&ulcrop;"], [0, "&bnot;"], [1, "&profline;"], [0, "&profsurf;"], [1, "&telrec;"], [0, "&target;"], [5, "&ulcorn;"], [0, "&urcorn;"], [0, "&dlcorn;"], [0, "&drcorn;"], [2, "&frown;"], [0, "&smile;"], [9, "&cylcty;"], [0, "&profalar;"], [7, "&topbot;"], [6, "&ovbar;"], [1, "&solbar;"], [60, "&angzarr;"], [51, "&lmoustache;"], [0, "&rmoustache;"], [2, "&OverBracket;"], [0, "&bbrk;"], [0, "&bbrktbrk;"], [37, "&OverParenthesis;"], [0, "&UnderParenthesis;"], [0, "&OverBrace;"], [0, "&UnderBrace;"], [2, "&trpezium;"], [4, "&elinters;"], [59, "&blank;"], [164, "&circledS;"], [55, "&boxh;"], [1, "&boxv;"], [9, "&boxdr;"], [3, "&boxdl;"], [3, "&boxur;"], [3, "&boxul;"], [3, "&boxvr;"], [7, "&boxvl;"], [7, "&boxhd;"], [7, "&boxhu;"], [7, "&boxvh;"], [19, "&boxH;"], [0, "&boxV;"], [0, "&boxdR;"], [0, "&boxDr;"], [0, "&boxDR;"], [0, "&boxdL;"], [0, "&boxDl;"], [0, "&boxDL;"], [0, "&boxuR;"], [0, "&boxUr;"], [0, "&boxUR;"], [0, "&boxuL;"], [0, "&boxUl;"], [0, "&boxUL;"], [0, "&boxvR;"], [0, "&boxVr;"], [0, "&boxVR;"], [0, "&boxvL;"], [0, "&boxVl;"], [0, "&boxVL;"], [0, "&boxHd;"], [0, "&boxhD;"], [0, "&boxHD;"], [0, "&boxHu;"], [0, "&boxhU;"], [0, "&boxHU;"], [0, "&boxvH;"], [0, "&boxVh;"], [0, "&boxVH;"], [19, "&uhblk;"], [3, "&lhblk;"], [3, "&block;"], [8, "&blk14;"], [0, "&blk12;"], [0, "&blk34;"], [13, "&square;"], [8, "&blacksquare;"], [0, "&EmptyVerySmallSquare;"], [1, "&rect;"], [0, "&marker;"], [2, "&fltns;"], [1, "&bigtriangleup;"], [0, "&blacktriangle;"], [0, "&triangle;"], [2, "&blacktriangleright;"], [0, "&rtri;"], [3, "&bigtriangledown;"], [0, "&blacktriangledown;"], [0, "&dtri;"], [2, "&blacktriangleleft;"], [0, "&ltri;"], [6, "&loz;"], [0, "&cir;"], [32, "&tridot;"], [2, "&bigcirc;"], [8, "&ultri;"], [0, "&urtri;"], [0, "&lltri;"], [0, "&EmptySmallSquare;"], [0, "&FilledSmallSquare;"], [8, "&bigstar;"], [0, "&star;"], [7, "&phone;"], [49, "&female;"], [1, "&male;"], [29, "&spades;"], [2, "&clubs;"], [1, "&hearts;"], [0, "&diamondsuit;"], [3, "&sung;"], [2, "&flat;"], [0, "&natural;"], [0, "&sharp;"], [163, "&check;"], [3, "&cross;"], [8, "&malt;"], [21, "&sext;"], [33, "&VerticalSeparator;"], [25, "&lbbrk;"], [0, "&rbbrk;"], [84, "&bsolhsub;"], [0, "&suphsol;"], [28, "&LeftDoubleBracket;"], [0, "&RightDoubleBracket;"], [0, "&lang;"], [0, "&rang;"], [0, "&Lang;"], [0, "&Rang;"], [0, "&loang;"], [0, "&roang;"], [7, "&longleftarrow;"], [0, "&longrightarrow;"], [0, "&longleftrightarrow;"], [0, "&DoubleLongLeftArrow;"], [0, "&DoubleLongRightArrow;"], [0, "&DoubleLongLeftRightArrow;"], [1, "&longmapsto;"], [2, "&dzigrarr;"], [258, "&nvlArr;"], [0, "&nvrArr;"], [0, "&nvHarr;"], [0, "&Map;"], [6, "&lbarr;"], [0, "&bkarow;"], [0, "&lBarr;"], [0, "&dbkarow;"], [0, "&drbkarow;"], [0, "&DDotrahd;"], [0, "&UpArrowBar;"], [0, "&DownArrowBar;"], [2, "&Rarrtl;"], [2, "&latail;"], [0, "&ratail;"], [0, "&lAtail;"], [0, "&rAtail;"], [0, "&larrfs;"], [0, "&rarrfs;"], [0, "&larrbfs;"], [0, "&rarrbfs;"], [2, "&nwarhk;"], [0, "&nearhk;"], [0, "&hksearow;"], [0, "&hkswarow;"], [0, "&nwnear;"], [0, "&nesear;"], [0, "&seswar;"], [0, "&swnwar;"], [8, { v: "&rarrc;", n: 824, o: "&nrarrc;" }], [1, "&cudarrr;"], [0, "&ldca;"], [0, "&rdca;"], [0, "&cudarrl;"], [0, "&larrpl;"], [2, "&curarrm;"], [0, "&cularrp;"], [7, "&rarrpl;"], [2, "&harrcir;"], [0, "&Uarrocir;"], [0, "&lurdshar;"], [0, "&ldrushar;"], [2, "&LeftRightVector;"], [0, "&RightUpDownVector;"], [0, "&DownLeftRightVector;"], [0, "&LeftUpDownVector;"], [0, "&LeftVectorBar;"], [0, "&RightVectorBar;"], [0, "&RightUpVectorBar;"], [0, "&RightDownVectorBar;"], [0, "&DownLeftVectorBar;"], [0, "&DownRightVectorBar;"], [0, "&LeftUpVectorBar;"], [0, "&LeftDownVectorBar;"], [0, "&LeftTeeVector;"], [0, "&RightTeeVector;"], [0, "&RightUpTeeVector;"], [0, "&RightDownTeeVector;"], [0, "&DownLeftTeeVector;"], [0, "&DownRightTeeVector;"], [0, "&LeftUpTeeVector;"], [0, "&LeftDownTeeVector;"], [0, "&lHar;"], [0, "&uHar;"], [0, "&rHar;"], [0, "&dHar;"], [0, "&luruhar;"], [0, "&ldrdhar;"], [0, "&ruluhar;"], [0, "&rdldhar;"], [0, "&lharul;"], [0, "&llhard;"], [0, "&rharul;"], [0, "&lrhard;"], [0, "&udhar;"], [0, "&duhar;"], [0, "&RoundImplies;"], [0, "&erarr;"], [0, "&simrarr;"], [0, "&larrsim;"], [0, "&rarrsim;"], [0, "&rarrap;"], [0, "&ltlarr;"], [1, "&gtrarr;"], [0, "&subrarr;"], [1, "&suplarr;"], [0, "&lfisht;"], [0, "&rfisht;"], [0, "&ufisht;"], [0, "&dfisht;"], [5, "&lopar;"], [0, "&ropar;"], [4, "&lbrke;"], [0, "&rbrke;"], [0, "&lbrkslu;"], [0, "&rbrksld;"], [0, "&lbrksld;"], [0, "&rbrkslu;"], [0, "&langd;"], [0, "&rangd;"], [0, "&lparlt;"], [0, "&rpargt;"], [0, "&gtlPar;"], [0, "&ltrPar;"], [3, "&vzigzag;"], [1, "&vangrt;"], [0, "&angrtvbd;"], [6, "&ange;"], [0, "&range;"], [0, "&dwangle;"], [0, "&uwangle;"], [0, "&angmsdaa;"], [0, "&angmsdab;"], [0, "&angmsdac;"], [0, "&angmsdad;"], [0, "&angmsdae;"], [0, "&angmsdaf;"], [0, "&angmsdag;"], [0, "&angmsdah;"], [0, "&bemptyv;"], [0, "&demptyv;"], [0, "&cemptyv;"], [0, "&raemptyv;"], [0, "&laemptyv;"], [0, "&ohbar;"], [0, "&omid;"], [0, "&opar;"], [1, "&operp;"], [1, "&olcross;"], [0, "&odsold;"], [1, "&olcir;"], [0, "&ofcir;"], [0, "&olt;"], [0, "&ogt;"], [0, "&cirscir;"], [0, "&cirE;"], [0, "&solb;"], [0, "&bsolb;"], [3, "&boxbox;"], [3, "&trisb;"], [0, "&rtriltri;"], [0, { v: "&LeftTriangleBar;", n: 824, o: "&NotLeftTriangleBar;" }], [0, { v: "&RightTriangleBar;", n: 824, o: "&NotRightTriangleBar;" }], [11, "&iinfin;"], [0, "&infintie;"], [0, "&nvinfin;"], [4, "&eparsl;"], [0, "&smeparsl;"], [0, "&eqvparsl;"], [5, "&blacklozenge;"], [8, "&RuleDelayed;"], [1, "&dsol;"], [9, "&bigodot;"], [0, "&bigoplus;"], [0, "&bigotimes;"], [1, "&biguplus;"], [1, "&bigsqcup;"], [5, "&iiiint;"], [0, "&fpartint;"], [2, "&cirfnint;"], [0, "&awint;"], [0, "&rppolint;"], [0, "&scpolint;"], [0, "&npolint;"], [0, "&pointint;"], [0, "&quatint;"], [0, "&intlarhk;"], [10, "&pluscir;"], [0, "&plusacir;"], [0, "&simplus;"], [0, "&plusdu;"], [0, "&plussim;"], [0, "&plustwo;"], [1, "&mcomma;"], [0, "&minusdu;"], [2, "&loplus;"], [0, "&roplus;"], [0, "&Cross;"], [0, "&timesd;"], [0, "&timesbar;"], [1, "&smashp;"], [0, "&lotimes;"], [0, "&rotimes;"], [0, "&otimesas;"], [0, "&Otimes;"], [0, "&odiv;"], [0, "&triplus;"], [0, "&triminus;"], [0, "&tritime;"], [0, "&intprod;"], [2, "&amalg;"], [0, "&capdot;"], [1, "&ncup;"], [0, "&ncap;"], [0, "&capand;"], [0, "&cupor;"], [0, "&cupcap;"], [0, "&capcup;"], [0, "&cupbrcap;"], [0, "&capbrcup;"], [0, "&cupcup;"], [0, "&capcap;"], [0, "&ccups;"], [0, "&ccaps;"], [2, "&ccupssm;"], [2, "&And;"], [0, "&Or;"], [0, "&andand;"], [0, "&oror;"], [0, "&orslope;"], [0, "&andslope;"], [1, "&andv;"], [0, "&orv;"], [0, "&andd;"], [0, "&ord;"], [1, "&wedbar;"], [6, "&sdote;"], [3, "&simdot;"], [2, { v: "&congdot;", n: 824, o: "&ncongdot;" }], [0, "&easter;"], [0, "&apacir;"], [0, { v: "&apE;", n: 824, o: "&napE;" }], [0, "&eplus;"], [0, "&pluse;"], [0, "&Esim;"], [0, "&Colone;"], [0, "&Equal;"], [1, "&ddotseq;"], [0, "&equivDD;"], [0, "&ltcir;"], [0, "&gtcir;"], [0, "&ltquest;"], [0, "&gtquest;"], [0, { v: "&leqslant;", n: 824, o: "&nleqslant;" }], [0, { v: "&geqslant;", n: 824, o: "&ngeqslant;" }], [0, "&lesdot;"], [0, "&gesdot;"], [0, "&lesdoto;"], [0, "&gesdoto;"], [0, "&lesdotor;"], [0, "&gesdotol;"], [0, "&lap;"], [0, "&gap;"], [0, "&lne;"], [0, "&gne;"], [0, "&lnap;"], [0, "&gnap;"], [0, "&lEg;"], [0, "&gEl;"], [0, "&lsime;"], [0, "&gsime;"], [0, "&lsimg;"], [0, "&gsiml;"], [0, "&lgE;"], [0, "&glE;"], [0, "&lesges;"], [0, "&gesles;"], [0, "&els;"], [0, "&egs;"], [0, "&elsdot;"], [0, "&egsdot;"], [0, "&el;"], [0, "&eg;"], [2, "&siml;"], [0, "&simg;"], [0, "&simlE;"], [0, "&simgE;"], [0, { v: "&LessLess;", n: 824, o: "&NotNestedLessLess;" }], [0, { v: "&GreaterGreater;", n: 824, o: "&NotNestedGreaterGreater;" }], [1, "&glj;"], [0, "&gla;"], [0, "&ltcc;"], [0, "&gtcc;"], [0, "&lescc;"], [0, "&gescc;"], [0, "&smt;"], [0, "&lat;"], [0, { v: "&smte;", n: 65024, o: "&smtes;" }], [0, { v: "&late;", n: 65024, o: "&lates;" }], [0, "&bumpE;"], [0, { v: "&PrecedesEqual;", n: 824, o: "&NotPrecedesEqual;" }], [0, { v: "&sce;", n: 824, o: "&NotSucceedsEqual;" }], [2, "&prE;"], [0, "&scE;"], [0, "&precneqq;"], [0, "&scnE;"], [0, "&prap;"], [0, "&scap;"], [0, "&precnapprox;"], [0, "&scnap;"], [0, "&Pr;"], [0, "&Sc;"], [0, "&subdot;"], [0, "&supdot;"], [0, "&subplus;"], [0, "&supplus;"], [0, "&submult;"], [0, "&supmult;"], [0, "&subedot;"], [0, "&supedot;"], [0, { v: "&subE;", n: 824, o: "&nsubE;" }], [0, { v: "&supE;", n: 824, o: "&nsupE;" }], [0, "&subsim;"], [0, "&supsim;"], [2, { v: "&subnE;", n: 65024, o: "&varsubsetneqq;" }], [0, { v: "&supnE;", n: 65024, o: "&varsupsetneqq;" }], [2, "&csub;"], [0, "&csup;"], [0, "&csube;"], [0, "&csupe;"], [0, "&subsup;"], [0, "&supsub;"], [0, "&subsub;"], [0, "&supsup;"], [0, "&suphsub;"], [0, "&supdsub;"], [0, "&forkv;"], [0, "&topfork;"], [0, "&mlcp;"], [8, "&Dashv;"], [1, "&Vdashl;"], [0, "&Barv;"], [0, "&vBar;"], [0, "&vBarv;"], [1, "&Vbar;"], [0, "&Not;"], [0, "&bNot;"], [0, "&rnmid;"], [0, "&cirmid;"], [0, "&midcir;"], [0, "&topcir;"], [0, "&nhpar;"], [0, "&parsim;"], [9, { v: "&parsl;", n: 8421, o: "&nparsl;" }], [44343, { n: new Map(/* #__PURE__ */ restoreDiff([[56476, "&Ascr;"], [1, "&Cscr;"], [0, "&Dscr;"], [2, "&Gscr;"], [2, "&Jscr;"], [0, "&Kscr;"], [2, "&Nscr;"], [0, "&Oscr;"], [0, "&Pscr;"], [0, "&Qscr;"], [1, "&Sscr;"], [0, "&Tscr;"], [0, "&Uscr;"], [0, "&Vscr;"], [0, "&Wscr;"], [0, "&Xscr;"], [0, "&Yscr;"], [0, "&Zscr;"], [0, "&ascr;"], [0, "&bscr;"], [0, "&cscr;"], [0, "&dscr;"], [1, "&fscr;"], [1, "&hscr;"], [0, "&iscr;"], [0, "&jscr;"], [0, "&kscr;"], [0, "&lscr;"], [0, "&mscr;"], [0, "&nscr;"], [1, "&pscr;"], [0, "&qscr;"], [0, "&rscr;"], [0, "&sscr;"], [0, "&tscr;"], [0, "&uscr;"], [0, "&vscr;"], [0, "&wscr;"], [0, "&xscr;"], [0, "&yscr;"], [0, "&zscr;"], [52, "&Afr;"], [0, "&Bfr;"], [1, "&Dfr;"], [0, "&Efr;"], [0, "&Ffr;"], [0, "&Gfr;"], [2, "&Jfr;"], [0, "&Kfr;"], [0, "&Lfr;"], [0, "&Mfr;"], [0, "&Nfr;"], [0, "&Ofr;"], [0, "&Pfr;"], [0, "&Qfr;"], [1, "&Sfr;"], [0, "&Tfr;"], [0, "&Ufr;"], [0, "&Vfr;"], [0, "&Wfr;"], [0, "&Xfr;"], [0, "&Yfr;"], [1, "&afr;"], [0, "&bfr;"], [0, "&cfr;"], [0, "&dfr;"], [0, "&efr;"], [0, "&ffr;"], [0, "&gfr;"], [0, "&hfr;"], [0, "&ifr;"], [0, "&jfr;"], [0, "&kfr;"], [0, "&lfr;"], [0, "&mfr;"], [0, "&nfr;"], [0, "&ofr;"], [0, "&pfr;"], [0, "&qfr;"], [0, "&rfr;"], [0, "&sfr;"], [0, "&tfr;"], [0, "&ufr;"], [0, "&vfr;"], [0, "&wfr;"], [0, "&xfr;"], [0, "&yfr;"], [0, "&zfr;"], [0, "&Aopf;"], [0, "&Bopf;"], [1, "&Dopf;"], [0, "&Eopf;"], [0, "&Fopf;"], [0, "&Gopf;"], [1, "&Iopf;"], [0, "&Jopf;"], [0, "&Kopf;"], [0, "&Lopf;"], [0, "&Mopf;"], [1, "&Oopf;"], [3, "&Sopf;"], [0, "&Topf;"], [0, "&Uopf;"], [0, "&Vopf;"], [0, "&Wopf;"], [0, "&Xopf;"], [0, "&Yopf;"], [1, "&aopf;"], [0, "&bopf;"], [0, "&copf;"], [0, "&dopf;"], [0, "&eopf;"], [0, "&fopf;"], [0, "&gopf;"], [0, "&hopf;"], [0, "&iopf;"], [0, "&jopf;"], [0, "&kopf;"], [0, "&lopf;"], [0, "&mopf;"], [0, "&nopf;"], [0, "&oopf;"], [0, "&popf;"], [0, "&qopf;"], [0, "&ropf;"], [0, "&sopf;"], [0, "&topf;"], [0, "&uopf;"], [0, "&vopf;"], [0, "&wopf;"], [0, "&xopf;"], [0, "&yopf;"], [0, "&zopf;"]])) }], [8906, "&fflig;"], [0, "&filig;"], [0, "&fllig;"], [0, "&ffilig;"], [0, "&ffllig;"]]));
 
-},{}],71:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeXMLStrict = exports.decodeHTML5Strict = exports.decodeHTML4Strict = exports.decodeHTML5 = exports.decodeHTML4 = exports.decodeHTMLStrict = exports.decodeHTML = exports.decodeXML = exports.encodeHTML5 = exports.encodeHTML4 = exports.encodeNonAsciiHTML = exports.encodeHTML = exports.escapeText = exports.escapeAttribute = exports.escapeUTF8 = exports.escape = exports.encodeXML = exports.encode = exports.decodeStrict = exports.decode = exports.EncodingMode = exports.DecodingMode = exports.EntityLevel = void 0;
+exports.decodeXMLStrict = exports.decodeHTML5Strict = exports.decodeHTML4Strict = exports.decodeHTML5 = exports.decodeHTML4 = exports.decodeHTMLAttribute = exports.decodeHTMLStrict = exports.decodeHTML = exports.decodeXML = exports.DecodingMode = exports.EntityDecoder = exports.encodeHTML5 = exports.encodeHTML4 = exports.encodeNonAsciiHTML = exports.encodeHTML = exports.escapeText = exports.escapeAttribute = exports.escapeUTF8 = exports.escape = exports.encodeXML = exports.encode = exports.decodeStrict = exports.decode = exports.EncodingMode = exports.EntityLevel = void 0;
 var decode_js_1 = require("./decode.js");
 var encode_js_1 = require("./encode.js");
 var escape_js_1 = require("./escape.js");
@@ -1864,14 +2258,6 @@ var EntityLevel;
     /** Support HTML entities, which are a superset of XML entities. */
     EntityLevel[EntityLevel["HTML"] = 1] = "HTML";
 })(EntityLevel = exports.EntityLevel || (exports.EntityLevel = {}));
-/** Determines whether some entities are allowed to be written without a trailing `;`. */
-var DecodingMode;
-(function (DecodingMode) {
-    /** Support legacy HTML entities. */
-    DecodingMode[DecodingMode["Legacy"] = 0] = "Legacy";
-    /** Do not support legacy HTML entities. */
-    DecodingMode[DecodingMode["Strict"] = 1] = "Strict";
-})(DecodingMode = exports.DecodingMode || (exports.DecodingMode = {}));
 var EncodingMode;
 (function (EncodingMode) {
     /**
@@ -1909,12 +2295,10 @@ var EncodingMode;
  */
 function decode(data, options) {
     if (options === void 0) { options = EntityLevel.XML; }
-    var opts = typeof options === "number" ? { level: options } : options;
-    if (opts.level === EntityLevel.HTML) {
-        if (opts.mode === DecodingMode.Strict) {
-            return (0, decode_js_1.decodeHTMLStrict)(data);
-        }
-        return (0, decode_js_1.decodeHTML)(data);
+    var level = typeof options === "number" ? options : options.level;
+    if (level === EntityLevel.HTML) {
+        var mode = typeof options === "object" ? options.mode : undefined;
+        return (0, decode_js_1.decodeHTML)(data, mode);
     }
     return (0, decode_js_1.decodeXML)(data);
 }
@@ -1927,15 +2311,11 @@ exports.decode = decode;
  * @deprecated Use `decode` with the `mode` set to `Strict`.
  */
 function decodeStrict(data, options) {
+    var _a;
     if (options === void 0) { options = EntityLevel.XML; }
     var opts = typeof options === "number" ? { level: options } : options;
-    if (opts.level === EntityLevel.HTML) {
-        if (opts.mode === DecodingMode.Legacy) {
-            return (0, decode_js_1.decodeHTML)(data);
-        }
-        return (0, decode_js_1.decodeHTMLStrict)(data);
-    }
-    return (0, decode_js_1.decodeXML)(data);
+    (_a = opts.mode) !== null && _a !== void 0 ? _a : (opts.mode = decode_js_1.DecodingMode.Strict);
+    return decode(data, opts);
 }
 exports.decodeStrict = decodeStrict;
 /**
@@ -1977,9 +2357,12 @@ Object.defineProperty(exports, "encodeNonAsciiHTML", { enumerable: true, get: fu
 Object.defineProperty(exports, "encodeHTML4", { enumerable: true, get: function () { return encode_js_2.encodeHTML; } });
 Object.defineProperty(exports, "encodeHTML5", { enumerable: true, get: function () { return encode_js_2.encodeHTML; } });
 var decode_js_2 = require("./decode.js");
+Object.defineProperty(exports, "EntityDecoder", { enumerable: true, get: function () { return decode_js_2.EntityDecoder; } });
+Object.defineProperty(exports, "DecodingMode", { enumerable: true, get: function () { return decode_js_2.DecodingMode; } });
 Object.defineProperty(exports, "decodeXML", { enumerable: true, get: function () { return decode_js_2.decodeXML; } });
 Object.defineProperty(exports, "decodeHTML", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
 Object.defineProperty(exports, "decodeHTMLStrict", { enumerable: true, get: function () { return decode_js_2.decodeHTMLStrict; } });
+Object.defineProperty(exports, "decodeHTMLAttribute", { enumerable: true, get: function () { return decode_js_2.decodeHTMLAttribute; } });
 // Legacy aliases (deprecated)
 Object.defineProperty(exports, "decodeHTML4", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
 Object.defineProperty(exports, "decodeHTML5", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
@@ -1987,7 +2370,7 @@ Object.defineProperty(exports, "decodeHTML4Strict", { enumerable: true, get: fun
 Object.defineProperty(exports, "decodeHTML5Strict", { enumerable: true, get: function () { return decode_js_2.decodeHTMLStrict; } });
 Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: function () { return decode_js_2.decodeXML; } });
 
-},{"./decode.js":64,"./encode.js":66,"./escape.js":67}],72:[function(require,module,exports){
+},{"./decode.js":67,"./encode.js":69,"./escape.js":70}],75:[function(require,module,exports){
 (function (global){(function (){
 /*! https://mths.be/he v1.2.0 by @mathias | MIT license */
 ;(function(root) {
@@ -2336,10 +2719,10 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 }(this));
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],73:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = require('./lib/html-to-text');
 
-},{"./lib/html-to-text":77}],74:[function(require,module,exports){
+},{"./lib/html-to-text":80}],77:[function(require,module,exports){
 
 // eslint-disable-next-line no-unused-vars
 const { Picker } = require('selderee');
@@ -2768,7 +3151,7 @@ function addText (stackItem, text, leadingLineBreaks, trailingLineBreaks) {
 
 module.exports = { BlockTextBuilder: BlockTextBuilder };
 
-},{"./helper":76,"./stack-item":79,"./table-printer":80,"./typedefs":81,"./whitespace-processor":82,"selderee":111}],75:[function(require,module,exports){
+},{"./helper":79,"./stack-item":82,"./table-printer":83,"./typedefs":84,"./whitespace-processor":85,"selderee":115}],78:[function(require,module,exports){
 const he = require('he');
 
 const { get, numberToLetterSequence, numberToRoman, splitClassesAndIds, trimCharacter } = require('./helper');
@@ -3169,7 +3552,7 @@ module.exports = {
   wbr: formatWbr
 };
 
-},{"./helper":76,"./typedefs":81,"he":72}],76:[function(require,module,exports){
+},{"./helper":79,"./typedefs":84,"he":75}],79:[function(require,module,exports){
 
 const merge = require('deepmerge');
 
@@ -3327,7 +3710,7 @@ module.exports = {
   trimCharacter: trimCharacter
 };
 
-},{"deepmerge":62}],77:[function(require,module,exports){
+},{"deepmerge":66}],80:[function(require,module,exports){
 (function (process){(function (){
 const { hp2Builder } = require('@selderee/plugin-htmlparser2');
 const merge = require('deepmerge');
@@ -3745,7 +4128,7 @@ module.exports = {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./block-text-builder":74,"./formatter":75,"./helper":76,"./typedefs":81,"@selderee/plugin-htmlparser2":59,"_process":110,"deepmerge":62,"he":72,"htmlparser2":106,"selderee":111}],78:[function(require,module,exports){
+},{"./block-text-builder":77,"./formatter":78,"./helper":79,"./typedefs":84,"@selderee/plugin-htmlparser2":62,"_process":114,"deepmerge":66,"he":75,"htmlparser2":110,"selderee":115}],81:[function(require,module,exports){
 // eslint-disable-next-line import/no-unassigned-import
 require('./typedefs');
 
@@ -3935,7 +4318,7 @@ class InlineTextBuilder {
 
 module.exports = { InlineTextBuilder: InlineTextBuilder };
 
-},{"./typedefs":81}],79:[function(require,module,exports){
+},{"./typedefs":84}],82:[function(require,module,exports){
 /* eslint-disable max-classes-per-file */
 
 const { InlineTextBuilder } = require('./inline-text-builder');
@@ -4000,7 +4383,7 @@ module.exports = {
   TransformerStackItem: TransformerStackItem,
 };
 
-},{"./inline-text-builder":78}],80:[function(require,module,exports){
+},{"./inline-text-builder":81}],83:[function(require,module,exports){
 
 function getRow (matrix, j) {
   if (!matrix[j]) { matrix[j] = []; }
@@ -4111,7 +4494,7 @@ function tableToString (tableRows, rowSpacing, colSpacing) {
 
 module.exports = { tableToString: tableToString };
 
-},{}],81:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 
 /**
  * @typedef { object } Options
@@ -4369,7 +4752,7 @@ module.exports = { tableToString: tableToString };
  * @param   { BlockTextBuilder } builder Passed around to accumulate output text. Contains options object.
  */
 
-},{}],82:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 
 // eslint-disable-next-line no-unused-vars
 const { InlineTextBuilder } = require('./inline-text-builder');
@@ -4527,7 +4910,7 @@ class WhitespaceProcessor {
 
 module.exports = { WhitespaceProcessor: WhitespaceProcessor };
 
-},{"./inline-text-builder":78,"./typedefs":81}],83:[function(require,module,exports){
+},{"./inline-text-builder":81,"./typedefs":84}],86:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.attributeNames = exports.elementNames = void 0;
@@ -4632,7 +5015,7 @@ exports.attributeNames = new Map([
     ["zoomandpan", "zoomAndPan"],
 ]);
 
-},{}],84:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 "use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -4845,11 +5228,13 @@ function renderComment(elem) {
     return "<!--" + elem.data + "-->";
 }
 
-},{"./foreignNames":83,"domelementtype":63,"entities":98}],85:[function(require,module,exports){
-arguments[4][60][0].apply(exports,arguments)
-},{"./node":86,"domelementtype":63,"dup":60}],86:[function(require,module,exports){
-arguments[4][61][0].apply(exports,arguments)
-},{"domelementtype":63,"dup":61}],87:[function(require,module,exports){
+},{"./foreignNames":86,"domelementtype":88,"entities":102}],88:[function(require,module,exports){
+arguments[4][63][0].apply(exports,arguments)
+},{"dup":63}],89:[function(require,module,exports){
+arguments[4][64][0].apply(exports,arguments)
+},{"./node":90,"domelementtype":88,"dup":64}],90:[function(require,module,exports){
+arguments[4][65][0].apply(exports,arguments)
+},{"domelementtype":88,"dup":65}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFeed = void 0;
@@ -5041,7 +5426,7 @@ function isValidFeed(value) {
     return value === "rss" || value === "feed" || value === "rdf:RDF";
 }
 
-},{"./legacy":90,"./stringify":93}],88:[function(require,module,exports){
+},{"./legacy":94,"./stringify":97}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uniqueSort = exports.compareDocumentPosition = exports.removeSubsets = void 0;
@@ -5168,7 +5553,7 @@ function uniqueSort(nodes) {
 }
 exports.uniqueSort = uniqueSort;
 
-},{"domhandler":85}],89:[function(require,module,exports){
+},{"domhandler":89}],93:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -5198,7 +5583,7 @@ Object.defineProperty(exports, "isComment", { enumerable: true, get: function ()
 Object.defineProperty(exports, "isDocument", { enumerable: true, get: function () { return domhandler_1.isDocument; } });
 Object.defineProperty(exports, "hasChildren", { enumerable: true, get: function () { return domhandler_1.hasChildren; } });
 
-},{"./feeds":87,"./helpers":88,"./legacy":90,"./manipulation":91,"./querying":92,"./stringify":93,"./traversal":94,"domhandler":85}],90:[function(require,module,exports){
+},{"./feeds":91,"./helpers":92,"./legacy":94,"./manipulation":95,"./querying":96,"./stringify":97,"./traversal":98,"domhandler":89}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getElementsByTagType = exports.getElementsByTagName = exports.getElementById = exports.getElements = exports.testElement = void 0;
@@ -5324,7 +5709,7 @@ function getElementsByTagType(type, nodes, recurse, limit) {
 }
 exports.getElementsByTagType = getElementsByTagType;
 
-},{"./querying":92,"domhandler":85}],91:[function(require,module,exports){
+},{"./querying":96,"domhandler":89}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prepend = exports.prependChild = exports.append = exports.appendChild = exports.replaceElement = exports.removeElement = void 0;
@@ -5455,7 +5840,7 @@ function prepend(elem, prev) {
 }
 exports.prepend = prepend;
 
-},{}],92:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findAll = exports.existsOne = exports.findOne = exports.findOneChild = exports.find = exports.filter = void 0;
@@ -5583,7 +5968,7 @@ function findAll(test, nodes) {
 }
 exports.findAll = findAll;
 
-},{"domhandler":85}],93:[function(require,module,exports){
+},{"domhandler":89}],97:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -5671,7 +6056,7 @@ function innerText(node) {
 }
 exports.innerText = innerText;
 
-},{"dom-serializer":84,"domelementtype":63,"domhandler":85}],94:[function(require,module,exports){
+},{"dom-serializer":87,"domelementtype":88,"domhandler":89}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prevElementSibling = exports.nextElementSibling = exports.getName = exports.hasAttrib = exports.getAttributeValue = exports.getSiblings = exports.getParent = exports.getChildren = void 0;
@@ -5790,7 +6175,7 @@ function prevElementSibling(elem) {
 }
 exports.prevElementSibling = prevElementSibling;
 
-},{"domhandler":85}],95:[function(require,module,exports){
+},{"domhandler":89}],99:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -5845,7 +6230,7 @@ function getReplacer(map) {
     };
 }
 
-},{"./decode_codepoint":96,"./maps/entities.json":100,"./maps/legacy.json":101,"./maps/xml.json":102}],96:[function(require,module,exports){
+},{"./decode_codepoint":100,"./maps/entities.json":104,"./maps/legacy.json":105,"./maps/xml.json":106}],100:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -5877,7 +6262,7 @@ function decodeCodePoint(codePoint) {
 }
 exports.default = decodeCodePoint;
 
-},{"./maps/decode.json":99}],97:[function(require,module,exports){
+},{"./maps/decode.json":103}],101:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6015,7 +6400,7 @@ function getASCIIEncoder(obj) {
     };
 }
 
-},{"./maps/entities.json":100,"./maps/xml.json":102}],98:[function(require,module,exports){
+},{"./maps/entities.json":104,"./maps/xml.json":106}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decodeXMLStrict = exports.decodeHTML5Strict = exports.decodeHTML4Strict = exports.decodeHTML5 = exports.decodeHTML4 = exports.decodeHTMLStrict = exports.decodeHTML = exports.decodeXML = exports.encodeHTML5 = exports.encodeHTML4 = exports.escapeUTF8 = exports.escape = exports.encodeNonAsciiHTML = exports.encodeHTML = exports.encodeXML = exports.encode = exports.decodeStrict = exports.decode = void 0;
@@ -6074,19 +6459,19 @@ Object.defineProperty(exports, "decodeHTML4Strict", { enumerable: true, get: fun
 Object.defineProperty(exports, "decodeHTML5Strict", { enumerable: true, get: function () { return decode_2.decodeHTMLStrict; } });
 Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: function () { return decode_2.decodeXML; } });
 
-},{"./decode":95,"./encode":97}],99:[function(require,module,exports){
+},{"./decode":99,"./encode":101}],103:[function(require,module,exports){
 module.exports={"0":65533,"128":8364,"130":8218,"131":402,"132":8222,"133":8230,"134":8224,"135":8225,"136":710,"137":8240,"138":352,"139":8249,"140":338,"142":381,"145":8216,"146":8217,"147":8220,"148":8221,"149":8226,"150":8211,"151":8212,"152":732,"153":8482,"154":353,"155":8250,"156":339,"158":382,"159":376}
 
-},{}],100:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 module.exports={"Aacute":"Á","aacute":"á","Abreve":"Ă","abreve":"ă","ac":"∾","acd":"∿","acE":"∾̳","Acirc":"Â","acirc":"â","acute":"´","Acy":"А","acy":"а","AElig":"Æ","aelig":"æ","af":"⁡","Afr":"𝔄","afr":"𝔞","Agrave":"À","agrave":"à","alefsym":"ℵ","aleph":"ℵ","Alpha":"Α","alpha":"α","Amacr":"Ā","amacr":"ā","amalg":"⨿","amp":"&","AMP":"&","andand":"⩕","And":"⩓","and":"∧","andd":"⩜","andslope":"⩘","andv":"⩚","ang":"∠","ange":"⦤","angle":"∠","angmsdaa":"⦨","angmsdab":"⦩","angmsdac":"⦪","angmsdad":"⦫","angmsdae":"⦬","angmsdaf":"⦭","angmsdag":"⦮","angmsdah":"⦯","angmsd":"∡","angrt":"∟","angrtvb":"⊾","angrtvbd":"⦝","angsph":"∢","angst":"Å","angzarr":"⍼","Aogon":"Ą","aogon":"ą","Aopf":"𝔸","aopf":"𝕒","apacir":"⩯","ap":"≈","apE":"⩰","ape":"≊","apid":"≋","apos":"'","ApplyFunction":"⁡","approx":"≈","approxeq":"≊","Aring":"Å","aring":"å","Ascr":"𝒜","ascr":"𝒶","Assign":"≔","ast":"*","asymp":"≈","asympeq":"≍","Atilde":"Ã","atilde":"ã","Auml":"Ä","auml":"ä","awconint":"∳","awint":"⨑","backcong":"≌","backepsilon":"϶","backprime":"‵","backsim":"∽","backsimeq":"⋍","Backslash":"∖","Barv":"⫧","barvee":"⊽","barwed":"⌅","Barwed":"⌆","barwedge":"⌅","bbrk":"⎵","bbrktbrk":"⎶","bcong":"≌","Bcy":"Б","bcy":"б","bdquo":"„","becaus":"∵","because":"∵","Because":"∵","bemptyv":"⦰","bepsi":"϶","bernou":"ℬ","Bernoullis":"ℬ","Beta":"Β","beta":"β","beth":"ℶ","between":"≬","Bfr":"𝔅","bfr":"𝔟","bigcap":"⋂","bigcirc":"◯","bigcup":"⋃","bigodot":"⨀","bigoplus":"⨁","bigotimes":"⨂","bigsqcup":"⨆","bigstar":"★","bigtriangledown":"▽","bigtriangleup":"△","biguplus":"⨄","bigvee":"⋁","bigwedge":"⋀","bkarow":"⤍","blacklozenge":"⧫","blacksquare":"▪","blacktriangle":"▴","blacktriangledown":"▾","blacktriangleleft":"◂","blacktriangleright":"▸","blank":"␣","blk12":"▒","blk14":"░","blk34":"▓","block":"█","bne":"=⃥","bnequiv":"≡⃥","bNot":"⫭","bnot":"⌐","Bopf":"𝔹","bopf":"𝕓","bot":"⊥","bottom":"⊥","bowtie":"⋈","boxbox":"⧉","boxdl":"┐","boxdL":"╕","boxDl":"╖","boxDL":"╗","boxdr":"┌","boxdR":"╒","boxDr":"╓","boxDR":"╔","boxh":"─","boxH":"═","boxhd":"┬","boxHd":"╤","boxhD":"╥","boxHD":"╦","boxhu":"┴","boxHu":"╧","boxhU":"╨","boxHU":"╩","boxminus":"⊟","boxplus":"⊞","boxtimes":"⊠","boxul":"┘","boxuL":"╛","boxUl":"╜","boxUL":"╝","boxur":"└","boxuR":"╘","boxUr":"╙","boxUR":"╚","boxv":"│","boxV":"║","boxvh":"┼","boxvH":"╪","boxVh":"╫","boxVH":"╬","boxvl":"┤","boxvL":"╡","boxVl":"╢","boxVL":"╣","boxvr":"├","boxvR":"╞","boxVr":"╟","boxVR":"╠","bprime":"‵","breve":"˘","Breve":"˘","brvbar":"¦","bscr":"𝒷","Bscr":"ℬ","bsemi":"⁏","bsim":"∽","bsime":"⋍","bsolb":"⧅","bsol":"\\","bsolhsub":"⟈","bull":"•","bullet":"•","bump":"≎","bumpE":"⪮","bumpe":"≏","Bumpeq":"≎","bumpeq":"≏","Cacute":"Ć","cacute":"ć","capand":"⩄","capbrcup":"⩉","capcap":"⩋","cap":"∩","Cap":"⋒","capcup":"⩇","capdot":"⩀","CapitalDifferentialD":"ⅅ","caps":"∩︀","caret":"⁁","caron":"ˇ","Cayleys":"ℭ","ccaps":"⩍","Ccaron":"Č","ccaron":"č","Ccedil":"Ç","ccedil":"ç","Ccirc":"Ĉ","ccirc":"ĉ","Cconint":"∰","ccups":"⩌","ccupssm":"⩐","Cdot":"Ċ","cdot":"ċ","cedil":"¸","Cedilla":"¸","cemptyv":"⦲","cent":"¢","centerdot":"·","CenterDot":"·","cfr":"𝔠","Cfr":"ℭ","CHcy":"Ч","chcy":"ч","check":"✓","checkmark":"✓","Chi":"Χ","chi":"χ","circ":"ˆ","circeq":"≗","circlearrowleft":"↺","circlearrowright":"↻","circledast":"⊛","circledcirc":"⊚","circleddash":"⊝","CircleDot":"⊙","circledR":"®","circledS":"Ⓢ","CircleMinus":"⊖","CirclePlus":"⊕","CircleTimes":"⊗","cir":"○","cirE":"⧃","cire":"≗","cirfnint":"⨐","cirmid":"⫯","cirscir":"⧂","ClockwiseContourIntegral":"∲","CloseCurlyDoubleQuote":"”","CloseCurlyQuote":"’","clubs":"♣","clubsuit":"♣","colon":":","Colon":"∷","Colone":"⩴","colone":"≔","coloneq":"≔","comma":",","commat":"@","comp":"∁","compfn":"∘","complement":"∁","complexes":"ℂ","cong":"≅","congdot":"⩭","Congruent":"≡","conint":"∮","Conint":"∯","ContourIntegral":"∮","copf":"𝕔","Copf":"ℂ","coprod":"∐","Coproduct":"∐","copy":"©","COPY":"©","copysr":"℗","CounterClockwiseContourIntegral":"∳","crarr":"↵","cross":"✗","Cross":"⨯","Cscr":"𝒞","cscr":"𝒸","csub":"⫏","csube":"⫑","csup":"⫐","csupe":"⫒","ctdot":"⋯","cudarrl":"⤸","cudarrr":"⤵","cuepr":"⋞","cuesc":"⋟","cularr":"↶","cularrp":"⤽","cupbrcap":"⩈","cupcap":"⩆","CupCap":"≍","cup":"∪","Cup":"⋓","cupcup":"⩊","cupdot":"⊍","cupor":"⩅","cups":"∪︀","curarr":"↷","curarrm":"⤼","curlyeqprec":"⋞","curlyeqsucc":"⋟","curlyvee":"⋎","curlywedge":"⋏","curren":"¤","curvearrowleft":"↶","curvearrowright":"↷","cuvee":"⋎","cuwed":"⋏","cwconint":"∲","cwint":"∱","cylcty":"⌭","dagger":"†","Dagger":"‡","daleth":"ℸ","darr":"↓","Darr":"↡","dArr":"⇓","dash":"‐","Dashv":"⫤","dashv":"⊣","dbkarow":"⤏","dblac":"˝","Dcaron":"Ď","dcaron":"ď","Dcy":"Д","dcy":"д","ddagger":"‡","ddarr":"⇊","DD":"ⅅ","dd":"ⅆ","DDotrahd":"⤑","ddotseq":"⩷","deg":"°","Del":"∇","Delta":"Δ","delta":"δ","demptyv":"⦱","dfisht":"⥿","Dfr":"𝔇","dfr":"𝔡","dHar":"⥥","dharl":"⇃","dharr":"⇂","DiacriticalAcute":"´","DiacriticalDot":"˙","DiacriticalDoubleAcute":"˝","DiacriticalGrave":"`","DiacriticalTilde":"˜","diam":"⋄","diamond":"⋄","Diamond":"⋄","diamondsuit":"♦","diams":"♦","die":"¨","DifferentialD":"ⅆ","digamma":"ϝ","disin":"⋲","div":"÷","divide":"÷","divideontimes":"⋇","divonx":"⋇","DJcy":"Ђ","djcy":"ђ","dlcorn":"⌞","dlcrop":"⌍","dollar":"$","Dopf":"𝔻","dopf":"𝕕","Dot":"¨","dot":"˙","DotDot":"⃜","doteq":"≐","doteqdot":"≑","DotEqual":"≐","dotminus":"∸","dotplus":"∔","dotsquare":"⊡","doublebarwedge":"⌆","DoubleContourIntegral":"∯","DoubleDot":"¨","DoubleDownArrow":"⇓","DoubleLeftArrow":"⇐","DoubleLeftRightArrow":"⇔","DoubleLeftTee":"⫤","DoubleLongLeftArrow":"⟸","DoubleLongLeftRightArrow":"⟺","DoubleLongRightArrow":"⟹","DoubleRightArrow":"⇒","DoubleRightTee":"⊨","DoubleUpArrow":"⇑","DoubleUpDownArrow":"⇕","DoubleVerticalBar":"∥","DownArrowBar":"⤓","downarrow":"↓","DownArrow":"↓","Downarrow":"⇓","DownArrowUpArrow":"⇵","DownBreve":"̑","downdownarrows":"⇊","downharpoonleft":"⇃","downharpoonright":"⇂","DownLeftRightVector":"⥐","DownLeftTeeVector":"⥞","DownLeftVectorBar":"⥖","DownLeftVector":"↽","DownRightTeeVector":"⥟","DownRightVectorBar":"⥗","DownRightVector":"⇁","DownTeeArrow":"↧","DownTee":"⊤","drbkarow":"⤐","drcorn":"⌟","drcrop":"⌌","Dscr":"𝒟","dscr":"𝒹","DScy":"Ѕ","dscy":"ѕ","dsol":"⧶","Dstrok":"Đ","dstrok":"đ","dtdot":"⋱","dtri":"▿","dtrif":"▾","duarr":"⇵","duhar":"⥯","dwangle":"⦦","DZcy":"Џ","dzcy":"џ","dzigrarr":"⟿","Eacute":"É","eacute":"é","easter":"⩮","Ecaron":"Ě","ecaron":"ě","Ecirc":"Ê","ecirc":"ê","ecir":"≖","ecolon":"≕","Ecy":"Э","ecy":"э","eDDot":"⩷","Edot":"Ė","edot":"ė","eDot":"≑","ee":"ⅇ","efDot":"≒","Efr":"𝔈","efr":"𝔢","eg":"⪚","Egrave":"È","egrave":"è","egs":"⪖","egsdot":"⪘","el":"⪙","Element":"∈","elinters":"⏧","ell":"ℓ","els":"⪕","elsdot":"⪗","Emacr":"Ē","emacr":"ē","empty":"∅","emptyset":"∅","EmptySmallSquare":"◻","emptyv":"∅","EmptyVerySmallSquare":"▫","emsp13":" ","emsp14":" ","emsp":" ","ENG":"Ŋ","eng":"ŋ","ensp":" ","Eogon":"Ę","eogon":"ę","Eopf":"𝔼","eopf":"𝕖","epar":"⋕","eparsl":"⧣","eplus":"⩱","epsi":"ε","Epsilon":"Ε","epsilon":"ε","epsiv":"ϵ","eqcirc":"≖","eqcolon":"≕","eqsim":"≂","eqslantgtr":"⪖","eqslantless":"⪕","Equal":"⩵","equals":"=","EqualTilde":"≂","equest":"≟","Equilibrium":"⇌","equiv":"≡","equivDD":"⩸","eqvparsl":"⧥","erarr":"⥱","erDot":"≓","escr":"ℯ","Escr":"ℰ","esdot":"≐","Esim":"⩳","esim":"≂","Eta":"Η","eta":"η","ETH":"Ð","eth":"ð","Euml":"Ë","euml":"ë","euro":"€","excl":"!","exist":"∃","Exists":"∃","expectation":"ℰ","exponentiale":"ⅇ","ExponentialE":"ⅇ","fallingdotseq":"≒","Fcy":"Ф","fcy":"ф","female":"♀","ffilig":"ﬃ","fflig":"ﬀ","ffllig":"ﬄ","Ffr":"𝔉","ffr":"𝔣","filig":"ﬁ","FilledSmallSquare":"◼","FilledVerySmallSquare":"▪","fjlig":"fj","flat":"♭","fllig":"ﬂ","fltns":"▱","fnof":"ƒ","Fopf":"𝔽","fopf":"𝕗","forall":"∀","ForAll":"∀","fork":"⋔","forkv":"⫙","Fouriertrf":"ℱ","fpartint":"⨍","frac12":"½","frac13":"⅓","frac14":"¼","frac15":"⅕","frac16":"⅙","frac18":"⅛","frac23":"⅔","frac25":"⅖","frac34":"¾","frac35":"⅗","frac38":"⅜","frac45":"⅘","frac56":"⅚","frac58":"⅝","frac78":"⅞","frasl":"⁄","frown":"⌢","fscr":"𝒻","Fscr":"ℱ","gacute":"ǵ","Gamma":"Γ","gamma":"γ","Gammad":"Ϝ","gammad":"ϝ","gap":"⪆","Gbreve":"Ğ","gbreve":"ğ","Gcedil":"Ģ","Gcirc":"Ĝ","gcirc":"ĝ","Gcy":"Г","gcy":"г","Gdot":"Ġ","gdot":"ġ","ge":"≥","gE":"≧","gEl":"⪌","gel":"⋛","geq":"≥","geqq":"≧","geqslant":"⩾","gescc":"⪩","ges":"⩾","gesdot":"⪀","gesdoto":"⪂","gesdotol":"⪄","gesl":"⋛︀","gesles":"⪔","Gfr":"𝔊","gfr":"𝔤","gg":"≫","Gg":"⋙","ggg":"⋙","gimel":"ℷ","GJcy":"Ѓ","gjcy":"ѓ","gla":"⪥","gl":"≷","glE":"⪒","glj":"⪤","gnap":"⪊","gnapprox":"⪊","gne":"⪈","gnE":"≩","gneq":"⪈","gneqq":"≩","gnsim":"⋧","Gopf":"𝔾","gopf":"𝕘","grave":"`","GreaterEqual":"≥","GreaterEqualLess":"⋛","GreaterFullEqual":"≧","GreaterGreater":"⪢","GreaterLess":"≷","GreaterSlantEqual":"⩾","GreaterTilde":"≳","Gscr":"𝒢","gscr":"ℊ","gsim":"≳","gsime":"⪎","gsiml":"⪐","gtcc":"⪧","gtcir":"⩺","gt":">","GT":">","Gt":"≫","gtdot":"⋗","gtlPar":"⦕","gtquest":"⩼","gtrapprox":"⪆","gtrarr":"⥸","gtrdot":"⋗","gtreqless":"⋛","gtreqqless":"⪌","gtrless":"≷","gtrsim":"≳","gvertneqq":"≩︀","gvnE":"≩︀","Hacek":"ˇ","hairsp":" ","half":"½","hamilt":"ℋ","HARDcy":"Ъ","hardcy":"ъ","harrcir":"⥈","harr":"↔","hArr":"⇔","harrw":"↭","Hat":"^","hbar":"ℏ","Hcirc":"Ĥ","hcirc":"ĥ","hearts":"♥","heartsuit":"♥","hellip":"…","hercon":"⊹","hfr":"𝔥","Hfr":"ℌ","HilbertSpace":"ℋ","hksearow":"⤥","hkswarow":"⤦","hoarr":"⇿","homtht":"∻","hookleftarrow":"↩","hookrightarrow":"↪","hopf":"𝕙","Hopf":"ℍ","horbar":"―","HorizontalLine":"─","hscr":"𝒽","Hscr":"ℋ","hslash":"ℏ","Hstrok":"Ħ","hstrok":"ħ","HumpDownHump":"≎","HumpEqual":"≏","hybull":"⁃","hyphen":"‐","Iacute":"Í","iacute":"í","ic":"⁣","Icirc":"Î","icirc":"î","Icy":"И","icy":"и","Idot":"İ","IEcy":"Е","iecy":"е","iexcl":"¡","iff":"⇔","ifr":"𝔦","Ifr":"ℑ","Igrave":"Ì","igrave":"ì","ii":"ⅈ","iiiint":"⨌","iiint":"∭","iinfin":"⧜","iiota":"℩","IJlig":"Ĳ","ijlig":"ĳ","Imacr":"Ī","imacr":"ī","image":"ℑ","ImaginaryI":"ⅈ","imagline":"ℐ","imagpart":"ℑ","imath":"ı","Im":"ℑ","imof":"⊷","imped":"Ƶ","Implies":"⇒","incare":"℅","in":"∈","infin":"∞","infintie":"⧝","inodot":"ı","intcal":"⊺","int":"∫","Int":"∬","integers":"ℤ","Integral":"∫","intercal":"⊺","Intersection":"⋂","intlarhk":"⨗","intprod":"⨼","InvisibleComma":"⁣","InvisibleTimes":"⁢","IOcy":"Ё","iocy":"ё","Iogon":"Į","iogon":"į","Iopf":"𝕀","iopf":"𝕚","Iota":"Ι","iota":"ι","iprod":"⨼","iquest":"¿","iscr":"𝒾","Iscr":"ℐ","isin":"∈","isindot":"⋵","isinE":"⋹","isins":"⋴","isinsv":"⋳","isinv":"∈","it":"⁢","Itilde":"Ĩ","itilde":"ĩ","Iukcy":"І","iukcy":"і","Iuml":"Ï","iuml":"ï","Jcirc":"Ĵ","jcirc":"ĵ","Jcy":"Й","jcy":"й","Jfr":"𝔍","jfr":"𝔧","jmath":"ȷ","Jopf":"𝕁","jopf":"𝕛","Jscr":"𝒥","jscr":"𝒿","Jsercy":"Ј","jsercy":"ј","Jukcy":"Є","jukcy":"є","Kappa":"Κ","kappa":"κ","kappav":"ϰ","Kcedil":"Ķ","kcedil":"ķ","Kcy":"К","kcy":"к","Kfr":"𝔎","kfr":"𝔨","kgreen":"ĸ","KHcy":"Х","khcy":"х","KJcy":"Ќ","kjcy":"ќ","Kopf":"𝕂","kopf":"𝕜","Kscr":"𝒦","kscr":"𝓀","lAarr":"⇚","Lacute":"Ĺ","lacute":"ĺ","laemptyv":"⦴","lagran":"ℒ","Lambda":"Λ","lambda":"λ","lang":"⟨","Lang":"⟪","langd":"⦑","langle":"⟨","lap":"⪅","Laplacetrf":"ℒ","laquo":"«","larrb":"⇤","larrbfs":"⤟","larr":"←","Larr":"↞","lArr":"⇐","larrfs":"⤝","larrhk":"↩","larrlp":"↫","larrpl":"⤹","larrsim":"⥳","larrtl":"↢","latail":"⤙","lAtail":"⤛","lat":"⪫","late":"⪭","lates":"⪭︀","lbarr":"⤌","lBarr":"⤎","lbbrk":"❲","lbrace":"{","lbrack":"[","lbrke":"⦋","lbrksld":"⦏","lbrkslu":"⦍","Lcaron":"Ľ","lcaron":"ľ","Lcedil":"Ļ","lcedil":"ļ","lceil":"⌈","lcub":"{","Lcy":"Л","lcy":"л","ldca":"⤶","ldquo":"“","ldquor":"„","ldrdhar":"⥧","ldrushar":"⥋","ldsh":"↲","le":"≤","lE":"≦","LeftAngleBracket":"⟨","LeftArrowBar":"⇤","leftarrow":"←","LeftArrow":"←","Leftarrow":"⇐","LeftArrowRightArrow":"⇆","leftarrowtail":"↢","LeftCeiling":"⌈","LeftDoubleBracket":"⟦","LeftDownTeeVector":"⥡","LeftDownVectorBar":"⥙","LeftDownVector":"⇃","LeftFloor":"⌊","leftharpoondown":"↽","leftharpoonup":"↼","leftleftarrows":"⇇","leftrightarrow":"↔","LeftRightArrow":"↔","Leftrightarrow":"⇔","leftrightarrows":"⇆","leftrightharpoons":"⇋","leftrightsquigarrow":"↭","LeftRightVector":"⥎","LeftTeeArrow":"↤","LeftTee":"⊣","LeftTeeVector":"⥚","leftthreetimes":"⋋","LeftTriangleBar":"⧏","LeftTriangle":"⊲","LeftTriangleEqual":"⊴","LeftUpDownVector":"⥑","LeftUpTeeVector":"⥠","LeftUpVectorBar":"⥘","LeftUpVector":"↿","LeftVectorBar":"⥒","LeftVector":"↼","lEg":"⪋","leg":"⋚","leq":"≤","leqq":"≦","leqslant":"⩽","lescc":"⪨","les":"⩽","lesdot":"⩿","lesdoto":"⪁","lesdotor":"⪃","lesg":"⋚︀","lesges":"⪓","lessapprox":"⪅","lessdot":"⋖","lesseqgtr":"⋚","lesseqqgtr":"⪋","LessEqualGreater":"⋚","LessFullEqual":"≦","LessGreater":"≶","lessgtr":"≶","LessLess":"⪡","lesssim":"≲","LessSlantEqual":"⩽","LessTilde":"≲","lfisht":"⥼","lfloor":"⌊","Lfr":"𝔏","lfr":"𝔩","lg":"≶","lgE":"⪑","lHar":"⥢","lhard":"↽","lharu":"↼","lharul":"⥪","lhblk":"▄","LJcy":"Љ","ljcy":"љ","llarr":"⇇","ll":"≪","Ll":"⋘","llcorner":"⌞","Lleftarrow":"⇚","llhard":"⥫","lltri":"◺","Lmidot":"Ŀ","lmidot":"ŀ","lmoustache":"⎰","lmoust":"⎰","lnap":"⪉","lnapprox":"⪉","lne":"⪇","lnE":"≨","lneq":"⪇","lneqq":"≨","lnsim":"⋦","loang":"⟬","loarr":"⇽","lobrk":"⟦","longleftarrow":"⟵","LongLeftArrow":"⟵","Longleftarrow":"⟸","longleftrightarrow":"⟷","LongLeftRightArrow":"⟷","Longleftrightarrow":"⟺","longmapsto":"⟼","longrightarrow":"⟶","LongRightArrow":"⟶","Longrightarrow":"⟹","looparrowleft":"↫","looparrowright":"↬","lopar":"⦅","Lopf":"𝕃","lopf":"𝕝","loplus":"⨭","lotimes":"⨴","lowast":"∗","lowbar":"_","LowerLeftArrow":"↙","LowerRightArrow":"↘","loz":"◊","lozenge":"◊","lozf":"⧫","lpar":"(","lparlt":"⦓","lrarr":"⇆","lrcorner":"⌟","lrhar":"⇋","lrhard":"⥭","lrm":"‎","lrtri":"⊿","lsaquo":"‹","lscr":"𝓁","Lscr":"ℒ","lsh":"↰","Lsh":"↰","lsim":"≲","lsime":"⪍","lsimg":"⪏","lsqb":"[","lsquo":"‘","lsquor":"‚","Lstrok":"Ł","lstrok":"ł","ltcc":"⪦","ltcir":"⩹","lt":"<","LT":"<","Lt":"≪","ltdot":"⋖","lthree":"⋋","ltimes":"⋉","ltlarr":"⥶","ltquest":"⩻","ltri":"◃","ltrie":"⊴","ltrif":"◂","ltrPar":"⦖","lurdshar":"⥊","luruhar":"⥦","lvertneqq":"≨︀","lvnE":"≨︀","macr":"¯","male":"♂","malt":"✠","maltese":"✠","Map":"⤅","map":"↦","mapsto":"↦","mapstodown":"↧","mapstoleft":"↤","mapstoup":"↥","marker":"▮","mcomma":"⨩","Mcy":"М","mcy":"м","mdash":"—","mDDot":"∺","measuredangle":"∡","MediumSpace":" ","Mellintrf":"ℳ","Mfr":"𝔐","mfr":"𝔪","mho":"℧","micro":"µ","midast":"*","midcir":"⫰","mid":"∣","middot":"·","minusb":"⊟","minus":"−","minusd":"∸","minusdu":"⨪","MinusPlus":"∓","mlcp":"⫛","mldr":"…","mnplus":"∓","models":"⊧","Mopf":"𝕄","mopf":"𝕞","mp":"∓","mscr":"𝓂","Mscr":"ℳ","mstpos":"∾","Mu":"Μ","mu":"μ","multimap":"⊸","mumap":"⊸","nabla":"∇","Nacute":"Ń","nacute":"ń","nang":"∠⃒","nap":"≉","napE":"⩰̸","napid":"≋̸","napos":"ŉ","napprox":"≉","natural":"♮","naturals":"ℕ","natur":"♮","nbsp":" ","nbump":"≎̸","nbumpe":"≏̸","ncap":"⩃","Ncaron":"Ň","ncaron":"ň","Ncedil":"Ņ","ncedil":"ņ","ncong":"≇","ncongdot":"⩭̸","ncup":"⩂","Ncy":"Н","ncy":"н","ndash":"–","nearhk":"⤤","nearr":"↗","neArr":"⇗","nearrow":"↗","ne":"≠","nedot":"≐̸","NegativeMediumSpace":"​","NegativeThickSpace":"​","NegativeThinSpace":"​","NegativeVeryThinSpace":"​","nequiv":"≢","nesear":"⤨","nesim":"≂̸","NestedGreaterGreater":"≫","NestedLessLess":"≪","NewLine":"\n","nexist":"∄","nexists":"∄","Nfr":"𝔑","nfr":"𝔫","ngE":"≧̸","nge":"≱","ngeq":"≱","ngeqq":"≧̸","ngeqslant":"⩾̸","nges":"⩾̸","nGg":"⋙̸","ngsim":"≵","nGt":"≫⃒","ngt":"≯","ngtr":"≯","nGtv":"≫̸","nharr":"↮","nhArr":"⇎","nhpar":"⫲","ni":"∋","nis":"⋼","nisd":"⋺","niv":"∋","NJcy":"Њ","njcy":"њ","nlarr":"↚","nlArr":"⇍","nldr":"‥","nlE":"≦̸","nle":"≰","nleftarrow":"↚","nLeftarrow":"⇍","nleftrightarrow":"↮","nLeftrightarrow":"⇎","nleq":"≰","nleqq":"≦̸","nleqslant":"⩽̸","nles":"⩽̸","nless":"≮","nLl":"⋘̸","nlsim":"≴","nLt":"≪⃒","nlt":"≮","nltri":"⋪","nltrie":"⋬","nLtv":"≪̸","nmid":"∤","NoBreak":"⁠","NonBreakingSpace":" ","nopf":"𝕟","Nopf":"ℕ","Not":"⫬","not":"¬","NotCongruent":"≢","NotCupCap":"≭","NotDoubleVerticalBar":"∦","NotElement":"∉","NotEqual":"≠","NotEqualTilde":"≂̸","NotExists":"∄","NotGreater":"≯","NotGreaterEqual":"≱","NotGreaterFullEqual":"≧̸","NotGreaterGreater":"≫̸","NotGreaterLess":"≹","NotGreaterSlantEqual":"⩾̸","NotGreaterTilde":"≵","NotHumpDownHump":"≎̸","NotHumpEqual":"≏̸","notin":"∉","notindot":"⋵̸","notinE":"⋹̸","notinva":"∉","notinvb":"⋷","notinvc":"⋶","NotLeftTriangleBar":"⧏̸","NotLeftTriangle":"⋪","NotLeftTriangleEqual":"⋬","NotLess":"≮","NotLessEqual":"≰","NotLessGreater":"≸","NotLessLess":"≪̸","NotLessSlantEqual":"⩽̸","NotLessTilde":"≴","NotNestedGreaterGreater":"⪢̸","NotNestedLessLess":"⪡̸","notni":"∌","notniva":"∌","notnivb":"⋾","notnivc":"⋽","NotPrecedes":"⊀","NotPrecedesEqual":"⪯̸","NotPrecedesSlantEqual":"⋠","NotReverseElement":"∌","NotRightTriangleBar":"⧐̸","NotRightTriangle":"⋫","NotRightTriangleEqual":"⋭","NotSquareSubset":"⊏̸","NotSquareSubsetEqual":"⋢","NotSquareSuperset":"⊐̸","NotSquareSupersetEqual":"⋣","NotSubset":"⊂⃒","NotSubsetEqual":"⊈","NotSucceeds":"⊁","NotSucceedsEqual":"⪰̸","NotSucceedsSlantEqual":"⋡","NotSucceedsTilde":"≿̸","NotSuperset":"⊃⃒","NotSupersetEqual":"⊉","NotTilde":"≁","NotTildeEqual":"≄","NotTildeFullEqual":"≇","NotTildeTilde":"≉","NotVerticalBar":"∤","nparallel":"∦","npar":"∦","nparsl":"⫽⃥","npart":"∂̸","npolint":"⨔","npr":"⊀","nprcue":"⋠","nprec":"⊀","npreceq":"⪯̸","npre":"⪯̸","nrarrc":"⤳̸","nrarr":"↛","nrArr":"⇏","nrarrw":"↝̸","nrightarrow":"↛","nRightarrow":"⇏","nrtri":"⋫","nrtrie":"⋭","nsc":"⊁","nsccue":"⋡","nsce":"⪰̸","Nscr":"𝒩","nscr":"𝓃","nshortmid":"∤","nshortparallel":"∦","nsim":"≁","nsime":"≄","nsimeq":"≄","nsmid":"∤","nspar":"∦","nsqsube":"⋢","nsqsupe":"⋣","nsub":"⊄","nsubE":"⫅̸","nsube":"⊈","nsubset":"⊂⃒","nsubseteq":"⊈","nsubseteqq":"⫅̸","nsucc":"⊁","nsucceq":"⪰̸","nsup":"⊅","nsupE":"⫆̸","nsupe":"⊉","nsupset":"⊃⃒","nsupseteq":"⊉","nsupseteqq":"⫆̸","ntgl":"≹","Ntilde":"Ñ","ntilde":"ñ","ntlg":"≸","ntriangleleft":"⋪","ntrianglelefteq":"⋬","ntriangleright":"⋫","ntrianglerighteq":"⋭","Nu":"Ν","nu":"ν","num":"#","numero":"№","numsp":" ","nvap":"≍⃒","nvdash":"⊬","nvDash":"⊭","nVdash":"⊮","nVDash":"⊯","nvge":"≥⃒","nvgt":">⃒","nvHarr":"⤄","nvinfin":"⧞","nvlArr":"⤂","nvle":"≤⃒","nvlt":"<⃒","nvltrie":"⊴⃒","nvrArr":"⤃","nvrtrie":"⊵⃒","nvsim":"∼⃒","nwarhk":"⤣","nwarr":"↖","nwArr":"⇖","nwarrow":"↖","nwnear":"⤧","Oacute":"Ó","oacute":"ó","oast":"⊛","Ocirc":"Ô","ocirc":"ô","ocir":"⊚","Ocy":"О","ocy":"о","odash":"⊝","Odblac":"Ő","odblac":"ő","odiv":"⨸","odot":"⊙","odsold":"⦼","OElig":"Œ","oelig":"œ","ofcir":"⦿","Ofr":"𝔒","ofr":"𝔬","ogon":"˛","Ograve":"Ò","ograve":"ò","ogt":"⧁","ohbar":"⦵","ohm":"Ω","oint":"∮","olarr":"↺","olcir":"⦾","olcross":"⦻","oline":"‾","olt":"⧀","Omacr":"Ō","omacr":"ō","Omega":"Ω","omega":"ω","Omicron":"Ο","omicron":"ο","omid":"⦶","ominus":"⊖","Oopf":"𝕆","oopf":"𝕠","opar":"⦷","OpenCurlyDoubleQuote":"“","OpenCurlyQuote":"‘","operp":"⦹","oplus":"⊕","orarr":"↻","Or":"⩔","or":"∨","ord":"⩝","order":"ℴ","orderof":"ℴ","ordf":"ª","ordm":"º","origof":"⊶","oror":"⩖","orslope":"⩗","orv":"⩛","oS":"Ⓢ","Oscr":"𝒪","oscr":"ℴ","Oslash":"Ø","oslash":"ø","osol":"⊘","Otilde":"Õ","otilde":"õ","otimesas":"⨶","Otimes":"⨷","otimes":"⊗","Ouml":"Ö","ouml":"ö","ovbar":"⌽","OverBar":"‾","OverBrace":"⏞","OverBracket":"⎴","OverParenthesis":"⏜","para":"¶","parallel":"∥","par":"∥","parsim":"⫳","parsl":"⫽","part":"∂","PartialD":"∂","Pcy":"П","pcy":"п","percnt":"%","period":".","permil":"‰","perp":"⊥","pertenk":"‱","Pfr":"𝔓","pfr":"𝔭","Phi":"Φ","phi":"φ","phiv":"ϕ","phmmat":"ℳ","phone":"☎","Pi":"Π","pi":"π","pitchfork":"⋔","piv":"ϖ","planck":"ℏ","planckh":"ℎ","plankv":"ℏ","plusacir":"⨣","plusb":"⊞","pluscir":"⨢","plus":"+","plusdo":"∔","plusdu":"⨥","pluse":"⩲","PlusMinus":"±","plusmn":"±","plussim":"⨦","plustwo":"⨧","pm":"±","Poincareplane":"ℌ","pointint":"⨕","popf":"𝕡","Popf":"ℙ","pound":"£","prap":"⪷","Pr":"⪻","pr":"≺","prcue":"≼","precapprox":"⪷","prec":"≺","preccurlyeq":"≼","Precedes":"≺","PrecedesEqual":"⪯","PrecedesSlantEqual":"≼","PrecedesTilde":"≾","preceq":"⪯","precnapprox":"⪹","precneqq":"⪵","precnsim":"⋨","pre":"⪯","prE":"⪳","precsim":"≾","prime":"′","Prime":"″","primes":"ℙ","prnap":"⪹","prnE":"⪵","prnsim":"⋨","prod":"∏","Product":"∏","profalar":"⌮","profline":"⌒","profsurf":"⌓","prop":"∝","Proportional":"∝","Proportion":"∷","propto":"∝","prsim":"≾","prurel":"⊰","Pscr":"𝒫","pscr":"𝓅","Psi":"Ψ","psi":"ψ","puncsp":" ","Qfr":"𝔔","qfr":"𝔮","qint":"⨌","qopf":"𝕢","Qopf":"ℚ","qprime":"⁗","Qscr":"𝒬","qscr":"𝓆","quaternions":"ℍ","quatint":"⨖","quest":"?","questeq":"≟","quot":"\"","QUOT":"\"","rAarr":"⇛","race":"∽̱","Racute":"Ŕ","racute":"ŕ","radic":"√","raemptyv":"⦳","rang":"⟩","Rang":"⟫","rangd":"⦒","range":"⦥","rangle":"⟩","raquo":"»","rarrap":"⥵","rarrb":"⇥","rarrbfs":"⤠","rarrc":"⤳","rarr":"→","Rarr":"↠","rArr":"⇒","rarrfs":"⤞","rarrhk":"↪","rarrlp":"↬","rarrpl":"⥅","rarrsim":"⥴","Rarrtl":"⤖","rarrtl":"↣","rarrw":"↝","ratail":"⤚","rAtail":"⤜","ratio":"∶","rationals":"ℚ","rbarr":"⤍","rBarr":"⤏","RBarr":"⤐","rbbrk":"❳","rbrace":"}","rbrack":"]","rbrke":"⦌","rbrksld":"⦎","rbrkslu":"⦐","Rcaron":"Ř","rcaron":"ř","Rcedil":"Ŗ","rcedil":"ŗ","rceil":"⌉","rcub":"}","Rcy":"Р","rcy":"р","rdca":"⤷","rdldhar":"⥩","rdquo":"”","rdquor":"”","rdsh":"↳","real":"ℜ","realine":"ℛ","realpart":"ℜ","reals":"ℝ","Re":"ℜ","rect":"▭","reg":"®","REG":"®","ReverseElement":"∋","ReverseEquilibrium":"⇋","ReverseUpEquilibrium":"⥯","rfisht":"⥽","rfloor":"⌋","rfr":"𝔯","Rfr":"ℜ","rHar":"⥤","rhard":"⇁","rharu":"⇀","rharul":"⥬","Rho":"Ρ","rho":"ρ","rhov":"ϱ","RightAngleBracket":"⟩","RightArrowBar":"⇥","rightarrow":"→","RightArrow":"→","Rightarrow":"⇒","RightArrowLeftArrow":"⇄","rightarrowtail":"↣","RightCeiling":"⌉","RightDoubleBracket":"⟧","RightDownTeeVector":"⥝","RightDownVectorBar":"⥕","RightDownVector":"⇂","RightFloor":"⌋","rightharpoondown":"⇁","rightharpoonup":"⇀","rightleftarrows":"⇄","rightleftharpoons":"⇌","rightrightarrows":"⇉","rightsquigarrow":"↝","RightTeeArrow":"↦","RightTee":"⊢","RightTeeVector":"⥛","rightthreetimes":"⋌","RightTriangleBar":"⧐","RightTriangle":"⊳","RightTriangleEqual":"⊵","RightUpDownVector":"⥏","RightUpTeeVector":"⥜","RightUpVectorBar":"⥔","RightUpVector":"↾","RightVectorBar":"⥓","RightVector":"⇀","ring":"˚","risingdotseq":"≓","rlarr":"⇄","rlhar":"⇌","rlm":"‏","rmoustache":"⎱","rmoust":"⎱","rnmid":"⫮","roang":"⟭","roarr":"⇾","robrk":"⟧","ropar":"⦆","ropf":"𝕣","Ropf":"ℝ","roplus":"⨮","rotimes":"⨵","RoundImplies":"⥰","rpar":")","rpargt":"⦔","rppolint":"⨒","rrarr":"⇉","Rrightarrow":"⇛","rsaquo":"›","rscr":"𝓇","Rscr":"ℛ","rsh":"↱","Rsh":"↱","rsqb":"]","rsquo":"’","rsquor":"’","rthree":"⋌","rtimes":"⋊","rtri":"▹","rtrie":"⊵","rtrif":"▸","rtriltri":"⧎","RuleDelayed":"⧴","ruluhar":"⥨","rx":"℞","Sacute":"Ś","sacute":"ś","sbquo":"‚","scap":"⪸","Scaron":"Š","scaron":"š","Sc":"⪼","sc":"≻","sccue":"≽","sce":"⪰","scE":"⪴","Scedil":"Ş","scedil":"ş","Scirc":"Ŝ","scirc":"ŝ","scnap":"⪺","scnE":"⪶","scnsim":"⋩","scpolint":"⨓","scsim":"≿","Scy":"С","scy":"с","sdotb":"⊡","sdot":"⋅","sdote":"⩦","searhk":"⤥","searr":"↘","seArr":"⇘","searrow":"↘","sect":"§","semi":";","seswar":"⤩","setminus":"∖","setmn":"∖","sext":"✶","Sfr":"𝔖","sfr":"𝔰","sfrown":"⌢","sharp":"♯","SHCHcy":"Щ","shchcy":"щ","SHcy":"Ш","shcy":"ш","ShortDownArrow":"↓","ShortLeftArrow":"←","shortmid":"∣","shortparallel":"∥","ShortRightArrow":"→","ShortUpArrow":"↑","shy":"­","Sigma":"Σ","sigma":"σ","sigmaf":"ς","sigmav":"ς","sim":"∼","simdot":"⩪","sime":"≃","simeq":"≃","simg":"⪞","simgE":"⪠","siml":"⪝","simlE":"⪟","simne":"≆","simplus":"⨤","simrarr":"⥲","slarr":"←","SmallCircle":"∘","smallsetminus":"∖","smashp":"⨳","smeparsl":"⧤","smid":"∣","smile":"⌣","smt":"⪪","smte":"⪬","smtes":"⪬︀","SOFTcy":"Ь","softcy":"ь","solbar":"⌿","solb":"⧄","sol":"/","Sopf":"𝕊","sopf":"𝕤","spades":"♠","spadesuit":"♠","spar":"∥","sqcap":"⊓","sqcaps":"⊓︀","sqcup":"⊔","sqcups":"⊔︀","Sqrt":"√","sqsub":"⊏","sqsube":"⊑","sqsubset":"⊏","sqsubseteq":"⊑","sqsup":"⊐","sqsupe":"⊒","sqsupset":"⊐","sqsupseteq":"⊒","square":"□","Square":"□","SquareIntersection":"⊓","SquareSubset":"⊏","SquareSubsetEqual":"⊑","SquareSuperset":"⊐","SquareSupersetEqual":"⊒","SquareUnion":"⊔","squarf":"▪","squ":"□","squf":"▪","srarr":"→","Sscr":"𝒮","sscr":"𝓈","ssetmn":"∖","ssmile":"⌣","sstarf":"⋆","Star":"⋆","star":"☆","starf":"★","straightepsilon":"ϵ","straightphi":"ϕ","strns":"¯","sub":"⊂","Sub":"⋐","subdot":"⪽","subE":"⫅","sube":"⊆","subedot":"⫃","submult":"⫁","subnE":"⫋","subne":"⊊","subplus":"⪿","subrarr":"⥹","subset":"⊂","Subset":"⋐","subseteq":"⊆","subseteqq":"⫅","SubsetEqual":"⊆","subsetneq":"⊊","subsetneqq":"⫋","subsim":"⫇","subsub":"⫕","subsup":"⫓","succapprox":"⪸","succ":"≻","succcurlyeq":"≽","Succeeds":"≻","SucceedsEqual":"⪰","SucceedsSlantEqual":"≽","SucceedsTilde":"≿","succeq":"⪰","succnapprox":"⪺","succneqq":"⪶","succnsim":"⋩","succsim":"≿","SuchThat":"∋","sum":"∑","Sum":"∑","sung":"♪","sup1":"¹","sup2":"²","sup3":"³","sup":"⊃","Sup":"⋑","supdot":"⪾","supdsub":"⫘","supE":"⫆","supe":"⊇","supedot":"⫄","Superset":"⊃","SupersetEqual":"⊇","suphsol":"⟉","suphsub":"⫗","suplarr":"⥻","supmult":"⫂","supnE":"⫌","supne":"⊋","supplus":"⫀","supset":"⊃","Supset":"⋑","supseteq":"⊇","supseteqq":"⫆","supsetneq":"⊋","supsetneqq":"⫌","supsim":"⫈","supsub":"⫔","supsup":"⫖","swarhk":"⤦","swarr":"↙","swArr":"⇙","swarrow":"↙","swnwar":"⤪","szlig":"ß","Tab":"\t","target":"⌖","Tau":"Τ","tau":"τ","tbrk":"⎴","Tcaron":"Ť","tcaron":"ť","Tcedil":"Ţ","tcedil":"ţ","Tcy":"Т","tcy":"т","tdot":"⃛","telrec":"⌕","Tfr":"𝔗","tfr":"𝔱","there4":"∴","therefore":"∴","Therefore":"∴","Theta":"Θ","theta":"θ","thetasym":"ϑ","thetav":"ϑ","thickapprox":"≈","thicksim":"∼","ThickSpace":"  ","ThinSpace":" ","thinsp":" ","thkap":"≈","thksim":"∼","THORN":"Þ","thorn":"þ","tilde":"˜","Tilde":"∼","TildeEqual":"≃","TildeFullEqual":"≅","TildeTilde":"≈","timesbar":"⨱","timesb":"⊠","times":"×","timesd":"⨰","tint":"∭","toea":"⤨","topbot":"⌶","topcir":"⫱","top":"⊤","Topf":"𝕋","topf":"𝕥","topfork":"⫚","tosa":"⤩","tprime":"‴","trade":"™","TRADE":"™","triangle":"▵","triangledown":"▿","triangleleft":"◃","trianglelefteq":"⊴","triangleq":"≜","triangleright":"▹","trianglerighteq":"⊵","tridot":"◬","trie":"≜","triminus":"⨺","TripleDot":"⃛","triplus":"⨹","trisb":"⧍","tritime":"⨻","trpezium":"⏢","Tscr":"𝒯","tscr":"𝓉","TScy":"Ц","tscy":"ц","TSHcy":"Ћ","tshcy":"ћ","Tstrok":"Ŧ","tstrok":"ŧ","twixt":"≬","twoheadleftarrow":"↞","twoheadrightarrow":"↠","Uacute":"Ú","uacute":"ú","uarr":"↑","Uarr":"↟","uArr":"⇑","Uarrocir":"⥉","Ubrcy":"Ў","ubrcy":"ў","Ubreve":"Ŭ","ubreve":"ŭ","Ucirc":"Û","ucirc":"û","Ucy":"У","ucy":"у","udarr":"⇅","Udblac":"Ű","udblac":"ű","udhar":"⥮","ufisht":"⥾","Ufr":"𝔘","ufr":"𝔲","Ugrave":"Ù","ugrave":"ù","uHar":"⥣","uharl":"↿","uharr":"↾","uhblk":"▀","ulcorn":"⌜","ulcorner":"⌜","ulcrop":"⌏","ultri":"◸","Umacr":"Ū","umacr":"ū","uml":"¨","UnderBar":"_","UnderBrace":"⏟","UnderBracket":"⎵","UnderParenthesis":"⏝","Union":"⋃","UnionPlus":"⊎","Uogon":"Ų","uogon":"ų","Uopf":"𝕌","uopf":"𝕦","UpArrowBar":"⤒","uparrow":"↑","UpArrow":"↑","Uparrow":"⇑","UpArrowDownArrow":"⇅","updownarrow":"↕","UpDownArrow":"↕","Updownarrow":"⇕","UpEquilibrium":"⥮","upharpoonleft":"↿","upharpoonright":"↾","uplus":"⊎","UpperLeftArrow":"↖","UpperRightArrow":"↗","upsi":"υ","Upsi":"ϒ","upsih":"ϒ","Upsilon":"Υ","upsilon":"υ","UpTeeArrow":"↥","UpTee":"⊥","upuparrows":"⇈","urcorn":"⌝","urcorner":"⌝","urcrop":"⌎","Uring":"Ů","uring":"ů","urtri":"◹","Uscr":"𝒰","uscr":"𝓊","utdot":"⋰","Utilde":"Ũ","utilde":"ũ","utri":"▵","utrif":"▴","uuarr":"⇈","Uuml":"Ü","uuml":"ü","uwangle":"⦧","vangrt":"⦜","varepsilon":"ϵ","varkappa":"ϰ","varnothing":"∅","varphi":"ϕ","varpi":"ϖ","varpropto":"∝","varr":"↕","vArr":"⇕","varrho":"ϱ","varsigma":"ς","varsubsetneq":"⊊︀","varsubsetneqq":"⫋︀","varsupsetneq":"⊋︀","varsupsetneqq":"⫌︀","vartheta":"ϑ","vartriangleleft":"⊲","vartriangleright":"⊳","vBar":"⫨","Vbar":"⫫","vBarv":"⫩","Vcy":"В","vcy":"в","vdash":"⊢","vDash":"⊨","Vdash":"⊩","VDash":"⊫","Vdashl":"⫦","veebar":"⊻","vee":"∨","Vee":"⋁","veeeq":"≚","vellip":"⋮","verbar":"|","Verbar":"‖","vert":"|","Vert":"‖","VerticalBar":"∣","VerticalLine":"|","VerticalSeparator":"❘","VerticalTilde":"≀","VeryThinSpace":" ","Vfr":"𝔙","vfr":"𝔳","vltri":"⊲","vnsub":"⊂⃒","vnsup":"⊃⃒","Vopf":"𝕍","vopf":"𝕧","vprop":"∝","vrtri":"⊳","Vscr":"𝒱","vscr":"𝓋","vsubnE":"⫋︀","vsubne":"⊊︀","vsupnE":"⫌︀","vsupne":"⊋︀","Vvdash":"⊪","vzigzag":"⦚","Wcirc":"Ŵ","wcirc":"ŵ","wedbar":"⩟","wedge":"∧","Wedge":"⋀","wedgeq":"≙","weierp":"℘","Wfr":"𝔚","wfr":"𝔴","Wopf":"𝕎","wopf":"𝕨","wp":"℘","wr":"≀","wreath":"≀","Wscr":"𝒲","wscr":"𝓌","xcap":"⋂","xcirc":"◯","xcup":"⋃","xdtri":"▽","Xfr":"𝔛","xfr":"𝔵","xharr":"⟷","xhArr":"⟺","Xi":"Ξ","xi":"ξ","xlarr":"⟵","xlArr":"⟸","xmap":"⟼","xnis":"⋻","xodot":"⨀","Xopf":"𝕏","xopf":"𝕩","xoplus":"⨁","xotime":"⨂","xrarr":"⟶","xrArr":"⟹","Xscr":"𝒳","xscr":"𝓍","xsqcup":"⨆","xuplus":"⨄","xutri":"△","xvee":"⋁","xwedge":"⋀","Yacute":"Ý","yacute":"ý","YAcy":"Я","yacy":"я","Ycirc":"Ŷ","ycirc":"ŷ","Ycy":"Ы","ycy":"ы","yen":"¥","Yfr":"𝔜","yfr":"𝔶","YIcy":"Ї","yicy":"ї","Yopf":"𝕐","yopf":"𝕪","Yscr":"𝒴","yscr":"𝓎","YUcy":"Ю","yucy":"ю","yuml":"ÿ","Yuml":"Ÿ","Zacute":"Ź","zacute":"ź","Zcaron":"Ž","zcaron":"ž","Zcy":"З","zcy":"з","Zdot":"Ż","zdot":"ż","zeetrf":"ℨ","ZeroWidthSpace":"​","Zeta":"Ζ","zeta":"ζ","zfr":"𝔷","Zfr":"ℨ","ZHcy":"Ж","zhcy":"ж","zigrarr":"⇝","zopf":"𝕫","Zopf":"ℤ","Zscr":"𝒵","zscr":"𝓏","zwj":"‍","zwnj":"‌"}
 
-},{}],101:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 module.exports={"Aacute":"Á","aacute":"á","Acirc":"Â","acirc":"â","acute":"´","AElig":"Æ","aelig":"æ","Agrave":"À","agrave":"à","amp":"&","AMP":"&","Aring":"Å","aring":"å","Atilde":"Ã","atilde":"ã","Auml":"Ä","auml":"ä","brvbar":"¦","Ccedil":"Ç","ccedil":"ç","cedil":"¸","cent":"¢","copy":"©","COPY":"©","curren":"¤","deg":"°","divide":"÷","Eacute":"É","eacute":"é","Ecirc":"Ê","ecirc":"ê","Egrave":"È","egrave":"è","ETH":"Ð","eth":"ð","Euml":"Ë","euml":"ë","frac12":"½","frac14":"¼","frac34":"¾","gt":">","GT":">","Iacute":"Í","iacute":"í","Icirc":"Î","icirc":"î","iexcl":"¡","Igrave":"Ì","igrave":"ì","iquest":"¿","Iuml":"Ï","iuml":"ï","laquo":"«","lt":"<","LT":"<","macr":"¯","micro":"µ","middot":"·","nbsp":" ","not":"¬","Ntilde":"Ñ","ntilde":"ñ","Oacute":"Ó","oacute":"ó","Ocirc":"Ô","ocirc":"ô","Ograve":"Ò","ograve":"ò","ordf":"ª","ordm":"º","Oslash":"Ø","oslash":"ø","Otilde":"Õ","otilde":"õ","Ouml":"Ö","ouml":"ö","para":"¶","plusmn":"±","pound":"£","quot":"\"","QUOT":"\"","raquo":"»","reg":"®","REG":"®","sect":"§","shy":"­","sup1":"¹","sup2":"²","sup3":"³","szlig":"ß","THORN":"Þ","thorn":"þ","times":"×","Uacute":"Ú","uacute":"ú","Ucirc":"Û","ucirc":"û","Ugrave":"Ù","ugrave":"ù","uml":"¨","Uuml":"Ü","uuml":"ü","Yacute":"Ý","yacute":"ý","yen":"¥","yuml":"ÿ"}
 
-},{}],102:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 module.exports={"amp":"&","apos":"'","gt":">","lt":"<","quot":"\""}
 
-},{}],103:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6323,7 +6708,7 @@ function parseFeed(feed, options) {
 }
 exports.parseFeed = parseFeed;
 
-},{"./Parser":104,"domhandler":85,"domutils":89}],104:[function(require,module,exports){
+},{"./Parser":108,"domhandler":89,"domutils":93}],108:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6706,7 +7091,7 @@ var Parser = /** @class */ (function () {
 }());
 exports.Parser = Parser;
 
-},{"./Tokenizer":105}],105:[function(require,module,exports){
+},{"./Tokenizer":109}],109:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -7617,7 +8002,7 @@ var Tokenizer = /** @class */ (function () {
 }());
 exports.default = Tokenizer;
 
-},{"entities/lib/decode_codepoint":96,"entities/lib/maps/entities.json":100,"entities/lib/maps/legacy.json":101,"entities/lib/maps/xml.json":102}],106:[function(require,module,exports){
+},{"entities/lib/decode_codepoint":100,"entities/lib/maps/entities.json":104,"entities/lib/maps/legacy.json":105,"entities/lib/maps/xml.json":106}],110:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -7703,7 +8088,7 @@ exports.DomUtils = __importStar(require("domutils"));
 var FeedHandler_1 = require("./FeedHandler");
 Object.defineProperty(exports, "RssHandler", { enumerable: true, get: function () { return FeedHandler_1.FeedHandler; } });
 
-},{"./FeedHandler":103,"./Parser":104,"./Tokenizer":105,"domelementtype":63,"domhandler":85,"domutils":89}],107:[function(require,module,exports){
+},{"./FeedHandler":107,"./Parser":108,"./Tokenizer":109,"domelementtype":88,"domhandler":89,"domutils":93}],111:[function(require,module,exports){
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory) /* global define */
@@ -8305,7 +8690,7 @@ Object.defineProperty(exports, "RssHandler", { enumerable: true, get: function (
 
 }));
 
-},{}],108:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 (function(root, factory) {
     if (typeof module === 'object' && module.exports) {
         module.exports = factory();
@@ -8871,7 +9256,7 @@ Object.defineProperty(exports, "RssHandler", { enumerable: true, get: function (
 
 }));
 
-},{}],109:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -9223,7 +9608,7 @@ exports.parse = parse;
 exports.parse1 = parse1;
 exports.serialize = serialize;
 
-},{"moo":107,"nearley":108}],110:[function(require,module,exports){
+},{"moo":111,"nearley":112}],114:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -9409,7 +9794,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],111:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -9957,28 +10342,29 @@ exports.Picker = Picker;
 exports.Treeify = TreeifyBuilder;
 exports.Types = Types;
 
-},{"parseley":109}],112:[function(require,module,exports){
+},{"parseley":113}],116:[function(require,module,exports){
 "use strict";
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComicK = exports.ComicKInfo = void 0;
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const ComicKParser_1 = require("./ComicKParser");
 const ComicKSettings_1 = require("./ComicKSettings");
-const COMICK_DOMAIN = 'https://comick.fun';
+const ComicKHelper_1 = require("./ComicKHelper");
+const COMICK_DOMAIN = 'https://comick.app';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '2.0.3',
+    version: '2.0.0',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.fun.',
+    description: 'Extension that pulls manga from comick.app.',
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
-    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.SETTINGS_UI,
+    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.MANGA_CHAPTERS,
     sourceTags: [
         {
             text: 'Notifications',
@@ -9990,9 +10376,8 @@ exports.ComicKInfo = {
         }
     ]
 };
-class ComicK extends types_1.Source {
+class ComicK {
     constructor() {
-        super(...arguments);
         this.requestManager = App.createRequestManager({
             requestsPerSecond: 2,
             requestTimeout: 15000,
@@ -10001,6 +10386,7 @@ class ComicK extends types_1.Source {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
+                            'user-agent': await this.requestManager.getDefaultUserAgent(),
                             'referer': COMICK_DOMAIN
                         }
                     };
@@ -10029,25 +10415,7 @@ class ComicK extends types_1.Source {
     async getMangaDetails(mangaId) {
         const request = App.createRequest({
             url: `${COMICK_API}/comic/${mangaId}?tachiyomi=true`,
-            method: 'GET',
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        let data;
-        try {
-            data = JSON.parse(response?.data ?? '');
-        }
-        catch (e) {
-            throw new Error(`${e}`);
-        }
-        return (0, ComicKParser_1.parseMangaDetails)(data, mangaId);
-    }
-    async getChapters(mangaId) {
-        const showVol = await (0, ComicKSettings_1.getShowChapterVolume)(this.stateManager);
-        const showTitle = await (0, ComicKSettings_1.getShowChapterTitle)(this.stateManager);
-        const chapters = [];
-        const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}?tachiyomi=true`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -10057,20 +10425,26 @@ class ComicK extends types_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
+        return (0, ComicKParser_1.parseMangaDetails)(data, mangaId);
+    }
+    async getChapters(mangaId) {
+        const showVol = await this.stateManager.retrieve('show_volume_number') ?? false;
+        const showTitle = await this.stateManager.retrieve('show_title') ?? false;
+        const chapters = [];
         let page = 1;
         let json = null;
         do {
-            json = await this.createChapterRequest(data.comic.id, page);
+            json = await this.createChapterRequest(mangaId, page);
             chapters.push(...(0, ComicKParser_1.parseChapters)(json, { show_title: showTitle, show_volume: showVol }));
             page += 1;
         } while (json.chapters.length === SEARCH_PAGE_LIMIT);
         return chapters;
     }
     async createChapterRequest(mangaId, page) {
-        const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
+        const Languages = await this.stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault();
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapter?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
-            method: 'GET',
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -10085,7 +10459,7 @@ class ComicK extends types_1.Source {
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
             url: `${COMICK_API}/chapter/${chapterId}/?tachiyomi=true`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -10100,7 +10474,7 @@ class ComicK extends types_1.Source {
     async getSearchTags() {
         const request = App.createRequest({
             url: `${COMICK_API}/genre/`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -10116,66 +10490,42 @@ class ComicK extends types_1.Source {
         return true;
     }
     async getHomePageSections(sectionCallback) {
-        const HomeFilter = await (0, ComicKSettings_1.getHomeFilter)(this.stateManager);
-        const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
-        let filterLang = [];
-        for (const lang of Languages) {
-            if (lang === 'all') {
-                filterLang = [];
-                break;
-            }
-            filterLang.push(`&lang=${lang}`);
-        }
         const sections = [
             {
                 request: App.createRequest({
-                    url: `${COMICK_API}/search?page=1&limit=10&tachiyomi=true`,
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'top10',
-                    title: 'Top 10',
-                    type: types_1.HomeSectionType.featured,
+                    id: 'views',
+                    title: 'Most Viewed',
                     containsMoreItems: true,
-                }),
-                usesSearch: true
+                    type: 'singleRowNormal'
+                })
             },
             {
                 request: App.createRequest({
-                    url: `${COMICK_API}/search?page=1&limit=100&tachiyomi=true`,
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'popular',
-                    title: 'Popular',
+                    id: 'follow',
+                    title: 'Most Follows',
                     containsMoreItems: true,
-                    type: types_1.HomeSectionType.singleRowNormal,
-                }),
-                usesSearch: true
+                    type: 'singleRowNormal'
+                })
             },
             {
                 request: App.createRequest({
-                    url: `${COMICK_API}/chapter?page=1&order=hot${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`,
+                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'hot',
-                    title: 'Hot',
+                    id: 'latest',
+                    title: 'Latest Uploads',
                     containsMoreItems: true,
-                    type: types_1.HomeSectionType.singleRowNormal,
-                }),
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/chapter?page=1&order=new${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'new',
-                    title: 'New',
-                    containsMoreItems: true,
-                    type: types_1.HomeSectionType.singleRowNormal,
-                }),
+                    type: 'singleRowNormal'
+                })
             }
         ];
         const promises = [];
@@ -10189,7 +10539,7 @@ class ComicK extends types_1.Source {
                 catch (e) {
                     throw new Error(`${e}`);
                 }
-                section.section.items = (0, ComicKParser_1.parseSearch)(data, section.usesSearch);
+                section.section.items = (0, ComicKParser_1.parseSearch)(data);
                 sectionCallback(section.section);
             }));
         }
@@ -10197,28 +10547,16 @@ class ComicK extends types_1.Source {
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
-        let param = '';
-        let usesSearch = false;
-        const HomeFilter = await (0, ComicKSettings_1.getHomeFilter)(this.stateManager);
-        const Languages = await (0, ComicKSettings_1.getLanguages)(this.stateManager);
-        let filterLang = [];
-        for (const lang of Languages) {
-            if (lang === 'all') {
-                filterLang = [];
-                break;
-            }
-            filterLang.push(`&lang=${lang}`);
-        }
+        let param;
         switch (homepageSectionId) {
-            case 'popular':
-                param = `/search/?page=${page}&limit=${SEARCH_PAGE_LIMIT}&tachiyomi=true`;
-                usesSearch = true;
+            case 'views':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`;
                 break;
-            case 'hot':
-                param = `/chapter/?page=${page}&order=hot${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`;
+            case 'follow':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`;
                 break;
-            case 'new':
-                param = `/chapter/?page=${page}&order=new${HomeFilter ? filterLang.length !== 0 ? filterLang.join('') : '' : ''}&device-memory=8&tachiyomi=true`;
+            case 'latest':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`;
                 break;
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist');
@@ -10235,8 +10573,8 @@ class ComicK extends types_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = (0, ComicKParser_1.parseSearch)(data, usesSearch);
-        metadata = usesSearch ? data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined : { page: page + 1 };
+        const manga = (0, ComicKParser_1.parseSearch)(data);
+        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
             metadata
@@ -10244,53 +10582,49 @@ class ComicK extends types_1.Source {
     }
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
-        const includedGenres = query.includedTags?.map((x) => {
-            if (x.id.includes('genre.')) {
-                return `&genres=${x.id?.split('.')?.pop()}`;
+        const includedGenres = [];
+        const excludedGenres = [];
+        const Sort = [];
+        const CreatedAt = [];
+        const Type = [];
+        const Demographic = [];
+        query.includedTags?.map((x) => {
+            const id = x.id;
+            const SplittedID = id?.split('.')?.pop() ?? '';
+            if (id.includes('genre.')) {
+                includedGenres.push(`&genres=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const excludedGenres = query.excludedTags?.map((x) => {
-            if (x.id.includes('genre.')) {
-                return `&excludes=${x.id?.split('.')?.pop()}`;
+            if (id.includes('sort.')) {
+                Sort.push(`&sort=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const Sort = query.includedTags?.map((x) => {
-            if (x.id.includes('sort.')) {
-                return `&sort=${x.id?.split('.')?.pop()}`;
+            if (id.includes('createdat.')) {
+                CreatedAt.push(`&time=${SplittedID}`);
             }
-            return undefined;
-        })[0] ?? '';
-        const CreatedAt = query.includedTags?.map((x) => {
-            if (x.id.includes('createdat.')) {
-                return `&time=${x.id?.split('.')?.pop()}`;
+            if (id.includes('type.')) {
+                Type.push(`&country=${SplittedID}`);
             }
-            return undefined;
-        })[0] ?? '';
-        const Type = query.includedTags?.map((x) => {
-            if (x.id.includes('type.')) {
-                return `&country=${x.id?.split('.')?.pop()}`;
+            if (id.includes('demographic.')) {
+                Demographic.push(`&demographic=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
-        const Demographic = query.includedTags?.map((x) => {
-            if (x.id.includes('demographic.')) {
-                return `&demographic=${x.id?.split('.')?.pop()}`;
+        });
+        query.excludedTags?.map((x) => {
+            const id = x.id;
+            const SplittedID = id?.split('.')?.pop() ?? '';
+            if (id.includes('genre.')) {
+                excludedGenres.push(`&excludes=${SplittedID}`);
             }
-            return undefined;
-        }).join('') ?? '';
+        });
         let request;
         if (query.title) {
             request = App.createRequest({
                 url: `${COMICK_API}/search?q=${query.title.replace(/ /g, '%20')}&limit=${SEARCH_PAGE_LIMIT}&page=${page}&tachiyomi=true`,
-                method: 'GET',
+                method: 'GET'
             });
         }
         else {
             request = App.createRequest({
-                url: `${COMICK_API}/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres}${excludedGenres}${Sort}${CreatedAt}${Type}${Demographic}&tachiyomi=true`,
-                method: 'GET',
+                url: `${COMICK_API}/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
+                method: 'GET'
             });
         }
         const response = await this.requestManager.schedule(request, 1);
@@ -10301,7 +10635,7 @@ class ComicK extends types_1.Source {
         catch (e) {
             throw new Error(`${e}`);
         }
-        const manga = (0, ComicKParser_1.parseSearch)(data, true);
+        const manga = (0, ComicKParser_1.parseSearch)(data);
         metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
@@ -10311,7 +10645,7 @@ class ComicK extends types_1.Source {
 }
 exports.ComicK = ComicK;
 
-},{"./ComicKParser":114,"./ComicKSettings":115,"@paperback/types":58}],113:[function(require,module,exports){
+},{"./ComicKHelper":117,"./ComicKParser":118,"./ComicKSettings":119,"@paperback/types":61}],117:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CMLanguages = void 0;
@@ -10321,208 +10655,247 @@ class LanguagesClass {
             {
                 'name': 'All',
                 'CMCode': 'all',
-                'PBCode': 'all',
-                'default': true
+                'emoji': 'all'
             },
             {
                 'name': 'English',
                 'CMCode': 'en',
-                'PBCode': 'en'
+                'emoji': '🇬🇧'
             },
             {
-                'name': 'Português (Brasil)',
+                'name': 'português do Brasil',
                 'CMCode': 'pt-br',
-                'PBCode': 'pt-br'
+                'emoji': '🇧🇷'
             },
             {
-                'name': 'Русский',
+                'name': 'русский язык',
                 'CMCode': 'ru',
-                'PBCode': 'ru'
+                'emoji': '🇷🇺'
             },
             {
-                'name': 'Français',
+                'name': 'français, langue française',
                 'CMCode': 'fr',
-                'PBCode': 'fr'
+                'emoji': '🇫🇷'
             },
             {
-                'name': 'Español (Latinoamérica)',
-                'CMCode': 'es-419',
-                'PBCode': 'es-419'
-            },
-            {
-                'name': 'Polski',
+                'name': 'polski',
                 'CMCode': 'pl',
-                'PBCode': 'pl'
+                'emoji': '🇵🇱'
+            },
+            {
+                'name': 'español latinoamericano',
+                'CMCode': 'es-419',
+                'emoji': '🇦🇷'
             },
             {
                 'name': 'Türkçe',
                 'CMCode': 'tr',
-                'PBCode': 'tr'
+                'emoji': '🇹🇷'
             },
             {
                 'name': 'Italiano',
                 'CMCode': 'it',
-                'PBCode': 'it'
-            },
-            {
-                'name': 'Español',
-                'CMCode': 'es',
-                'PBCode': 'es'
+                'emoji': '🇮🇹'
             },
             {
                 'name': 'Bahasa Indonesia',
                 'CMCode': 'id',
-                'PBCode': 'id'
+                'emoji': '🇮🇩'
             },
             {
-                'name': 'Magyar',
-                'CMCode': 'hu',
-                'PBCode': 'hu'
+                'name': 'español, castellano',
+                'CMCode': 'es',
+                'emoji': '🇪🇸'
             },
             {
                 'name': 'Tiếng Việt',
                 'CMCode': 'vi',
-                'PBCode': 'vi'
-            },
-            {
-                'name': '中文繁體',
-                'CMCode': 'zh-hk',
-                'PBCode': 'zh-hk'
+                'emoji': '🇻🇮'
             },
             {
                 'name': 'العربية',
                 'CMCode': 'ar',
-                'PBCode': 'ar'
+                'emoji': '🇸🇦'
+            },
+            {
+                'name': '(Hong Kong) 繁體中文',
+                'CMCode': 'zh-hk',
+                'emoji': '🇭🇰'
+            },
+            {
+                'name': 'Magyar',
+                'CMCode': 'hu',
+                'emoji': '🇭🇺'
             },
             {
                 'name': 'Deutsch',
                 'CMCode': 'de',
-                'PBCode': 'de'
+                'emoji': '🇩🇪'
             },
             {
-                'name': '中文简体',
+                'name': 'українська',
+                'CMCode': 'uk',
+                'emoji': '🇺🇰'
+            },
+            {
+                'name': '中文 (Zhōngwén), 汉语, 漢語',
                 'CMCode': 'zh',
-                'PBCode': 'zh'
+                'emoji': '🇿🇭'
+            },
+            {
+                'name': 'ไทย',
+                'CMCode': 'th',
+                'emoji': '🇹🇭'
             },
             {
                 'name': 'Català',
                 'CMCode': 'ca',
-                'PBCode': 'ca'
+                'emoji': '🇨🇦'
             },
             {
-                'name': 'Български',
+                'name': 'български език',
                 'CMCode': 'bg',
-                'PBCode': 'bg'
-            },
-            {
-                'name': 'ภาษาไทย',
-                'CMCode': 'th',
-                'PBCode': 'th'
+                'emoji': '🇧🇬'
             },
             {
                 'name': 'فارسی',
                 'CMCode': 'fa',
-                'PBCode': 'fa'
+                'emoji': '🇫🇦'
             },
             {
-                'name': 'Українська',
-                'CMCode': 'uk',
-                'PBCode': 'uk'
-            },
-            {
-                'name': 'Монгол',
-                'CMCode': 'mn',
-                'PBCode': 'mn'
-            },
-            {
-                'name': 'Română',
+                'name': 'română',
                 'CMCode': 'ro',
-                'PBCode': 'ro'
+                'emoji': '🇷🇴'
             },
             {
-                'name': 'עברית‏',
+                'name': 'монгол',
+                'CMCode': 'mn',
+                'emoji': '🇲🇳'
+            },
+            {
+                'name': 'עברית',
                 'CMCode': 'he',
-                'PBCode': 'he'
+                'emoji': '🇭🇪'
             },
             {
-                'name': 'Bahasa Melayu',
-                'CMCode': 'ms',
-                'PBCode': 'ms'
-            },
-            {
-                'name': 'Tagalog',
-                'CMCode': 'tl',
-                'PBCode': 'tl'
-            },
-            {
-                'name': '日本語',
-                'CMCode': 'ja',
-                'PBCode': 'ja'
-            },
-            {
-                'name': 'हिन्दी',
-                'CMCode': 'hi',
-                'PBCode': 'hi'
-            },
-            {
-                'name': 'ဗမာစကာ',
-                'CMCode': 'my',
-                'PBCode': 'my'
-            },
-            {
-                'name': '한국어',
-                'CMCode': 'ko',
-                'PBCode': 'ko'
-            },
-            {
-                'name': 'Čeština',
+                'name': 'česky, čeština',
                 'CMCode': 'cs',
-                'PBCode': 'cs'
+                'emoji': '🇨🇸'
             },
             {
                 'name': 'Português',
                 'CMCode': 'pt',
-                'PBCode': 'pt'
+                'emoji': '🇵🇹'
             },
             {
-                'name': 'Nederlands',
+                'name': 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔',
+                'CMCode': 'tl',
+                'emoji': '🇹🇱'
+            },
+            {
+                'name': 'bahasa Melayu, بهاس ملايو‎',
+                'CMCode': 'ms',
+                'emoji': '🇲🇸'
+            },
+            {
+                'name': 'हिन्दी, हिंदी',
+                'CMCode': 'hi',
+                'emoji': '🇭🇮'
+            },
+            {
+                'name': '日本語 (にほんご／にっぽんご)',
+                'CMCode': 'ja',
+                'emoji': '🇯🇦'
+            },
+            {
+                'name': 'ဗမာစာ',
+                'CMCode': 'my',
+                'emoji': '🇲🇾'
+            },
+            {
+                'name': '한국어 (韓國語), 조선말 (朝鮮語)',
+                'CMCode': 'ko',
+                'emoji': '🇰🇴'
+            },
+            {
+                'name': 'Nederlands, Vlaams',
                 'CMCode': 'nl',
-                'PBCode': 'nl'
+                'emoji': '🇳🇱'
             },
             {
-                'name': 'Svenska',
+                'name': 'српски језик',
+                'CMCode': 'sr',
+                'emoji': '🇸🇷'
+            },
+            {
+                'name': 'Қазақ тілі',
+                'CMCode': 'kk',
+                'emoji': '🇰🇰'
+            },
+            {
+                'name': 'Esperanto',
+                'CMCode': 'eo',
+                'emoji': '🇪🇴'
+            },
+            {
+                'name': 'svenska',
                 'CMCode': 'sv',
-                'PBCode': 'sv'
-            },
-            {
-                'name': 'বাংলা',
-                'CMCode': 'bn',
-                'PBCode': 'bn'
-            },
-            {
-                'name': 'Norsk',
-                'CMCode': 'no',
-                'PBCode': 'no'
-            },
-            {
-                'name': 'Lietuvių',
-                'CMCode': 'lt',
-                'PBCode': 'lt'
+                'emoji': '🇸🇻'
             },
             {
                 'name': 'Ελληνικά',
                 'CMCode': 'el',
-                'PBCode': 'el'
+                'emoji': '🇪🇱'
             },
             {
-                'name': 'Српски',
-                'CMCode': 'sr',
-                'PBCode': 'sr'
+                'name': 'தமிழ்',
+                'CMCode': 'ta',
+                'emoji': '🇹🇦'
             },
             {
-                'name': 'Dansk',
+                'name': 'বাংলা',
+                'CMCode': 'bn',
+                'emoji': '🇧🇳'
+            },
+            {
+                'name': 'lietuvių kalba',
+                'CMCode': 'lt',
+                'emoji': '🇱🇹'
+            },
+            {
+                'name': 'नेपाली',
+                'CMCode': 'ne',
+                'emoji': '🇳🇪'
+            },
+            {
+                'name': 'Norsk',
+                'CMCode': 'no',
+                'emoji': '🇳🇴'
+            },
+            {
+                'name': 'latine, lingua latina',
+                'CMCode': 'la',
+                'emoji': '🇱🇦'
+            },
+            {
+                'name': 'suomi, suomen kieli',
+                'CMCode': 'fi',
+                'emoji': '🇫🇮'
+            },
+            {
+                'name': 'hrvatski',
+                'CMCode': 'hr',
+                'emoji': '🇭🇷'
+            },
+            {
+                'name': 'dansk',
                 'CMCode': 'da',
-                'PBCode': 'da'
+                'emoji': '🇩🇦'
+            },
+            {
+                'name': 'slovenčina',
+                'CMCode': 'sk',
+                'emoji': '🇸🇰'
             }
         ];
         this.Languages = this.Languages.sort((a, b) => a.name > b.name ? 1 : -1);
@@ -10533,8 +10906,8 @@ class LanguagesClass {
     getName(CMCode) {
         return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.name ?? 'Unknown';
     }
-    getPBCode(CMCode) {
-        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.PBCode ?? '_unknown';
+    getEmoji(CMCode) {
+        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.emoji ?? '⍰';
     }
     getDefault() {
         return this.Languages.filter(Language => Language.default).map(Language => Language.CMCode);
@@ -10542,49 +10915,44 @@ class LanguagesClass {
 }
 exports.CMLanguages = new LanguagesClass;
 
-},{}],114:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 "use strict";
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseSearch = exports.parseTags = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
 const ComicKHelper_1 = require("./ComicKHelper");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
 const parseMangaDetails = (data, mangaId) => {
-    const comic = data.comic;
-    const titles = [];
-    titles.push(comic.title);
-    if (comic.md_titles) {
-        for (const altTitles of comic.md_titles) {
+    const comic = data?.comic;
+    const titles = [comic?.title];
+    if (comic?.md_titles) {
+        for (const altTitles of comic?.md_titles) {
             titles.push(altTitles.title);
         }
     }
-    const image = comic.cover_url;
+    const image = comic?.cover_url;
     const author = [];
-    if (data.authors) {
-        for (const authors of data.authors) {
-            author.push(authors.name);
+    if (data?.authors) {
+        for (const authors of data?.authors) {
+            author.push(authors?.name);
         }
     }
     const artist = [];
-    if (data.artists) {
-        for (const authors of data.artists) {
-            artist.push(authors.name);
+    if (data?.artists) {
+        for (const authors of data?.artists) {
+            artist.push(authors?.name);
         }
     }
-    const description = (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic.desc), { wordwrap: 130 });
+    const description = comic?.desc ? (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic?.desc), { wordwrap: 130 }) : '';
     const arrayTags = [];
     const countryConvert = {
         kr: 'Manhwa',
         jp: 'Manga',
-        cn: 'Manhua',
+        cn: 'Manhua'
     };
-    if (comic.country) {
-        const id = `type.${comic.country}`;
-        const label = countryConvert[comic.country];
+    if (comic?.country) {
+        const id = `type.${comic?.country}`;
+        const label = countryConvert[comic?.country];
         if (id && label) {
             arrayTags.push({
                 id,
@@ -10592,19 +10960,18 @@ const parseMangaDetails = (data, mangaId) => {
             });
         }
     }
-    if (data.genres) {
-        for (const tag of data.genres) {
-            const label = tag.name;
-            const id = `genre.${tag.slug}`;
+    if (data?.genres) {
+        for (const tag of data?.genres) {
+            const label = tag?.name;
+            const id = `genre.${tag?.slug}`;
             if (!id || !label)
                 continue;
             arrayTags.push({ id: id, label: label });
         }
     }
-    const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-    let status = '';
-    if (comic.status) {
-        switch (comic.status) {
+    let status = 'ONGOING';
+    if (comic?.status) {
+        switch (comic?.status) {
             case 1:
                 status = 'ONGOING';
                 break;
@@ -10618,36 +10985,40 @@ const parseMangaDetails = (data, mangaId) => {
         mangaInfo: App.createMangaInfo({
             titles: titles,
             image: image,
-            hentai: comic.hentai,
+            hentai: comic?.hentai,
             status: status,
             author: author.join(','),
             artist: artist.join(','),
-            tags: tagSections,
-            desc: description,
+            tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })],
+            desc: description
         })
     });
 };
 exports.parseMangaDetails = parseMangaDetails;
 const parseChapters = (data, chapSettings) => {
     const chapters = [];
-    for (const chapter of data.chapters) {
-        const chapNum = Number(chapter.chap);
-        const volume = Number(chapter.vol);
+    for (const chapter of data?.chapters) {
+        const id = chapter?.hid ?? '';
+        const chap = chapter?.chap;
+        const vol = chapter?.vol;
+        const chapNum = Number(chap);
+        const volume = Number(vol);
         const groups = [];
-        if (chapter.group_name) {
-            for (const group of chapter.group_name) {
+        if (chapter?.group_name) {
+            for (const group of chapter?.group_name) {
                 groups.push(group);
             }
         }
+        if (!id)
+            continue;
         chapters.push(App.createChapter({
-            id: chapter.hid,
-            name: `Chapter ${chapter.chap}${chapSettings.show_title ? chapter.title ? `: ${chapter.title}` : '' : ''}`,
+            id,
+            name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
             chapNum: !isNaN(chapNum) ? chapNum : NaN,
-            volume: chapSettings.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
-            time: new Date(chapter.created_at),
-            group: groups.length !== 0 ? groups.join(',') : '',
-            // @ts-ignore
-            langCode: ComicKHelper_1.CMLanguages.getName(chapter.lang)
+            volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
+            time: new Date(chapter?.created_at),
+            group: groups?.length !== 0 ? groups?.join(',') : '',
+            langCode: ComicKHelper_1.CMLanguages?.getEmoji(chapter?.lang)
         }));
     }
     return chapters;
@@ -10655,8 +11026,11 @@ const parseChapters = (data, chapSettings) => {
 exports.parseChapters = parseChapters;
 const parseChapterDetails = (data, mangaId, chapterId) => {
     const pages = [];
-    for (const images of data.chapter.images) {
-        pages.push(images.url);
+    for (const images of data?.chapter?.images) {
+        const url = images?.url;
+        if (!url)
+            continue;
+        pages.push(url);
     }
     const chapterDetails = App.createChapterDetails({
         id: chapterId,
@@ -10669,8 +11043,8 @@ exports.parseChapterDetails = parseChapterDetails;
 const parseTags = (data) => {
     const arrayTags = [];
     for (const tag of data) {
-        const label = tag.name;
-        const id = tag.slug;
+        const label = tag?.name;
+        const id = tag?.slug;
         if (!id || !label)
             continue;
         arrayTags.push({ id: `genre.${id}`, label: label });
@@ -10753,19 +11127,19 @@ const parseTags = (data) => {
     ];
 };
 exports.parseTags = parseTags;
-const parseSearch = (data, usesSearch) => {
+const parseSearch = (data) => {
     const results = [];
     for (const manga of data) {
-        const id = usesSearch ? manga.slug : manga.md_comics.slug;
-        const title = usesSearch ? manga.title : manga.md_comics.title;
-        const image = usesSearch ? manga.cover_url : manga.md_comics.cover_url;
-        const subtitle = usesSearch ? manga.last_chapter : manga.md_comics.last_chapter;
+        const id = manga?.hid ?? '';
+        const title = manga?.title ?? '';
+        const image = manga?.cover_url ?? '';
+        const subtitle = manga?.last_chapter ?? '';
         if (!id)
             continue;
         results.push(App.createPartialSourceManga({
-            mangaId: id,
             image,
             title: decodeHTMLEntity(title),
+            mangaId: id,
             subtitle: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
         }));
     }
@@ -10778,21 +11152,11 @@ const decodeHTMLEntity = (str) => {
     });
 };
 
-},{"./ComicKHelper":113,"entities":71,"html-to-text":73}],115:[function(require,module,exports){
+},{"./ComicKHelper":117,"entities":74,"html-to-text":76}],119:[function(require,module,exports){
 "use strict";
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetSettings = exports.languageSettings = exports.getHomeFilter = exports.getLanguages = exports.chapterSettings = exports.getShowChapterTitle = exports.getShowChapterVolume = void 0;
+exports.resetSettings = exports.languageSettings = exports.chapterSettings = void 0;
 const ComicKHelper_1 = require("./ComicKHelper");
-const getShowChapterVolume = async (stateManager) => {
-    return await stateManager.retrieve('show_volume_number') ?? false;
-};
-exports.getShowChapterVolume = getShowChapterVolume;
-const getShowChapterTitle = async (stateManager) => {
-    return await stateManager.retrieve('show_title') ?? false;
-};
-exports.getShowChapterTitle = getShowChapterTitle;
 const chapterSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
@@ -10808,16 +11172,16 @@ const chapterSettings = (stateManager) => {
                             id: 'show_volume_number',
                             label: 'Show Chapter Volume',
                             value: App.createDUIBinding({
-                                get: () => (0, exports.getShowChapterVolume)(stateManager),
-                                set: (newValue) => stateManager.store('show_volume_number', newValue)
+                                get: async () => await stateManager.retrieve('show_volume_number') ?? false,
+                                set: async (newValue) => await stateManager.store('show_volume_number', newValue)
                             })
                         }),
                         App.createDUISwitch({
                             id: 'show_title',
                             label: 'Show Chapter Title',
                             value: App.createDUIBinding({
-                                get: () => (0, exports.getShowChapterTitle)(stateManager),
-                                set: (newValue) => stateManager.store('show_title', newValue)
+                                get: async () => await stateManager.retrieve('show_title') ?? false,
+                                set: async (newValue) => await stateManager.store('show_title', newValue)
                             })
                         })
                     ]
@@ -10827,14 +11191,6 @@ const chapterSettings = (stateManager) => {
     });
 };
 exports.chapterSettings = chapterSettings;
-const getLanguages = async (stateManager) => {
-    return await stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault();
-};
-exports.getLanguages = getLanguages;
-const getHomeFilter = async (stateManager) => {
-    return await stateManager.retrieve('language_home_filter') ?? false;
-};
-exports.getHomeFilter = getHomeFilter;
 const languageSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'language_settings',
@@ -10852,8 +11208,8 @@ const languageSettings = (stateManager) => {
                             options: ComicKHelper_1.CMLanguages.getCMCodeList(),
                             labelResolver: async (option) => ComicKHelper_1.CMLanguages.getName(option),
                             value: App.createDUIBinding({
-                                get: () => (0, exports.getLanguages)(stateManager),
-                                set: (newValue) => stateManager.store('languages', newValue)
+                                get: async () => await stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault(),
+                                set: async (newValue) => await stateManager.store('languages', newValue)
                             }),
                             allowsMultiselect: true,
                         }),
@@ -10861,9 +11217,9 @@ const languageSettings = (stateManager) => {
                             id: 'language_home_filter',
                             label: 'Filter Homepage Language',
                             value: App.createDUIBinding({
-                                get: () => (0, exports.getHomeFilter)(stateManager),
-                                set: (newValue) => stateManager.store('language_home_filter', newValue)
-                            })
+                                get: async () => await stateManager.retrieve('language_home_filter') ?? false,
+                                set: async (newValue) => await stateManager.store('language_home_filter', newValue)
+                            }),
                         })
                     ]
                 })
@@ -10877,16 +11233,14 @@ const resetSettings = (stateManager) => {
         id: 'reset',
         label: 'Reset to Default',
         onTap: async () => {
-            return Promise.all([
-                stateManager.store('show_volume_number', null),
+            stateManager.store('show_volume_number', null),
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
-                stateManager.store('language_home_filter', null),
-            ]).then();
+                stateManager.store('language_home_filter', null);
         }
     });
 };
 exports.resetSettings = resetSettings;
 
-},{"./ComicKHelper":113}]},{},[112])(112)
+},{"./ComicKHelper":117}]},{},[116])(116)
 });
