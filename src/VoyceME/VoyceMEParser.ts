@@ -1,48 +1,39 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable no-useless-escape */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-    Chapter,     
+import { 
+    Chapter,
     ChapterDetails,
     HomeSection,
     HomeSectionType,
-    LanguageCode, 
-    Manga, 
-    MangaStatus, 
-    MangaTile, 
+    SourceManga,
+    PartialSourceManga,
     Tag,
-    TagSection
-} from 'paperback-extensions-common'
+    TagSection 
+} from '@paperback/types'
 
-import {
+import { 
     SearchData,
     VoyceMangaData,
     VoyceChapterData,
     SearchType,
     VoyceChapterDetailsData,
-    HomePageData
+    HomePageData 
 } from './VoyceMEHelper'
 
-import {decodeHTML} from 'entities'
-
-import {convert} from 'html-to-text'
-
+import { decodeHTML } from 'entities'
+import { convert } from 'html-to-text'
 import '../scopes'
 
 export class Parser {
-
-    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net'
-
+    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net';
+    
     decodeHTMLEntity(str: string): string {
         return str.replace(/&#(\d+)/g, (_match, dec) => {
             return String.fromCharCode(dec)
         })
     }
-
-    parseSearch(VoyceD: SearchData): MangaTile[] {
-        const items: MangaTile[] = []
-
+    
+    parseSearch(VoyceD: SearchData): PartialSourceManga[] {
+        const items: PartialSourceManga[] = []
+        
         for(const data of VoyceD?.data?.voyce_series){
             const id = data?.id ?? ''
             const title = data?.title?.trim() ?? ''
@@ -50,13 +41,13 @@ export class Parser {
 
             if(!id) continue
 
-            items.push(createMangaTile({
-                id: `${id}`,
+            items.push(App.createPartialSourceManga({
                 image,
-                title: createIconText({ text: title })
+                title: title,
+                mangaId: `${id}`,
             }))
         }
-
+        
         return items
     }
     
@@ -64,62 +55,61 @@ export class Parser {
         const sections = [
             {
                 data: data.data.featured,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'featured',
                     title: 'Featured Series',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.featured
                 })
             },
             {
                 data: data.data.popular,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'popular',
                     title: 'Popular Series',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.singleRowNormal
                 })
             },
             {
                 data: data.data.trending,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'trending',
                     title: 'Trending Series',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.singleRowNormal
                 })
             },
             {
                 data: data.data.recommended,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'recommended',
                     title: 'Recommended Series',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.singleRowNormal
                 })
             },
             {
                 data: data.data.recent,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'recent',
                     title: 'Recent Episodes',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.singleRowNormal
                 })
             },
             {
                 data: data.data.fresh,
-                section: createHomeSection({
+                section: App.createHomeSection({
                     id: 'fresh',
                     title: 'Fresh Series',
-                    view_more: true,
+                    containsMoreItems: true,
                     type: HomeSectionType.singleRowNormal
                 })
             }
         ]
-        
         for (const section of sections) {
-            const mangaItemsArray: MangaTile[] = []
+            const mangaItemsArray: PartialSourceManga[] = []
             const collectedIds: number[] = []
 
             for (const manga of section.data) {
@@ -130,11 +120,11 @@ export class Parser {
     
                 if (!id || collectedIds.includes(id)) continue
 
-                mangaItemsArray.push(createMangaTile({
-                    id: `${id}`,
-                    title: createIconText({ text: title }),
-                    subtitleText: createIconText({ text: subtitle }),
-                    image: image
+                mangaItemsArray.push(App.createPartialSourceManga({
+                    title: title,
+                    image: image,
+                    mangaId: `${id}`,
+                    subtitle: subtitle
                 }))
                 collectedIds.push(id)
             }
@@ -142,11 +132,11 @@ export class Parser {
             sectionCallback(section.section)
         }
     }
-
-    parseViewMore(homepageSectionId: string, data: HomePageData): MangaTile[] {
+    
+    parseViewMore(homepageSectionId: string, data: HomePageData): PartialSourceManga[] {
         const collectedIds: number[] = []
-        const mangaItemsArray: MangaTile[] = []
-
+        const mangaItemsArray: PartialSourceManga[] = []
+        
         let mangaData
         switch (homepageSectionId) {
             case 'popular':
@@ -174,21 +164,21 @@ export class Parser {
                 const subtitle = manga?.chapter_count ? `${manga?.chapter_count} Chapters` : ''
     
                 if (!id || collectedIds.includes(id)) continue
-    
-                mangaItemsArray.push(createMangaTile({
-                    id: `${id}`,
-                    title: createIconText({ text: title }),
-                    subtitleText: createIconText({ text: subtitle }),
-                    image: image
+                
+                mangaItemsArray.push(App.createPartialSourceManga({
+                    title: title,
+                    image: image,
+                    mangaId: `${id}`,
+                    subtitle: subtitle
                 }))
                 collectedIds.push(id)
             }
         }
-
+        
         return mangaItemsArray
     }
-
-    parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string): Manga {
+    
+    parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string): SourceManga {
         const details = VoyceD.data.series.first()
 
         const title = details?.title.trim() ?? ''
@@ -212,57 +202,58 @@ export class Parser {
                 label: title
             })
         }
- 
-        const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => createTag(x)) })]
-
-        return createManga({
+        
+        return App.createSourceManga({
             id: mangaId,
-            titles: [this.decodeHTMLEntity(title)],
-            image,
-            status: this.parseStatus(status),
-            author: this.decodeHTMLEntity(author),
-            tags: tagSections,
-            desc: convert(decodeHTML(desc),{wordwrap: 130}),
+            mangaInfo: App.createMangaInfo({
+                titles: [this.decodeHTMLEntity(title)],
+                image,
+                status: this.parseStatus(status),
+                author: this.decodeHTMLEntity(author),
+                tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })],
+                desc: convert(decodeHTML(desc), { wordwrap: 130 })
+            })
         })
     }
-
-    parseChapters(VoyceD: VoyceChapterData, mangaId: string): Chapter[] {
+    
+    parseChapters(VoyceD: VoyceChapterData): Chapter[] {
         const chapters: Chapter[] = []
         const data = VoyceD?.data?.series?.first()
         let sortingIndex = 0
-
+        
         for (const obj of data?.chapters ?? []) {
             const id = obj.id ?? ''
             const name = obj.title ?? 'No Chpater Name'
             const release_date = obj.created_at
             const chapNum = Number(name.match(/\d+/)?.pop()?.replace(/-/g, '.'))
-
+            
             if (!id) continue
-
-            chapters.push(createChapter({
-                id: `${id}`, 
-                mangaId: mangaId,
-                name: name, 
+            
+            chapters.push(App.createChapter({
+                id: `${id}`,
+                name: name,
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
                 time: new Date(release_date),
-                langCode: LanguageCode.ENGLISH,
-                // @ts-ignore
-                sortingIndex
+                langCode: '🇬🇧',
+                sortingIndex,
             }))
-
             sortingIndex--
         }
-
+        
+        const chaps = chapters.map(chapter => {
+            chapter.sortingIndex += chapters.length
+            return App.createChapter(chapter)
+        
+        })
+        
         const key = 'name'
-        const arrayUniqueByKey = [...new Map(chapters.map(item =>
-            [item[key], item])).values()]
-
+        const arrayUniqueByKey = [...new Map(chaps.map(item => [item[key], item])).values()]
         return arrayUniqueByKey
     }
-
+    
     async parseChapterDetails(data: VoyceChapterDetailsData, mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const pages: string[] = []
-
+        
         for(const page of data.data.images){
             const url = page?.image ?? ''
 
@@ -270,16 +261,12 @@ export class Parser {
 
             pages.push(encodeURI(`${this.staticURL}/${url}`))
         }
-
-        return createChapterDetails({
+        return App.createChapterDetails({
             id: chapterId,
             mangaId: mangaId,
-            pages: pages,
-            longStrip: true
+            pages: pages
         })
     }
-
-
     parseTags(data: SearchType): TagSection[] {
         const Genres: Tag[] = []
 
@@ -328,28 +315,25 @@ export class Parser {
                 label: 'Completed'
             }
         ]
-
+        
         return [
-            createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map((x) => createTag(x))}),
-            createTagSection({ id: 'category', label: 'Category', tags: Category.map((x) => createTag(x))}),
-            createTagSection({ id: 'types', label: 'Types', tags: Types.map((x) => createTag(x))}),
-            createTagSection({ id: 'status', label: 'Status', tags: Status.map((x) => createTag(x))})
+            App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map((x) => App.createTag(x)) }),
+            App.createTagSection({ id: 'category', label: 'Category', tags: Category.map((x) => App.createTag(x)) }),
+            App.createTagSection({ id: 'types', label: 'Types', tags: Types.map((x) => App.createTag(x)) }),
+            App.createTagSection({ id: 'status', label: 'Status', tags: Status.map((x) => App.createTag(x)) })
         ]
     }
-
-    parseStatus(str: string): MangaStatus {
-        let status = MangaStatus.UNKNOWN
-
+    parseStatus(str: string): string {
+        let status = 'ONGOIG'
         switch (str.toLowerCase()) {
             case 'ongoing':
             case 'on-going':
-                status = MangaStatus.ONGOING
+                status = 'ONGOIG'
                 break
             case 'completed':
-                status = MangaStatus.COMPLETED
+                status = 'ONGOIG'
                 break
         }
-
         return status
     }
 }

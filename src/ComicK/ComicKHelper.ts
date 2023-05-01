@@ -81,7 +81,7 @@ export interface SearchData {
 interface Language {
     name: string,
     CMCode: string,
-    PBCode: string,
+    emoji: string,
     default?: boolean
 }
 
@@ -90,208 +90,247 @@ class LanguagesClass {
         {
             'name': 'All',
             'CMCode': 'all',
-            'PBCode': 'all',
-            'default': true
+            'emoji': 'all'
         },
         {
             'name': 'English',
             'CMCode': 'en',
-            'PBCode': 'en'
+            'emoji': '🇬🇧'
         },
         {
-            'name': 'Português (Brasil)',
+            'name': 'português do Brasil',
             'CMCode': 'pt-br',
-            'PBCode': 'pt-br'
+            'emoji': '🇧🇷'
         },
         {
-            'name': 'Русский',
+            'name': 'русский язык',
             'CMCode': 'ru',
-            'PBCode': 'ru'
+            'emoji': '🇷🇺'
         },
         {
-            'name': 'Français',
+            'name': 'français, langue française',
             'CMCode': 'fr',
-            'PBCode': 'fr'
+            'emoji': '🇫🇷'
         },
         {
-            'name': 'Español (Latinoamérica)',
-            'CMCode': 'es-419',
-            'PBCode': 'es-419'
-        },
-        {
-            'name': 'Polski',
+            'name': 'polski',
             'CMCode': 'pl',
-            'PBCode': 'pl'
+            'emoji': '🇵🇱'
+        },
+        {
+            'name': 'español latinoamericano',
+            'CMCode': 'es-419',
+            'emoji': '🇦🇷'
         },
         {
             'name': 'Türkçe',
             'CMCode': 'tr',
-            'PBCode': 'tr'
+            'emoji': '🇹🇷'
         },
         {
             'name': 'Italiano',
             'CMCode': 'it',
-            'PBCode': 'it'
-        },
-        {
-            'name': 'Español',
-            'CMCode': 'es',
-            'PBCode': 'es'
+            'emoji': '🇮🇹'
         },
         {
             'name': 'Bahasa Indonesia',
             'CMCode': 'id',
-            'PBCode': 'id'
+            'emoji': '🇮🇩'
         },
         {
-            'name': 'Magyar',
-            'CMCode': 'hu',
-            'PBCode': 'hu'
+            'name': 'español, castellano',
+            'CMCode': 'es',
+            'emoji': '🇪🇸'
         },
         {
             'name': 'Tiếng Việt',
             'CMCode': 'vi',
-            'PBCode': 'vi'
-        },
-        {
-            'name': '中文繁體',
-            'CMCode': 'zh-hk',
-            'PBCode': 'zh-hk'
+            'emoji': '🇻🇮'
         },
         {
             'name': 'العربية',
             'CMCode': 'ar',
-            'PBCode': 'ar'
+            'emoji': '🇸🇦'
+        },
+        {
+            'name': '(Hong Kong) 繁體中文',
+            'CMCode': 'zh-hk',
+            'emoji': '🇭🇰'
+        },
+        {
+            'name': 'Magyar',
+            'CMCode': 'hu',
+            'emoji': '🇭🇺'
         },
         {
             'name': 'Deutsch',
             'CMCode': 'de',
-            'PBCode': 'de'
+            'emoji': '🇩🇪'
         },
         {
-            'name': '中文简体',
+            'name': 'українська',
+            'CMCode': 'uk',
+            'emoji': '🇺🇰'
+        },
+        {
+            'name': '中文 (Zhōngwén), 汉语, 漢語',
             'CMCode': 'zh',
-            'PBCode': 'zh'
+            'emoji': '🇿🇭'
+        },
+        {
+            'name': 'ไทย',
+            'CMCode': 'th',
+            'emoji': '🇹🇭'
         },
         {
             'name': 'Català',
             'CMCode': 'ca',
-            'PBCode': 'ca'
+            'emoji': '🇨🇦'
         },
         {
-            'name': 'Български',
+            'name': 'български език',
             'CMCode': 'bg',
-            'PBCode': 'bg'
-        },
-        {
-            'name': 'ภาษาไทย',
-            'CMCode': 'th',
-            'PBCode': 'th'
+            'emoji': '🇧🇬'
         },
         {
             'name': 'فارسی',
             'CMCode': 'fa',
-            'PBCode': 'fa'
+            'emoji': '🇫🇦'
         },
         {
-            'name': 'Українська',
-            'CMCode': 'uk',
-            'PBCode': 'uk'
-        },
-        {
-            'name': 'Монгол',
-            'CMCode': 'mn',
-            'PBCode': 'mn'
-        },
-        {
-            'name': 'Română',
+            'name': 'română',
             'CMCode': 'ro',
-            'PBCode': 'ro'
+            'emoji': '🇷🇴'
         },
         {
-            'name': 'עברית‏',
+            'name': 'монгол',
+            'CMCode': 'mn',
+            'emoji': '🇲🇳'
+        },
+        {
+            'name': 'עברית',
             'CMCode': 'he',
-            'PBCode': 'he'
+            'emoji': '🇭🇪'
         },
         {
-            'name': 'Bahasa Melayu',
-            'CMCode': 'ms',
-            'PBCode': 'ms'
-        },
-        {
-            'name': 'Tagalog',
-            'CMCode': 'tl',
-            'PBCode': 'tl'
-        },
-        {
-            'name': '日本語',
-            'CMCode': 'ja',
-            'PBCode': 'ja'
-        },
-        {
-            'name': 'हिन्दी',
-            'CMCode': 'hi',
-            'PBCode': 'hi'
-        },
-        {
-            'name': 'ဗမာစကာ',
-            'CMCode': 'my',
-            'PBCode': 'my'
-        },
-        {
-            'name': '한국어',
-            'CMCode': 'ko',
-            'PBCode': 'ko'
-        },
-        {
-            'name': 'Čeština',
+            'name': 'česky, čeština',
             'CMCode': 'cs',
-            'PBCode': 'cs'
+            'emoji': '🇨🇸'
         },
         {
             'name': 'Português',
             'CMCode': 'pt',
-            'PBCode': 'pt'
+            'emoji': '🇵🇹'
         },
         {
-            'name': 'Nederlands',
+            'name': 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔',
+            'CMCode': 'tl',
+            'emoji': '🇹🇱'
+        },
+        {
+            'name': 'bahasa Melayu, بهاس ملايو‎',
+            'CMCode': 'ms',
+            'emoji': '🇲🇸'
+        },
+        {
+            'name': 'हिन्दी, हिंदी',
+            'CMCode': 'hi',
+            'emoji': '🇭🇮'
+        },
+        {
+            'name': '日本語 (にほんご／にっぽんご)',
+            'CMCode': 'ja',
+            'emoji': '🇯🇦'
+        },
+        {
+            'name': 'ဗမာစာ',
+            'CMCode': 'my',
+            'emoji': '🇲🇾'
+        },
+        {
+            'name': '한국어 (韓國語), 조선말 (朝鮮語)',
+            'CMCode': 'ko',
+            'emoji': '🇰🇴'
+        },
+        {
+            'name': 'Nederlands, Vlaams',
             'CMCode': 'nl',
-            'PBCode': 'nl'
+            'emoji': '🇳🇱'
         },
         {
-            'name': 'Svenska',
+            'name': 'српски језик',
+            'CMCode': 'sr',
+            'emoji': '🇸🇷'
+        },
+        {
+            'name': 'Қазақ тілі',
+            'CMCode': 'kk',
+            'emoji': '🇰🇰'
+        },
+        {
+            'name': 'Esperanto',
+            'CMCode': 'eo',
+            'emoji': '🇪🇴'
+        },
+        {
+            'name': 'svenska',
             'CMCode': 'sv',
-            'PBCode': 'sv'
-        },
-        {
-            'name': 'বাংলা',
-            'CMCode': 'bn',
-            'PBCode': 'bn'
-        },
-        {
-            'name': 'Norsk',
-            'CMCode': 'no',
-            'PBCode': 'no'
-        },
-        {
-            'name': 'Lietuvių',
-            'CMCode': 'lt',
-            'PBCode': 'lt'
+            'emoji': '🇸🇻'
         },
         {
             'name': 'Ελληνικά',
             'CMCode': 'el',
-            'PBCode': 'el'
+            'emoji': '🇪🇱'
         },
         {
-            'name': 'Српски',
-            'CMCode': 'sr',
-            'PBCode': 'sr'
+            'name': 'தமிழ்',
+            'CMCode': 'ta',
+            'emoji': '🇹🇦'
         },
         {
-            'name': 'Dansk',
+            'name': 'বাংলা',
+            'CMCode': 'bn',
+            'emoji': '🇧🇳'
+        },
+        {
+            'name': 'lietuvių kalba',
+            'CMCode': 'lt',
+            'emoji': '🇱🇹'
+        },
+        {
+            'name': 'नेपाली',
+            'CMCode': 'ne',
+            'emoji': '🇳🇪'
+        },
+        {
+            'name': 'Norsk',
+            'CMCode': 'no',
+            'emoji': '🇳🇴'
+        },
+        {
+            'name': 'latine, lingua latina',
+            'CMCode': 'la',
+            'emoji': '🇱🇦'
+        },
+        {
+            'name': 'suomi, suomen kieli',
+            'CMCode': 'fi',
+            'emoji': '🇫🇮'
+        },
+        {
+            'name': 'hrvatski',
+            'CMCode': 'hr',
+            'emoji': '🇭🇷'
+        },
+        {
+            'name': 'dansk',
             'CMCode': 'da',
-            'PBCode': 'da'
+            'emoji': '🇩🇦'
+        },
+        {
+            'name': 'slovenčina',
+            'CMCode': 'sk',
+            'emoji': '🇸🇰'
         }
     ]
 
@@ -307,8 +346,8 @@ class LanguagesClass {
         return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.name ?? 'Unknown'
     }
 
-    getPBCode(CMCode: string): string {
-        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.PBCode ?? '_unknown'
+    getEmoji(CMCode: string): string {
+        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.emoji ?? '⍰'
     }
 
     getDefault(): string[] {

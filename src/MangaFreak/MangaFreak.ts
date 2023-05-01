@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import {
+import { 
     PagedResults,
-    Source,
-    Manga,
+    SourceManga,
     Chapter,
     ChapterDetails,
     HomeSection,
@@ -12,97 +10,98 @@ import {
     SourceInfo,
     ContentRating,
     TagSection,
-    LanguageCode,
     Request,
     Response,
-    TagType
-} from 'paperback-extensions-common'
+    BadgeColor, 
+    ChapterProviding,
+    HomePageSectionsProviding,
+    MangaProviding,
+    SearchResultsProviding,
+    SourceIntents
+} from '@paperback/types'
 
-import {
-    Parser
-} from './MangaFreakParser'
+import { Parser } from './MangaFreakParser'
 
-const MangaFreak_BASE = 'https://w14.mangafreak.net'
+const MangaFreak_BASE = 'https://w15.mangafreak.net'
 const MangaFreak_CDN = 'https://images.mangafreak.net'
-const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15'
-
 export const MangaFreakInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.4',
+    version: '2.0.0',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
-    language: LanguageCode.ENGLISH,
+    intents: SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS,
+    language: 'English',
     sourceTags: [
         {
             text: 'Cloudflare',
-            type: TagType.RED
+            type: BadgeColor.RED
         }
     ]
 }
 
-export class MangaFreak extends Source {
-    private readonly parser: Parser = new Parser()
+export class MangaFreak implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
+    constructor(public cheerio: CheerioAPI) { }
 
-    baseUrl = MangaFreak_BASE
-    baseCdn = MangaFreak_CDN
-    readonly requestManager = createRequestManager({
+    private readonly parser: Parser = new Parser();
+    baseUrl = MangaFreak_BASE;
+    baseCdn = MangaFreak_CDN;
+    
+    readonly requestManager = App.createRequestManager({
         requestsPerSecond: 3,
         requestTimeout: 45000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
-
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'user-agent': userAgent,
+                        'user-agent': await this.requestManager.getDefaultUserAgent(),
                         'referer': `${MangaFreak_BASE}/`
                     }
                 }
-
                 return request
             },
-
             interceptResponse: async (response: Response): Promise<Response> => {
                 return response
             }
         }
-    })
-
-
-    override getMangaShareUrl(mangaId: string): string {
+    });
+    
+    getMangaShareUrl(mangaId: string): string {
         return `${MangaFreak_BASE}/Manga/${mangaId}`
     }
-    override getCloudflareBypassRequest(): any {
-        return createRequestObject({
+    
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
             url: `${MangaFreak_BASE}/Genre`,
             method: 'GET',
-            headers:{
-                'user-agent': userAgent
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent(),
             }
         })
     }
-
-    override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const request = createRequestObject({
+    
+    async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        const request = App.createRequest({
             url: `${MangaFreak_BASE}/`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
-
+        const $ = this.cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
+        
         return this.parser.parseHomeSections($, sectionCallback, this)
     }
-
-    override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    
+    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page = metadata?.page ?? 1
+        
         let param = ''
         let isPopular = false
-
         switch (homepageSectionId) {
             case 'popular':
                 param = `Genre/All/${page}`
@@ -114,144 +113,136 @@ export class MangaFreak extends Source {
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
         }
-
-        const request = createRequestObject({
+        
+        const request = App.createRequest({
             url: `${MangaFreak_BASE}/${param}`,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        const $ = this.cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
         const manga = this.parser.ViewMoreParse($, this, isPopular)
-
-        metadata = this.parser.NextPage($) ? {page: page + 1} : undefined 
-
-        return createPagedResults({
+        
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-
-    override async getSearchTags(): Promise<TagSection[]> {
-        const request = createRequestObject({
-            url: `${MangaFreak_BASE}/Search`,
+    
+    async getSearchTags(): Promise<TagSection[]> {
+        const request = App.createRequest({
+            url: `${MangaFreak_BASE}/Find`,
             method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data)
-
+        const $ = this.cheerio.load(response.data as string)
+        
         return this.parser.parseTags($)
     }
-
-    async getMangaDetails(mangaId: string): Promise<Manga> {
-        const request = createRequestObject({
-            url: `${MangaFreak_BASE}/Manga/${mangaId}`,
-            method: 'GET',
-        })
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data)
-
-        return this.parser.parseMangaDetails($, mangaId, this)
-    }
-
-    async getChapters(mangaId: string): Promise<Chapter[]> {
-        const request = createRequestObject({
+    
+    async getMangaDetails(mangaId: string): Promise<SourceManga> {
+        const request = App.createRequest({
             url: `${MangaFreak_BASE}/Manga/${mangaId}`,
             method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data)
-
+        const $ = this.cheerio.load(response.data as string)
+        
+        return this.parser.parseMangaDetails($, mangaId, this)
+    }
+    
+    async getChapters(mangaId: string): Promise<Chapter[]> {
+        const request = App.createRequest({
+            url: `${MangaFreak_BASE}/Manga/${mangaId}`,
+            method: 'GET'
+        })
+        const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+        
         return this.parser.parseChapters($, mangaId)
     }
-
+    
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const request = createRequestObject({
+        const request = App.createRequest({
             url: `${MangaFreak_BASE}/${chapterId}`,
             method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data)
-
+        const $ = this.cheerio.load(response.data as string)
+        
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
-
+    
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page = metadata?.page ?? 1
+        
         let UsesDeatils = false
         let request
-
-        if(query.includedTags?.length === 0){
-            request = createRequestObject({
-                url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}`,
-                method: 'GET',
-            })   
+        if (query.includedTags?.length === 0) {
+            request = App.createRequest({
+                url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}`,
+                method: 'GET'
+            })
         } else {
             const GenreDeatils: string[] = []
             const SelectedTags: string[] = []
             const UnSelectedTags: string[] = []
             const Status: string[] = []
             const Types: string[] = []
-
-            query.includedTags?.map(x =>{ 
+            query.includedTags?.map(x => {
                 const id = x.id
                 const SplittedID = id?.split('.')?.pop() ?? ''
-
+                
                 if (id.includes('details.')) {
                     GenreDeatils.push(SplittedID)
                 }
-
+                
                 if (query.includedTags?.length === 1 && id.includes('genre.')) {
                     GenreDeatils.push(SplittedID)
                 }
-
+                
                 if (id.includes('genre.')) {
                     SelectedTags.push(SplittedID)
                 }
-
+                
                 if (id.includes('status.')) {
                     Status.push(SplittedID)
                 }
-
+                
                 if (id.includes('types.')) {
                     Types.push(SplittedID)
                 }
             })
-
-            query.excludedTags?.map(x =>{ 
+            
+            query.excludedTags?.map(x => {
                 const id = x.id
                 const SplittedID = id?.split('.')?.pop() ?? ''
-
+                
                 if (id.includes('genre.')) {
                     UnSelectedTags.push(SplittedID)
                 }
             })
-
+            
             if (GenreDeatils.length === 1) {
-                request = createRequestObject({
+                request = App.createRequest({
                     url: `${MangaFreak_BASE}/Genre/${GenreDeatils[0]}/${page}`,
                     method: 'GET'
                 })
                 UsesDeatils = true
             } else {
-
                 if (!query.title) {
                     throw new Error('Do not use genre with multipule tags search without putting a title or the search will infinitely loop')
                 }
-
+                
                 const genres: string[] = ['/Genre/']
-
                 for (const tag of (await this.getSearchTags())[0]?.tags ?? []) {
                     const SplittedID = tag.id?.split('.')?.pop() ?? ''
-
                     if (SelectedTags?.includes(SplittedID)) {
                         genres.push('1')
                     } else if (UnSelectedTags?.includes(SplittedID)) {
@@ -260,35 +251,34 @@ export class MangaFreak extends Source {
                         genres.push('0')
                     }
                 }
-
-                request = createRequestObject({
-                    url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
-                    method: 'GET',
+                
+                request = App.createRequest({
+                    url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
+                    method: 'GET'
                 })
             }
-
         }
-
+        
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
-        const $ = this.cheerio.load(data.data)
+        const $ = this.cheerio.load(data.data as string)
         const manga = this.parser.parseSearchResults($, this, UsesDeatils)
-
-        metadata = this.parser.NextPage($) ? {page: page + 1} : undefined 
-
-        return createPagedResults({
+        
+        metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-
-    override async supportsTagExclusion(): Promise<boolean> {
+    
+    async supportsTagExclusion(): Promise<boolean> {
         return true
     }
-
-    CloudFlareError(status: number) {
-        if(status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > MangaFreak and press Cloudflare Bypass or press the Cloud image on the right')
+    
+    CloudFlareError(status: number): void {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${MangaFreakInfo.name} and press Cloudflare Bypass`)
         }
     }
 }

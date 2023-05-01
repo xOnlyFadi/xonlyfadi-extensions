@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import {
-    Source,
-    Manga,
+import { 
+    SourceManga,
     Chapter,
     ChapterDetails,
     HomeSection,
@@ -16,11 +14,15 @@ import {
     HomeSectionType,
     TagSection,
     SearchField,
-    MangaUpdates,
-    TagType,
-} from 'paperback-extensions-common'
+    BadgeColor, 
+    SourceIntents,
+    ChapterProviding,
+    HomePageSectionsProviding,
+    MangaProviding,
+    SearchResultsProviding
+} from '@paperback/types'
 
-import {
+import { 
     parseChapterDetails,
     parseChapters,
     parseHompage,
@@ -34,18 +36,11 @@ import {
 
 import { GMangaUtil } from './GMangaUtils'
 
-import moment from 'moment'
-
-import { LatestData } from './GMangaHelper'
-
 const DOMAIN = 'gmanga.org'
 const GMANGA_BASE = `https://${DOMAIN}`
 const GMANGA_API = `https://api.${DOMAIN}/api`
-
-const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36'
-
 export const GMangaInfo: SourceInfo = {
-    version: '1.0.3',
+    version: '2.0.0',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -53,367 +48,304 @@ export const GMangaInfo: SourceInfo = {
     description: 'Extension that pulls from gmanga.org.',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: GMANGA_BASE,
+    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS,
     language: 'Arabic',
     sourceTags: [
         {
             text: 'Arabic',
-            type: TagType.GREY
+            type: BadgeColor.GREY
         },
         {
             text: 'Cloudflare',
-            type: TagType.RED
+            type: BadgeColor.RED
         }
     ]
 }
 
+export class GManga implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
+    constructor(public cheerio: CheerioAPI) { }
 
-export class GManga extends Source {
-
-    requestManager = createRequestManager({
+    requestManager = App.createRequestManager({
         requestsPerSecond: 2,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
-
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'user-agent': userAgent,
+                        'user-agent': await this.requestManager.getDefaultUserAgent(),
                         'referer': `${GMANGA_BASE}/`
                     }
                 }
-
                 return request
             },
-
             interceptResponse: async (response: Response): Promise<Response> => {
                 return response
             }
         }
-    })
-
-    override getMangaShareUrl(mangaId: string): string { return `${GMANGA_BASE}/mangas/${mangaId}` }
-
-    override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+    });
+    
+    getMangaShareUrl(mangaId: string): string { return `${GMANGA_BASE}/mangas/${mangaId}` }
+    
+    async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
-                request: createRequestObject({
+                request: App.createRequest({
                     url: `${GMANGA_BASE}/api/mangas/search`,
                     method: 'POST',
                     headers: {
-                        'content-type': 'application/json',
+                        'content-type': 'application/json'
                     },
                     data: popularQuery(1)
                 }),
                 info: [
                     {
-                        section: createHomeSection({
+                        section: App.createHomeSection({
                             id: 'popular',
                             title: 'المانجا المشهورة',
-                            view_more: true,
+                            containsMoreItems: true,
+                            type: 'singleRowNormal'
                         }),
                         selector: 'mangas'
-                    }       
-                ],
+                    }
+                ]
             },
             {
-                request: createRequestObject({
+                request: App.createRequest({
                     url: `${GMANGA_API}/releases?page=1`,
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 info: [
                     {
-                        section: createHomeSection({
+                        section: App.createHomeSection({
                             id: 'latest',
                             title: 'المانجا المحدثه',
-                            view_more: true,
+                            containsMoreItems: true,
+                            type: 'singleRowNormal'
                         }),
                         selector: 'releases'
                     }
                 ]
             },
             {
-                request: createRequestObject({
+                request: App.createRequest({
                     url: `${GMANGA_API}/mangas/featured?page=1`,
-                    method: 'GET',
+                    method: 'GET'
                 }),
                 info: [
                     {
-                        section: createHomeSection({
+                        section: App.createHomeSection({
                             id: 'top7completed',
                             title: 'مانجات اكتملت ترجمتها آخر ٧ أيام',
+                            containsMoreItems: false,
                             type: HomeSectionType.featured
                         }),
                         selector: 'finished'
                     },
                     {
-                        section: createHomeSection({
+                        section: App.createHomeSection({
                             id: 'new',
                             title: 'مانجات جديدة',
-                            type: HomeSectionType.singleRowNormal,
-                            view_more: true
+                            containsMoreItems: true,
+                            type: HomeSectionType.singleRowNormal
                         }),
                         selector: 'new'
                     }
                 ]
             }
         ]
-
-        const promises: Promise<void>[] = []
         
+        const promises: Promise<void>[] = []
         for (const section of sections) {
             for (const dsection of section.info) {
                 sectionCallback(dsection.section)
-                promises.push(
-                    this.requestManager.schedule(section.request, 1).then(response => {
-                        this.CloudFlareError(response.status)
-                        let data
-
-                        try {
-                            data = JSON.parse(response.data)
-                        } catch (e) {
-                            throw new Error(`${e}`)
-                        }
-
-                        data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
-                        data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-
-                        dsection.section.items = parseHompage(data, dsection.selector)
-                        sectionCallback(dsection.section)
-                    }),
-                )
+                promises.push(this.requestManager.schedule(section.request, 1).then(response => {
+                    this.CloudFlareError(response.status)
+                    let data
+                    try {
+                        data = JSON.parse(response.data as string)
+                    }
+                    catch (e) {
+                        throw new Error(`${e}`)
+                    }
+                    
+                    data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
+                    data = data['isCompact'] ? GMangaUtil.unpack(data) : data
+                    
+                    dsection.section.items = parseHompage(data, dsection.selector)
+                    sectionCallback(dsection.section)
+                }))
             }
         }
-
+        
         await Promise.all(promises)
     }
-
-    override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    
+    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
+        
         let request: Request
         let selector = 'undefined'
-
         if (homepageSectionId === 'latest') {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${GMANGA_API}/releases?page=${page}`,
-                method: 'GET',
-            }) 
+                method: 'GET'
+            })
             selector = 'releases'
         } else if (homepageSectionId === 'popular') {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${GMANGA_BASE}/api/mangas/search`,
                 method: 'POST',
                 headers: {
-                    'content-type': 'application/json',
+                    'content-type': 'application/json'
                 },
                 data: popularQuery(page)
             })
             selector = 'mangas'
         } else if (homepageSectionId === 'new') {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${GMANGA_API}/mangas/featured`,
-                method: 'GET',
+                method: 'GET'
             })
             selector = 'new'
         } else {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${GMANGA_API}/empty`,
-                method: 'GET',
+                method: 'GET'
             })
         }
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-
+        
         let data
-
         try {
-            data = JSON.parse(response.data)
-        } catch (e) {
+            data = JSON.parse(response.data as string)
+        }
+        catch (e) {
             throw new Error(`${e}`)
         }
         
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-
         const manga = parseHompage(data, selector)
-
+        
         if (homepageSectionId === 'popular') {
-            metadata = data.mangas.length === 50 ? {page: page + 1} : undefined
+            metadata = data.mangas.length === 50 ? { page: page + 1 } : undefined
         } else if (homepageSectionId === 'latest') {
-            metadata = data.releases.length >= 30 ? {page: page + 1} : undefined
+            metadata = data.releases.length >= 30 ? { page: page + 1 } : undefined
         } else {
             metadata = undefined
         }
-
-        return createPagedResults({
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-
-    override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-
-        const request = createRequestObject({
+        const request = App.createRequest({
             url: `${GMANGA_BASE}/api/mangas/search`,
             method: 'POST',
             headers: {
-                'content-type': 'application/json',
+                'content-type': 'application/json'
             },
             data: parseMetadata(query, metadata)
         })
-        
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-
+        
         let data
-
         try {
-            data = JSON.parse(response.data)
-        } catch (e) {
+            data = JSON.parse(response.data as string)
+        }
+        catch (e) {
             throw new Error(`${e}`)
         }
         
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-
         const manga = parseSearch(data)
-
-        metadata = data.mangas.length === 50 ? {page: page + 1} : undefined
-
-        return createPagedResults({
+        
+        metadata = data.mangas.length === 50 ? { page: page + 1 } : undefined
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-
-    override async getMangaDetails(mangaId: string): Promise<Manga> {
-        const request = createRequestObject({
+    async getMangaDetails(mangaId: string): Promise<SourceManga> {
+        const request = App.createRequest({
             url: `${GMANGA_API}/mangas/${mangaId}`,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-
+        
         let data
-
         try {
-            data = JSON.parse(response.data)
-        } catch (e) {
+            data = JSON.parse(response.data as string)
+        }
+        catch (e) {
             throw new Error(`${e}`)
         }
-
+        
         return parseMangaDetails(data, mangaId)
     }
-
-    override async getChapters(mangaId: string): Promise<Chapter[]> {
-        const request = createRequestObject({
+    
+    async getChapters(mangaId: string): Promise<Chapter[]> {
+        const request = App.createRequest({
             url: `${GMANGA_API}/mangas/${mangaId}/releases`,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-
-
+        
         let data
-
         try {
-            data = JSON.parse(response.data)
-        } catch (e) {
+            data = JSON.parse(response.data as string)
+        }
+        catch (e) {
             throw new Error(`${e}`)
         }
-
+        
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-
+        
         return parseChapters(data, mangaId)
     }
-
-    override async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const request = createRequestObject({
+    
+    async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
+        const request = App.createRequest({
             url: `${GMANGA_BASE}/r/${chapterId}`,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data)
-
+        const $ = this.cheerio.load(response.data as string)
+        
         return parseChapterDetails($, mangaId, chapterId)
     }
     
-    override async filterUpdatedManga(mangaUpdatesFoundCallback: (updates: MangaUpdates) => void, time: Date, ids: string[]): Promise<void> {
-        const updatedManga: string[] = []
-        let day = 0
-
-        while (day < 7) {
-            const mangaToUpdate: string[] = []
-
-            const request = createRequestObject({
-                url: `${GMANGA_API}/releases/latest_wday?wday=${day}`,
-                method: 'GET',
-            })
-
-            const response = await this.requestManager.schedule(request, 1)
-
-            this.CloudFlareError(response.status)
-
-
-            let data: LatestData
-    
-            try {
-                data = JSON.parse(response.data)
-            } catch (e) {
-                throw new Error(`${e}`)
-            }
-
-            for (const release of data.releases) {
-                const chapter = release.new_chapters[0]
-                const id = chapter.manga_id ?? ''
-                const FormatedCurrentDate = moment(time).format('YYYY-MM-DD')
-                const FormatedChapterDate = moment(new Date(chapter.time_stamp * 1000)).format('YYYY-MM-DD')
-
-                if (!id) continue
-
-                if (FormatedChapterDate === FormatedCurrentDate) {
-                    if (ids.includes(`${id}`) && !updatedManga.includes(`${id}`)) {
-                        mangaToUpdate.push(`${id}`)
-                        updatedManga.push(`${id}`)
-                    }
-                }
-            }
-
-            day++
-
-            if (mangaToUpdate.length > 0) {
-                mangaUpdatesFoundCallback(createMangaUpdates({
-                    ids: mangaToUpdate
-                }))
-            }
-        }
-    }
-
-    override async getTags(): Promise<TagSection[]> {
+    async getSearchTags(): Promise<TagSection[]> {
         return parseTags()
     }
-
-    override async getSearchFields(): Promise<SearchField[]> {
+    
+    async getSearchFields(): Promise<SearchField[]> {
         return parseSearchFields()
     }
-    override async supportsTagExclusion(): Promise<boolean> {
+    
+    async supportsTagExclusion(): Promise<boolean> {
         return true
     }
-
-    override async supportsSearchOperators(): Promise<boolean> {
+    
+    async supportsSearchOperators(): Promise<boolean> {
         return true
     }
-
+    
     CloudFlareError(status: number): void {
-        if (status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > GManga and press Cloudflare Bypass or press the Cloud image on the right')
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${GMangaInfo.name} and press Cloudflare Bypass`)
         }
     }
 }

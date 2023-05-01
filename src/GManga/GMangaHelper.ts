@@ -8,20 +8,6 @@ export interface SearchData {
     ]
 }
 
-export interface LatestData {
-    releases: [
-        {
-            new_chapters: [
-                {
-                    manga_id: number
-                    time_stamp: number
-                }
-            ]
-        }
-
-    ]
-}
-
 export interface SearchForm {
     oneshot: {
         value: boolean | null

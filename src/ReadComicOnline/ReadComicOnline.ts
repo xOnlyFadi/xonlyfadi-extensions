@@ -1,20 +1,26 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    Source,
-    Manga,
+    SourceManga,
     Chapter,
     ChapterDetails,
     HomeSection,
     SearchRequest,
     PagedResults,
     SourceInfo,
-    TagType,
+    BadgeColor,
     TagSection,
     ContentRating,
     Request,
-    Response
-} from 'paperback-extensions-common'
+    Response,
+    ChapterProviding,
+    HomePageSectionsProviding,
+    MangaProviding,
+    SearchResultsProviding,
+    SourceIntents
+} from '@paperback/types'
 
-import {
+import { 
     parseChapterDetails,
     isLastPage,
     parseTags,
@@ -22,113 +28,121 @@ import {
     parseHomeSections,
     parseMangaDetails,
     parseViewMore,
-    parseSearch
+    parseSearch 
 } from './ReadComicOnlineParser'
 
 const RCO_DOMAIN = 'https://readcomiconline.li'
-
 export const ReadComicOnlineInfo: SourceInfo = {
-    version: '1.0.7',
+    version: '2.0.0',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     description: 'Extension that pulls comics from ReadComicOnline.li.',
+    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     contentRating: ContentRating.MATURE,
     websiteBaseURL: RCO_DOMAIN,
     sourceTags: [
         {
             text: 'Cloudflare',
-            type: TagType.RED
+            type: BadgeColor.RED
         }
     ]
 }
 
-export class ReadComicOnline extends Source {
-    requestManager = createRequestManager({
+export class ReadComicOnline implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
+    constructor(public cheerio: CheerioAPI) { }
+    
+    requestManager = App.createRequestManager({
         requestsPerSecond: 2,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
-
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
                         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-                        'referer': RCO_DOMAIN
+                        'referer': `${RCO_DOMAIN}/`,
                     }
                 }
-
                 return request
             },
-
             interceptResponse: async (response: Response): Promise<Response> => {
                 return response
             }
         }
-    })
+    });
+    
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: RCO_DOMAIN,
+            method: 'GET',
+            headers: {
+                'referer': `${RCO_DOMAIN}/`,
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+            }
+        })
+    }
 
-    override getMangaShareUrl(mangaId: string): string { return `${RCO_DOMAIN}/Comic/${mangaId}` }
-
-    override async getMangaDetails(mangaId: string): Promise<Manga> {
-        const request = createRequestObject({
+    getMangaShareUrl(mangaId: string): string { return `${RCO_DOMAIN}/Comic/${mangaId}` }
+    
+    async getMangaDetails(mangaId: string): Promise<SourceManga> {
+        const request = App.createRequest({
             url: `${RCO_DOMAIN}/Comic/`,
             method: 'GET',
             param: mangaId
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        const $ = this.cheerio.load(response.data as string)
+        
         return parseMangaDetails($, mangaId)
     }
-
-    override async getChapters(mangaId: string): Promise<Chapter[]> {
-        const request = createRequestObject({
+    async getChapters(mangaId: string): Promise<Chapter[]> {
+        const request = App.createRequest({
             url: `${RCO_DOMAIN}/Comic/`,
             method: 'GET',
-            param: mangaId,
+            param: mangaId
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
-        return parseChapters($, mangaId)
+        const $ = this.cheerio.load(response.data as string)
+        
+        return parseChapters($)
     }
-
-    override async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const request = createRequestObject({
+    async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
+        const request = App.createRequest({
             url: `${RCO_DOMAIN}/Comic/${mangaId}/${chapterId}`,
             method: 'GET',
             param: '?readType=1&quality=hq'
         })
-
         const response = await this.requestManager.schedule(request, 1)
-
-        return parseChapterDetails(response.data, mangaId, chapterId)
+        
+        return parseChapterDetails(response.data as string, mangaId, chapterId)
     }
-
-    override async getTags(): Promise<TagSection[]> {
-        const request = createRequestObject({
+    async getSearchTags(): Promise<TagSection[]> {
+        const request = App.createRequest({
             url: `${RCO_DOMAIN}/ComicList`,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+        
         return parseTags($)
     }
-
-    override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const request = createRequestObject({
+    async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        const request = App.createRequest({
             url: RCO_DOMAIN,
-            method: 'GET',
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+        
         parseHomeSections($, sectionCallback)
     }
-
-    override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
+        
         let param = ''
         switch (homepageSectionId) {
             case 'latest_comic':
@@ -143,69 +157,61 @@ export class ReadComicOnline extends Source {
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist')
         }
-
-        const request = createRequestObject({
+        
+        const request = App.createRequest({
             url: `${RCO_DOMAIN}/ComicList`,
             method: 'GET',
-            param,
+            param
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
-
-        const manga = parseViewMore($, this.cheerio)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+        const manga = parseViewMore($)
+        
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
-        return createPagedResults({
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-
-    override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        let request
 
-        //Regular search
+        let request
         if (query.title) {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${RCO_DOMAIN}/Search/Comic`,
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Content-type': 'application/x-www-form-urlencoded',
+                    'Content-type': 'application/x-www-form-urlencoded'
                 },
                 data: `keyword=${encodeURI(query.title ?? '')}`
             })
-
-            //Tag Search
         } else {
-            request = createRequestObject({
+            request = App.createRequest({
                 url: `${RCO_DOMAIN}/Genre/`,
                 method: 'GET',
                 param: `${query?.includedTags?.map((x: any) => x.id)[0]}?page=${page}`
             })
         }
-        
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
-        const manga = parseSearch($, this.cheerio)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+        const manga = parseSearch($)
+        
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
-
-        return createPagedResults({
+        
+        return App.createPagedResults({
             results: manga,
             metadata
         })
-
-        //Genre search, no advanced search since it requires reCaptcha
     }
 
-    override getCloudflareBypassRequest(): Request {
-        return createRequestObject({
-            url: RCO_DOMAIN,
-            method: 'GET',
-            headers: {
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-            }
-        })
+    CloudFlareError(status: number): void {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${ReadComicOnlineInfo.name} and press Cloudflare Bypass`)
+        }
     }
 }

@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
-import { 
-    SearchRequest, 
-} from 'paperback-extensions-common'
-
+import { SearchRequest } from '@paperback/types'
 import '../scopes'
-
 export interface GraphQLQuery {
-    query: string
-    variables?: unknown
+    query: string;
+    variables?: unknown;
 }
 
 export const HomePageQuery = (page: number, source: any): GraphQLQuery => ({
@@ -94,10 +89,10 @@ export const HomePageQuery = (page: number, source: any): GraphQLQuery => ({
       title
       chapter_count
     }`,
-    variables: {'offset': page * source.popularPerPage, 'limit':source.popularPerPage}
+    variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
 })
 
-export const SearchQuery = (query: SearchRequest, metadata: any, source : any): GraphQLQuery => {
+export const SearchQuery = (query: SearchRequest, metadata: any, source: any): GraphQLQuery => {
     const page: number = metadata?.page ?? 0 
     const Genres: number[] = []
     const Types: number[] = []
@@ -183,7 +178,7 @@ export const MangaDetailQuery = (id: number): GraphQLQuery => ({
                   }
               }
       }`,
-    variables: {'id': id}
+    variables: { 'id': id }
 })
 
 export const ChaptersQuery = (id: number): GraphQLQuery => ({
@@ -203,7 +198,7 @@ export const ChaptersQuery = (id: number): GraphQLQuery => ({
           }
         }
       }`,
-    variables: {'id': id}
+    variables: { 'id': id }
 })
 
 export const ChapterDetailsQuery = (chapterId: number): GraphQLQuery => ({
@@ -217,7 +212,7 @@ export const ChapterDetailsQuery = (chapterId: number): GraphQLQuery => ({
           sort_order
         }
       }`,
-    variables: {'chapterId': chapterId}
+    variables: { 'chapterId': chapterId }
 })
 
 export const FiltersQuery = (): GraphQLQuery => ({

@@ -1,26 +1,24 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
-import {
+import { 
     Chapter,
     ChapterDetails,
     Tag,
-    Manga,
-    MangaStatus,
-    MangaTile,
+    SourceManga,
+    PartialSourceManga,
     TagSection,
     SearchRequest,
-    SearchField,
-} from 'paperback-extensions-common'
+    SearchField
+} from '@paperback/types'
 
 import { 
     ChapterData,
     ChapterDetailsImages,
     Chapterization,
     MangaDetails,
-    SearchData, 
-    SearchForm, 
+    SearchData,
+    SearchForm,
     Team
 } from './GMangaHelper'
 
@@ -28,48 +26,43 @@ import { decodeHTML } from 'entities'
 
 import '../scopes'
 
-export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga => {
+export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const details = data.mangaData
-
+    
     const titles: string[] = []
-
     if (details?.title) titles.push(details?.title.trim())
     if (details?.synonyms) titles.push(details?.synonyms.trim())
     if (details?.arabic_title) titles.push(details?.arabic_title.trim())
     if (details?.japanese) titles.push(details?.japanese.trim())
     if (details?.english) titles.push(details?.english.trim())
-
+    
     const cover = details?.cover?.substringBeforeLast('.') ?? ''
     const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${mangaId}/medium_${cover}.webp` : ''
-
+    
     const authors: string[] = []
     if (details?.authors) {
         for (const author of details?.authors) {
             const name = author?.name
-
-            if (!name) continue
-
+            if (!name)
+                continue
             authors.push(name)
         }
     }
-
+    
     const artists: string[] = []
     if (details?.artists) {
         for (const artist of details?.artists) {
             const name = artist?.name
-
-            if (!name) continue
-
+            if (!name)
+                continue
             artists.push(name)
         }
     }
-
+    
     const arrayTags: Tag[] = []
-
     if (details?.type) {
         const id = details.type.id ?? ''
         const name = details.type.title ?? details.type.name ?? ''
-
         if (id && name) {
             arrayTags.push({
                 id: `mtype.${id}`,
@@ -77,147 +70,136 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
             })
         }
     }
-
+    
     if (details?.categories) {
         for (const category of details?.categories) {
             const id = category.id ?? ''
             const label = category?.name ?? ''
-
-            if (!id || !label) continue
-
+            if (!id || !label)
+                continue
             arrayTags.push({
                 id: `genre.${id}`,
                 label
             })
         }
     }
-
-    const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })]
-
-    let status = MangaStatus.ONGOING
-
+    
+    let status = 'مستمرة'
     if (details?.story_status) {
-        if (details?.story_status === 2) status = MangaStatus.ONGOING
-
-        if (details?.story_status === 3) status = MangaStatus.COMPLETED
+        if (details?.story_status === 2)
+            status = 'مستمرة'
+        if (details?.story_status === 3)
+            status = 'منتهية'
     }
     
-    return createManga({
+    return App.createSourceManga({
         id: mangaId,
-        titles,
-        image: image,
-        status: status,
-        artist: artists.length !== 0 ? artists.join(', ') : '',
-        author: authors.length !== 0 ? artists.join(', ') : '',
-        tags: tagSections,
-        desc: details?.summary ? details?.summary : ''
+        mangaInfo: App.createMangaInfo({
+            titles,
+            image: image,
+            status: status,
+            artist: artists.length !== 0 ? artists.join(', ') : '',
+            author: authors.length !== 0 ? artists.join(', ') : '',
+            tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })],
+            desc: details?.summary ? details?.summary : ''
+        })
     })
 }
-
 export const parseChapters = (data: ChapterData, mangaId: string): Chapter[] => {
     const chapters: Chapter[] = []
     const chapterList = data
-
-
     for (const release of chapterList.releases) {
         const chapterization: Chapterization[] = chapterList.chapterizations.filter(x => x.id === release.chapterization_id) ?? []
         const teams: Team[] = chapterList.teams.filter(x => x.id === release.team_id) ?? []
-
+        
         if (!chapterization && !chapterization[0] && !teams && !teams[0]) continue
-
+        
         const chapter = chapterization[0]
         const team = teams[0]
-
+       
         const id = release?.id ?? ''
         const chapNum = chapter?.chapter ?? 0
         const time = release?.time_stamp * 1000 ?? 0
         const group = team?.name ?? ''
         const name = chapter?.title ? chapter?.title : ''
-
-
+        
         if (!id) continue
-
-        chapters.push(createChapter({
-            id: id.toString(),
-            mangaId,
+        
+        chapters.push(App.createChapter({
+            id: `${id}`,
             name,
             chapNum,
             time: new Date(time),
             group: group,
-            // @ts-ignore
-            langCode: 'العربية'
+            langCode: '🇸🇦'
         }))
     }
-
+    
     return chapters
 }
-
 export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
     const html = $('.js-react-on-rails-component').html() ?? ''
     const data: ChapterDetailsImages = JSON.parse(html)
-
-    const releaseData = data?.readerDataAction?.readerData?.release 
-
+    
+    const releaseData = data?.readerDataAction?.readerData?.release
     const hasWebP = releaseData.webp_pages.length > 0
-
     for (const page of hasWebP ? releaseData.webp_pages : releaseData.pages) {
         pages.push(encodeURI(`https://media.gmanga.me/uploads/releases/${releaseData.storage_key}/hq${hasWebP ? '_webp' : ''}/${page}`))
     }
-
-    return createChapterDetails({
+    
+    return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
-        pages: pages,
-        longStrip: true
+        pages: pages
     })
 }
 
-export const parseSearch = (data: SearchData): MangaTile[] => {
-    const results: MangaTile[] = []
-
+export const parseSearch = (data: SearchData): PartialSourceManga[] => {
+    const results: PartialSourceManga[] = []
+    
     for (const obj of data.mangas) {
         const id = obj?.id?.toString() ?? ''
         const title = obj?.title ?? ''
         const cover = obj?.cover?.substringBeforeLast('.') ?? ''
         const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${id}/medium_${cover}.webp` : ''
-
+        
         if (!id) continue
-
-        results.push(createMangaTile({
-            title: createIconText({ text: decodeHTML(title) }),
-            id,
-            image
+        
+        results.push(App.createPartialSourceManga({
+            title: decodeHTML(title),
+            image,
+            mangaId: id
         }))
     }
-
+    
     return results
 }
 
-export const parseHompage = (data: any, selector: string): MangaTile[] => {
-    const results: MangaTile[] = []
+export const parseHompage = (data: any, selector: string): PartialSourceManga[] => {
+    const results: PartialSourceManga[] = []
     const collectedIds: string[] = []
-
+    
     if (selector !== 'undefined') {
         for (const obj of data[selector ?? 'undefined']) {
             const id = obj?.manga?.id ?? obj?.id ?? ''
-            const title =  obj?.manga?.title ?? obj?.title ?? ''
+            const title = obj?.manga?.title ?? obj?.title ?? ''
             const cover = obj?.manga?.cover ?? obj?.cover ?? ''
             const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${id}/medium_${cover.substringBeforeLast('.')}.webp` : ''
-
+            
             if (!id) continue
             if (collectedIds.includes(id)) continue
-
-
-            results.push(createMangaTile({
-                title: createIconText({ text: decodeHTML(title) }),
-                id: id.toString(),
-                image
+            
+            results.push(App.createPartialSourceManga({
+                title: decodeHTML(title),
+                image,
+                mangaId: id.toString(),
+                subtitle: undefined
             }))
             collectedIds.push(id)
         }
     }
-
+    
     return results
 }
 
@@ -559,20 +541,20 @@ export const parseTags = (): TagSection[] => {
     ]
 
     return [
-        createTagSection({ id: 'genres', label: 'التصنيفات', tags: Genres.map(x => createTag(x)) }),
-        createTagSection({ id: 'mangatype', label: 'الأصل', tags: MangaType.map(x => createTag(x)) }),
-        createTagSection({ id: 'oneshot', label: 'ونشوت؟', tags: OneShot.map(x => createTag(x)) }),
-        createTagSection({ id: 'storystatus', label: 'حالة القصة', tags: StoryStatus.map(x => createTag(x)) }),
-        createTagSection({ id: 'translationstatus', label: 'حالة الترجمة', tags: TranslationStatus.map(x => createTag(x)) })
+        App.createTagSection({ id: 'genres', label: 'التصنيفات', tags: Genres.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'mangatype', label: 'الأصل', tags: MangaType.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'oneshot', label: 'ونشوت؟', tags: OneShot.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'storystatus', label: 'حالة القصة', tags: StoryStatus.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'translationstatus', label: 'حالة الترجمة', tags: TranslationStatus.map(x => App.createTag(x)) })
     ]
 }
 
 export const parseSearchFields = (): SearchField[] =>{
     return [
-        createSearchField({id: 'min_chapter_count', name: 'عدد الفصول على الأقل', placeholder: ''}),
-        createSearchField({id: 'max_chapter_count', name: 'عدد الفصول على الأكثر', placeholder: ''}),
-        createSearchField({id: 'start_date', name: 'تاريخ النشر', placeholder: 'yyyy/MM/dd'}),
-        createSearchField({id: 'end_date', name: 'تاريخ الإنتهاء', placeholder: 'yyyy/MM/dd'})
+        App.createSearchField({id: 'min_chapter_count', name: 'عدد الفصول على الأقل', placeholder: ''}),
+        App.createSearchField({id: 'max_chapter_count', name: 'عدد الفصول على الأكثر', placeholder: ''}),
+        App.createSearchField({id: 'start_date', name: 'تاريخ النشر', placeholder: 'yyyy/MM/dd'}),
+        App.createSearchField({id: 'end_date', name: 'تاريخ الإنتهاء', placeholder: 'yyyy/MM/dd'})
     ]
 }
 

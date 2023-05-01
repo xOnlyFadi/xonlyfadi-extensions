@@ -1,71 +1,62 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {
+import { 
     Chapter,
     ChapterDetails,
     Tag,
-    Manga,
-    MangaStatus,
-    MangaTile,
-    TagSection
-} from 'paperback-extensions-common'
+    SourceManga,
+    PartialSourceManga,
+    TagSection 
+} from '@paperback/types'
 
 import { 
-    ChapterDetailsT, 
-    GenresDa, 
-    MangaDetails, 
+    ChapterDetailsT,
+    GenresDa,
+    MangaDetails,
     PageList,
-    SearchData
+    SearchData 
 } from './ComicKHelper'
 
 import { CMLanguages } from './ComicKHelper'
-
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
 
-export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga => {
+export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const comic = data?.comic
+    const titles: string[] = [comic?.title]
 
-    const titles: string[] = []
-    titles.push(comic?.title)
     if (comic?.md_titles) {
-        for (const altTitles of comic?.md_titles){
+        for (const altTitles of comic?.md_titles) {
             titles.push(altTitles.title)
         }
     }
-    const image = comic?.cover_url
 
+    const image = comic?.cover_url
     const author = []
     if (data?.authors) {
-        for (const authors of data?.authors){
+        for (const authors of data?.authors) {
             author.push(authors?.name)
         }
     }
 
     const artist = []
     if (data?.artists) {
-        for (const authors of data?.artists){
+        for (const authors of data?.artists) {
             artist.push(authors?.name)
         }
     }
 
-    const description = convert(decodeHTML(comic?.desc), {wordwrap: 130})
-
+    const description = comic?.desc ? convert(decodeHTML(comic?.desc), { wordwrap: 130 }) : ''
     const arrayTags: Tag[] = []
 
-    const countryConvert: {[key:string]: string} = {
+    const countryConvert: { [key: string]: string; } = {
         kr: 'Manhwa',
         jp: 'Manga',
-        cn: 'Manhua',
+        cn: 'Manhua'
     }
 
     if (comic?.country) {
         const id = `type.${comic?.country}`
         const label = countryConvert[comic?.country]
-
         if (id && label) {
             arrayTags.push({
                 id,
@@ -78,104 +69,102 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): Manga =>
         for (const tag of data?.genres) {
             const label = tag?.name
             const id = `genre.${tag?.slug}`
-
-            if (!id || !label) continue
-
+            if (!id || !label)
+                continue
             arrayTags.push({ id: id, label: label })
         }
     }
-    
-    const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })]
-
-    let status = MangaStatus.UNKNOWN
+   
+    let status = 'ONGOING'
     if (comic?.status) {
-        switch(comic?.status){
+        switch (comic?.status) {
             case 1:
-                status = MangaStatus.ONGOING
+                status = 'ONGOING'
                 break
             case 2:
-                status = MangaStatus.COMPLETED
+                status = 'COMPLETED'
                 break
         }
     }
-    
-    return createManga({
+
+    return App.createSourceManga({
         id: mangaId,
-        titles: titles,
-        image: image,
-        hentai: comic?.hentai,
-        status: status,
-        author: author.join(','),
-        artist: artist.join(','),
-        tags: tagSections,
-        desc: description,
+        mangaInfo: App.createMangaInfo({
+            titles: titles,
+            image: image,
+            hentai: comic?.hentai,
+            status: status,
+            author: author.join(','),
+            artist: artist.join(','),
+            tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })],
+            desc: description
+        })
     })
 }
-
-export const parseChapters = (data: ChapterDetailsT, mangaId: string, chapSettings: {show_volume: boolean, show_title: boolean}): Chapter[] => {
+export const parseChapters = (data: ChapterDetailsT, mangaId: string, chapSettings: { show_volume: boolean; show_title: boolean; }): Chapter[] => {
     const chapters: Chapter[] = []
+
     for (const chapter of data?.chapters) {
-        const id = chapter?.hid ?? '' 
-        
+        const id = chapter?.hid ?? ''
         const chap = chapter?.chap
         const vol = chapter?.vol
+
         const chapNum = Number(chap)
         const volume = Number(vol)
-
+        
         const groups = []
         if (chapter?.group_name) {
-            for (const group of chapter?.group_name){
+            for (const group of chapter?.group_name) {
                 groups.push(group)
             }
         }
-
+        
         if (!id) continue
-
-        chapters.push(createChapter({
+        
+        chapters.push(App.createChapter({
             id,
-            mangaId,
             name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
             chapNum: !isNaN(chapNum) ? chapNum : NaN,
             volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
             time: new Date(chapter?.created_at),
             group: groups?.length !== 0 ? groups?.join(',') : '',
-            // @ts-ignore
-            langCode: CMLanguages?.getName(chapter?.lang)
+            langCode: CMLanguages?.getEmoji(chapter?.lang)
         }))
     }
 
     return chapters
 }
-
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-
+    
     for (const images of data?.chapter?.images) {
-        pages.push(images?.url)
+        const url = images?.url
+
+        if(!url) continue
+
+        pages.push(url)
     }
 
-    const chapterDetails = createChapterDetails({
+    const chapterDetails = App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
-        pages: pages,
-        longStrip: true
+        pages: pages
     })
-
+    
     return chapterDetails
 }
 
 export const parseTags = (data: GenresDa[]): TagSection[] => {
     const arrayTags: Tag[] = []
-    
+
     for (const tag of data) {
         const label = tag?.name
         const id = tag?.slug
-
-        if (!id || !label) continue
-
+        if (!id || !label)
+            continue
         arrayTags.push({ id: `genre.${id}`, label: label })
     }
-
+    
     const Sort: Tag[] = [
         {
             label: 'Most follows',
@@ -249,46 +238,38 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
     ]
 
     return [
-        createTagSection({ id: '0', label: 'NOTE: Ignored if using text search!', tags: [] }),
-        createTagSection({ id: '1', label: 'Genres', tags: arrayTags.map(x => createTag(x)) }),
-        createTagSection({ id: '2', label: 'Sort', tags: Sort.map(x => createTag(x)) }),
-        createTagSection({ id: '3', label: 'Demographic', tags: Demographic.map(x => createTag(x)) }),
-        createTagSection({ id: '4', label: 'Type', tags: Types.map(x => createTag(x)) }),
-        createTagSection({ id: '5', label: 'Created At', tags: CreatedAt.map(x => createTag(x)) })
+        App.createTagSection({ id: '0', label: 'NOTE: Ignored if using text search!', tags: [] }),
+        App.createTagSection({ id: '1', label: 'Genres', tags: arrayTags.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: '2', label: 'Sort', tags: Sort.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: '3', label: 'Demographic', tags: Demographic.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: '4', label: 'Type', tags: Types.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: '5', label: 'Created At', tags: CreatedAt.map(x => App.createTag(x)) })
     ]
 }
 
-export const parseSearch = (data: SearchData[]): MangaTile[] => {
-    const results: MangaTile[] = []
+export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
+    const results: PartialSourceManga[] = []
 
     for (const manga of data) {
         const id = manga?.hid ?? ''
         const title = manga?.title ?? ''
         const image = manga?.cover_url ?? ''
         const subtitle = manga?.last_chapter ?? ''
-
+        
         if (!id) continue
-
-        results.push(createMangaTile({
-            id,
+        
+        results.push(App.createPartialSourceManga({
             image,
-            title: createIconText({ text: decodeHTMLEntity(title) }),
-            subtitleText: createIconText({ text: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '') })
+            title: decodeHTMLEntity(title),
+            mangaId: id,
+            subtitle: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
         }))
-
     }
 
     return results
 }
-
 const decodeHTMLEntity = (str: string): string => {
     return str.replace(/&#(\d+)/g, (_match, dec) => {
         return String.fromCharCode(dec)
     })
 }
-
-
-
-
-
-
