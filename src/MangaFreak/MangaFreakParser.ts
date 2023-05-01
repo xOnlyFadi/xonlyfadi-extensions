@@ -181,7 +181,7 @@ export class Parser {
         })
     }
     
-    parseChapters($: CheerioStatic, mangaId: string): Chapter[] {
+    parseChapters($: CheerioStatic): Chapter[] {
         const chapters: Chapter[] = []
         const arrChapters = $('div.manga_series_list tr:has(a)').toArray()
 

@@ -102,7 +102,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     })
 }
 
-export const parseChapters = (data: MangaDetails, mangaId: string): Chapter[] => {
+export const parseChapters = (data: MangaDetails): Chapter[] => {
     const chapters: Chapter[] = []
     let sortingIndex = 0
     

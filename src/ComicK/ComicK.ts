@@ -127,7 +127,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         let json = null
         do {
             json = await this.createChapterRequest(mangaId, page)
-            chapters.push(...parseChapters(json, mangaId, { show_title: showTitle, show_volume: showVol }))
+            chapters.push(...parseChapters(json, { show_title: showTitle, show_volume: showVol }))
             page += 1
         } while (json.chapters.length === SEARCH_PAGE_LIMIT)
 

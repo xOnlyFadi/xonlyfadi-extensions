@@ -105,7 +105,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
         })
     })
 }
-export const parseChapters = (data: ChapterData, mangaId: string): Chapter[] => {
+export const parseChapters = (data: ChapterData): Chapter[] => {
     const chapters: Chapter[] = []
     const chapterList = data
     for (const release of chapterList.releases) {

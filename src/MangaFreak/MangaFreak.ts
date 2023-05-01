@@ -164,7 +164,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         
-        return this.parser.parseChapters($, mangaId)
+        return this.parser.parseChapters($)
     }
     
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {

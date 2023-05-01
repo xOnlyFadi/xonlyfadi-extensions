@@ -272,7 +272,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
             throw new Error(`${e}`)
         }
         
-        return parseChapters(data, mangaId)
+        return parseChapters(data)
     }
     
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
