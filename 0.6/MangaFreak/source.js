@@ -391,7 +391,7 @@ exports.MangaFreakInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
@@ -482,7 +482,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
     }
     async getSearchTags() {
         const request = createRequestObject({
-            url: `${MangaFreak_BASE}/Search`,
+            url: `${MangaFreak_BASE}/Find`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -526,7 +526,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
         let request;
         if (query.includedTags?.length === 0) {
             request = createRequestObject({
-                url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}`,
+                url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}`,
                 method: 'GET',
             });
         }
@@ -587,7 +587,7 @@ class MangaFreak extends paperback_extensions_common_1.Source {
                     }
                 }
                 request = createRequestObject({
-                    url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
+                    url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g, '+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
                     method: 'GET',
                 });
             }
