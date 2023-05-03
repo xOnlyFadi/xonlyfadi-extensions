@@ -31,7 +31,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '1.0.4',
+    version: '1.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -135,7 +135,7 @@ export class MangaFreak extends Source {
 
     override async getSearchTags(): Promise<TagSection[]> {
         const request = createRequestObject({
-            url: `${MangaFreak_BASE}/Search`,
+            url: `${MangaFreak_BASE}/Find`,
             method: 'GET'
         })
 
@@ -191,7 +191,7 @@ export class MangaFreak extends Source {
 
         if(query.includedTags?.length === 0){
             request = createRequestObject({
-                url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}`,
+                url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}`,
                 method: 'GET',
             })   
         } else {
@@ -262,7 +262,7 @@ export class MangaFreak extends Source {
                 }
 
                 request = createRequestObject({
-                    url: `${MangaFreak_BASE}/Search/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
+                    url: `${MangaFreak_BASE}/Find/${query?.title?.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}${genres.join('')}/Status/${Status.length !== 0 ? Status[0] : '0'}/Type/${Types.length !== 0 ? Types[0] : '0'}`,
                     method: 'GET',
                 })
             }
