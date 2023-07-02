@@ -39,7 +39,7 @@ import '../scopes'
 const DOMAIN = 'https://desu.me'
 const API = `${DOMAIN}/manga/api`
 export const DesuMEInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -50,10 +50,6 @@ export const DesuMEInfo: SourceInfo = {
     intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS,
     language: 'Russian',
     sourceTags: [
-        {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
         {
             text: 'Russian',
             type: BadgeColor.GREY

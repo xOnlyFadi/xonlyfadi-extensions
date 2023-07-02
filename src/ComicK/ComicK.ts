@@ -42,7 +42,7 @@ const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -52,10 +52,6 @@ export const ComicKInfo: SourceInfo = {
     websiteBaseURL: COMICK_DOMAIN,
     intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS,
     sourceTags: [
-        {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
         {
             text: 'Multi Language',
             type: BadgeColor.YELLOW
