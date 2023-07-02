@@ -10356,7 +10356,7 @@ const COMICK_DOMAIN = 'https://comick.app';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -10366,10 +10366,6 @@ exports.ComicKInfo = {
     websiteBaseURL: COMICK_DOMAIN,
     intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.MANGA_CHAPTERS,
     sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
         {
             text: 'Multi Language',
             type: types_1.BadgeColor.YELLOW

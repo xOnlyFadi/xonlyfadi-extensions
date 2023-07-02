@@ -1444,7 +1444,7 @@ require("../scopes");
 const DOMAIN = 'https://desu.me';
 const API = `${DOMAIN}/manga/api`;
 exports.DesuMEInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -1455,10 +1455,6 @@ exports.DesuMEInfo = {
     intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS,
     language: 'Russian',
     sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
         {
             text: 'Russian',
             type: types_1.BadgeColor.GREY
