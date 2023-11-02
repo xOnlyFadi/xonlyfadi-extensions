@@ -466,13 +466,13 @@ exports.TuMangaOnline = exports.TuMangaOnlineInfo = void 0;
 const types_1 = require("@paperback/types");
 const TuMangaOnlineParser_1 = require("./TuMangaOnlineParser");
 const TuMangaOnlineSettings_1 = require("./TuMangaOnlineSettings");
-const TuMangaOnline_Base = 'https://lectortmo.com';
+const TuMangaOnline_Base = 'https://visortmo.com';
 exports.TuMangaOnlineInfo = {
     author: 'xOnlyFadi',
-    description: 'Extensi\u00F3n que extrae el manga de lectortmo.com',
+    description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '2.0.0',
+    version: '2.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: types_1.ContentRating.ADULT,
@@ -636,7 +636,7 @@ class TuMangaOnline {
     }
     async getChapterDetails(mangaId, chapterId) {
         const options = App.createRequest({
-            url: await this.getChapterURL(chapterId),
+            url: await this.getChapterURL(chapterId, mangaId),
             method: 'GET'
         });
         const response = await this.requestManager.schedule(options, 1);
@@ -644,9 +644,12 @@ class TuMangaOnline {
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterDetails($, mangaId, chapterId);
     }
-    async getChapterURL(chapterId) {
+    async getChapterURL(chapterId, mangaId) {
         const request = App.createRequest({
             url: `${this.baseUrl}/view_uploads/${chapterId}/`,
+            headers: {
+                'referer': `${this.baseUrl}/library/${mangaId}`
+            },
             method: 'GET'
         });
         const data = await this.requestManager.schedule(request, 1);
