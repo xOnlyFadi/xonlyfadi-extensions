@@ -27,10 +27,10 @@ import {
     getNSFW 
 } from './TuMangaOnlineSettings'
 
-const TuMangaOnline_Base = 'https://lectortmo.com'
+const TuMangaOnline_Base = 'https://visortmo.com'
 export const TuMangaOnlineInfo: SourceInfo = {
     author: 'xOnlyFadi',
-    description: 'Extensi\u00F3n que extrae el manga de lectortmo.com',
+    description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
     version: '2.0.0',
