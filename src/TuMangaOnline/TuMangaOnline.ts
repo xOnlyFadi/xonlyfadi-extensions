@@ -216,7 +216,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
     
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const options = App.createRequest({
-            url: await this.getChapterURL(chapterId),
+            url: await this.getChapterURL(chapterId, mangaId),
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
@@ -226,9 +226,12 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
     
-    async getChapterURL(chapterId: string): Promise<string> {
+    async getChapterURL(chapterId: string, mangaId: string): Promise<string> {
         const request = App.createRequest({
             url: `${this.baseUrl}/view_uploads/${chapterId}/`,
+            headers: {
+                'referer': `${this.baseUrl}/library/${mangaId}`
+            },
             method: 'GET'
         })
         const data = await this.requestManager.schedule(request, 1)
