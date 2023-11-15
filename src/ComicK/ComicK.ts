@@ -32,7 +32,8 @@ import {
 import { 
     chapterSettings,
     languageSettings,
-    resetSettings 
+    resetSettings, 
+    uploadersSettings
 } from './ComicKSettings'
 
 import { CMLanguages } from './ComicKHelper'
@@ -42,7 +43,7 @@ const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.0.2',
+    version: '2.1.2',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -89,7 +90,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             rows: async () => [
                 languageSettings(this.stateManager),
                 chapterSettings(this.stateManager),
-                resetSettings(this.stateManager)
+                uploadersSettings(this.stateManager),
+                resetSettings(this.stateManager),
             ]
         }))
     }
@@ -123,7 +125,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         let json = null
         do {
             json = await this.createChapterRequest(mangaId, page)
-            chapters.push(...parseChapters(json, { show_title: showTitle, show_volume: showVol }))
+            chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
             page += 1
         } while (json.chapters.length === SEARCH_PAGE_LIMIT)
 
