@@ -100,7 +100,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
             sections: async () => [
                 App.createDUISection({
                     id: 'select_uploaders',
-                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the switch below.',
+                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the corresponding switch above.',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
