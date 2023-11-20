@@ -5,7 +5,8 @@ import {
     Tag,
     SourceManga,
     PartialSourceManga,
-    TagSection 
+    TagSection, 
+    SourceStateManager
 } from '@paperback/types'
 
 import { 
@@ -19,6 +20,7 @@ import {
 import { CMLanguages } from './ComicKHelper'
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
+import { Uploader } from './ComicKSettings'
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const comic = data?.comic
@@ -101,7 +103,13 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
         })
     })
 }
-export const parseChapters = (data: ChapterDetailsT, chapSettings: { show_volume: boolean; show_title: boolean; }): Chapter[] => {
+export const parseChapters = async (data: ChapterDetailsT, chapSettings: { show_volume: boolean; show_title: boolean; }, stateManager: SourceStateManager): Promise<Chapter[]> => {
+    const uploadersToggled: boolean = await stateManager.retrieve('uploaders_toggled') ?? false
+    const uploadersWhitelisted: boolean = await stateManager.retrieve('uploaders_whitelisted') ?? false
+    const aggressiveUploadersFilter: boolean = await stateManager.retrieve('aggressive_uploaders_filtering') ?? false
+    const strictNameMatching: boolean = await stateManager.retrieve('strict_name_matching') ?? false
+    const uploaders: Uploader[] = await stateManager.retrieve('uploaders') ?? []
+
     const chapters: Chapter[] = []
 
     for (const chapter of data?.chapters) {
@@ -120,7 +128,37 @@ export const parseChapters = (data: ChapterDetailsT, chapSettings: { show_volume
         }
         
         if (!id) continue
+
+        let pushChapter = true
+        if (uploadersToggled && uploaders.length > 0) {
+            if (aggressiveUploadersFilter) {
+                if (uploadersWhitelisted) {
+                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false
+                    }
+                } else {
+                    // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
+                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false
+                    }
+                }
+            } else {
+                if (uploadersWhitelisted) {
+                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false
+                    }
+                } else {
+                    // Only if all the uploaders are in the blacklist, we don't push the chapter
+                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false
+                    }
+                }
+            }
+        }
         
+        if (!pushChapter) continue
         chapters.push(App.createChapter({
             id,
             name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
