@@ -10356,7 +10356,7 @@ const COMICK_DOMAIN = 'https://comick.app';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '2.0.2',
+    version: '2.1.0',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -10403,7 +10403,8 @@ class ComicK {
             rows: async () => [
                 (0, ComicKSettings_1.languageSettings)(this.stateManager),
                 (0, ComicKSettings_1.chapterSettings)(this.stateManager),
-                (0, ComicKSettings_1.resetSettings)(this.stateManager)
+                (0, ComicKSettings_1.uploadersSettings)(this.stateManager),
+                (0, ComicKSettings_1.resetSettings)(this.stateManager),
             ]
         }));
     }
@@ -10431,7 +10432,7 @@ class ComicK {
         let json = null;
         do {
             json = await this.createChapterRequest(mangaId, page);
-            chapters.push(...(0, ComicKParser_1.parseChapters)(json, { show_title: showTitle, show_volume: showVol }));
+            chapters.push(...(await (0, ComicKParser_1.parseChapters)(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)));
             page += 1;
         } while (json.chapters.length === SEARCH_PAGE_LIMIT);
         return chapters;
@@ -10991,7 +10992,12 @@ const parseMangaDetails = (data, mangaId) => {
     });
 };
 exports.parseMangaDetails = parseMangaDetails;
-const parseChapters = (data, chapSettings) => {
+const parseChapters = async (data, chapSettings, stateManager) => {
+    const uploadersToggled = await stateManager.retrieve('uploaders_toggled') ?? false;
+    const uploadersWhitelisted = await stateManager.retrieve('uploaders_whitelisted') ?? false;
+    const aggressiveUploadersFilter = await stateManager.retrieve('aggressive_uploaders_filtering') ?? false;
+    const strictNameMatching = await stateManager.retrieve('strict_name_matching') ?? false;
+    const uploaders = await stateManager.retrieve('uploaders') ?? [];
     const chapters = [];
     for (const chapter of data?.chapters) {
         const id = chapter?.hid ?? '';
@@ -11006,6 +11012,39 @@ const parseChapters = (data, chapSettings) => {
             }
         }
         if (!id)
+            continue;
+        let pushChapter = true;
+        if (uploadersToggled && uploaders.length > 0) {
+            if (aggressiveUploadersFilter) {
+                if (uploadersWhitelisted) {
+                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false;
+                    }
+                }
+                else {
+                    // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
+                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false;
+                    }
+                }
+            }
+            else {
+                if (uploadersWhitelisted) {
+                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false;
+                    }
+                }
+                else {
+                    // Only if all the uploaders are in the blacklist, we don't push the chapter
+                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                        pushChapter = false;
+                    }
+                }
+            }
+        }
+        if (!pushChapter)
             continue;
         chapters.push(App.createChapter({
             id,
@@ -11151,7 +11190,7 @@ const decodeHTMLEntity = (str) => {
 },{"./ComicKHelper":117,"entities":74,"html-to-text":76}],119:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetSettings = exports.languageSettings = exports.chapterSettings = void 0;
+exports.resetSettings = exports.uploadersSettings = exports.languageSettings = exports.chapterSettings = void 0;
 const ComicKHelper_1 = require("./ComicKHelper");
 const chapterSettings = (stateManager) => {
     return App.createDUINavigationButton({
@@ -11224,6 +11263,152 @@ const languageSettings = (stateManager) => {
     });
 };
 exports.languageSettings = languageSettings;
+const getUploaders = async (stateManager) => {
+    return (await stateManager.retrieve('uploaders') ?? []);
+};
+const getSelectedUploaders = async (stateManager) => {
+    return (await getUploaders(stateManager) ?? []).filter((uploader) => uploader.selected).map((uploader) => uploader.value);
+};
+const uploadersSettings = (stateManager) => {
+    return App.createDUINavigationButton({
+        id: 'uploaders_settings',
+        label: 'Uploaders Settings',
+        form: App.createDUIForm({
+            sections: async () => [
+                App.createDUISection({
+                    id: 'select_uploaders',
+                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the corresponding switch above.',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISwitch({
+                            id: 'toggle_uploaders_filtering',
+                            label: 'Toggle uploaders filtering',
+                            value: App.createDUIBinding({
+                                get: async () => await stateManager.retrieve('uploaders_toggled') ?? false,
+                                set: async (newValue) => await stateManager.store('uploaders_toggled', newValue)
+                            }),
+                        }),
+                        App.createDUISelect({
+                            id: 'uploaders',
+                            label: 'Uploaders',
+                            options: (await getUploaders(stateManager)).map((uploader) => uploader.value),
+                            labelResolver: async (option) => {
+                                return option;
+                            },
+                            value: App.createDUIBinding({
+                                get: async () => await getSelectedUploaders(stateManager),
+                                set: async (selectedUploaders) => {
+                                    const uploaders = await getUploaders(stateManager);
+                                    uploaders.forEach((uploader) => {
+                                        uploader.selected = false;
+                                    });
+                                    selectedUploaders.forEach((selectedUploader) => {
+                                        uploaders.forEach((uploader) => {
+                                            if (uploader.value === selectedUploader) {
+                                                uploader.selected = true;
+                                            }
+                                        });
+                                    });
+                                    await stateManager.store('uploaders', uploaders);
+                                }
+                            }),
+                            allowsMultiselect: true,
+                        }),
+                        App.createDUISwitch({
+                            id: 'uploaders_switch',
+                            label: 'Blacklist / Whitelist Uploaders',
+                            value: App.createDUIBinding({
+                                get: async () => await stateManager.retrieve('uploaders_whitelisted') ?? false,
+                                set: async (newValue) => await stateManager.store('uploaders_whitelisted', newValue)
+                            }),
+                        }),
+                        App.createDUISwitch({
+                            id: 'toggle_uploaders_filtering_aggressiveness',
+                            label: 'Toggle aggressive filtering',
+                            value: App.createDUIBinding({
+                                // default to true if no value is set
+                                get: async () => {
+                                    const value = await stateManager.retrieve('aggressive_uploaders_filtering');
+                                    if (value !== false) {
+                                        return true;
+                                    }
+                                    return false;
+                                },
+                                set: async (newValue) => await stateManager.store('aggressive_uploaders_filtering', newValue)
+                            }),
+                        }),
+                        App.createDUISwitch({
+                            id: 'strict_name_matching',
+                            label: 'Strict uploader name matching',
+                            value: App.createDUIBinding({
+                                get: async () => await stateManager.retrieve('strict_name_matching') ?? false,
+                                set: async (newValue) => await stateManager.store('strict_name_matching', newValue)
+                            }),
+                        })
+                    ]
+                }),
+                App.createDUISection({
+                    id: 'modify_uploaders',
+                    footer: 'Edit list of uploaders.',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUIInputField({
+                            id: 'uploader',
+                            label: 'Uploader',
+                            value: App.createDUIBinding({
+                                get: async () => '',
+                                set: async (newValue) => await stateManager.store('uploader', newValue)
+                            }),
+                        }),
+                        App.createDUIButton({
+                            id: 'add_uploader',
+                            label: 'Add Uploader',
+                            onTap: async () => {
+                                const targetUploader = await stateManager.retrieve('uploader') ?? '';
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!');
+                                }
+                                const uploaders = await getUploaders(stateManager);
+                                if (uploaders.filter((uploader) => uploader.value === targetUploader).length > 0) {
+                                    console.log(`Uploader '${targetUploader}' already exists in list. (${uploaders.map((uploader) => uploader.value).join(', ')})`);
+                                    throw new Error('Uploader already exists in your list!');
+                                }
+                                else {
+                                    uploaders.push({
+                                        selected: false,
+                                        value: targetUploader
+                                    });
+                                    await stateManager.store('uploaders', uploaders);
+                                }
+                            }
+                        }),
+                        App.createDUIButton({
+                            id: 'remove_uploader',
+                            label: 'Remove Uploader',
+                            onTap: async () => {
+                                const targetUploader = await stateManager.retrieve('uploader') ?? '';
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!');
+                                }
+                                const uploaders = await getUploaders(stateManager);
+                                uploaders.forEach((uploader) => {
+                                    if (uploader.value === targetUploader) {
+                                        const index = uploaders.indexOf(uploader);
+                                        if (index > -1) {
+                                            uploaders.splice(index, 1);
+                                        }
+                                    }
+                                });
+                                await stateManager.store('uploaders', uploaders);
+                            }
+                        }),
+                    ]
+                })
+            ]
+        })
+    });
+};
+exports.uploadersSettings = uploadersSettings;
 const resetSettings = (stateManager) => {
     return App.createDUIButton({
         id: 'reset',
@@ -11232,7 +11417,13 @@ const resetSettings = (stateManager) => {
             stateManager.store('show_volume_number', null),
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
-                stateManager.store('language_home_filter', null);
+                stateManager.store('language_home_filter', null),
+                stateManager.store('uploaders', null),
+                stateManager.store('uploaders_whitelisted', null),
+                stateManager.store('aggressive_uploaders_filtering', null),
+                stateManager.store('uploaders_toggled', null),
+                stateManager.store('uploader', null),
+                stateManager.store('strict_name_matching', null);
         }
     });
 };
