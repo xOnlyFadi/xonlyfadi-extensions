@@ -2485,7 +2485,7 @@ const types_1 = require("@paperback/types");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -2505,7 +2505,7 @@ class ReadComicOnline {
     constructor(cheerio) {
         this.cheerio = cheerio;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

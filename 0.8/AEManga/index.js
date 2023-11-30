@@ -465,7 +465,7 @@ const types_1 = require("@paperback/types");
 const AEMangaParser_1 = require("./AEMangaParser");
 const AEManga_DOMAIN = 'https://manga.ae';
 exports.AEMangaInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'AEManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -491,7 +491,7 @@ class AEManga {
         this.cheerio = cheerio;
         this.baseUrl = AEManga_DOMAIN;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

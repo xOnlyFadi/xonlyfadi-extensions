@@ -467,7 +467,7 @@ const types_1 = require("@paperback/types");
 const MangaSectParser_1 = require("./MangaSectParser");
 const DOMAIN = 'https://mangasect.com';
 exports.MangaSectInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'MangaSect',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -483,7 +483,7 @@ class MangaSect {
         this.cheerio = cheerio;
         this.baseUrl = DOMAIN;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

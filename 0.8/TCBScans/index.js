@@ -469,7 +469,7 @@ exports.TCBScansInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: types_1.ContentRating.EVERYONE,
@@ -481,7 +481,7 @@ class TCBScans {
         this.cheerio = cheerio;
         this.parser = new TCBScansParser_1.Parser();
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 3,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

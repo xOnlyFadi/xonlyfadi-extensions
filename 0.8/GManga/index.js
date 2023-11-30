@@ -8766,7 +8766,7 @@ const DOMAIN = 'gmanga.org';
 const GMANGA_BASE = `https://${DOMAIN}`;
 const GMANGA_API = `https://api.${DOMAIN}/api`;
 exports.GMangaInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -8791,7 +8791,7 @@ class GManga {
     constructor(cheerio) {
         this.cheerio = cheerio;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

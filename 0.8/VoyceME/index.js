@@ -8907,7 +8907,7 @@ exports.VoyceMEInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: types_1.ContentRating.EVERYONE,
@@ -8920,7 +8920,7 @@ class VoyceME {
         this.graphqlURL = 'https://graphql.voyce.me/v1/graphql';
         this.popularPerPage = 30;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 3,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

@@ -470,7 +470,7 @@ exports.MangaFreakInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: types_1.ContentRating.EVERYONE,
@@ -490,7 +490,7 @@ class MangaFreak {
         this.baseUrl = MangaFreak_BASE;
         this.baseCdn = MangaFreak_CDN;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 3,
+            requestsPerSecond: 4,
             requestTimeout: 45000,
             interceptor: {
                 interceptRequest: async (request) => {

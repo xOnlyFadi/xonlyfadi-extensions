@@ -470,7 +470,7 @@ exports.TuMangaOnlineInfo = {
     description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '2.0.2',
+    version: '2.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: types_1.ContentRating.ADULT,
@@ -490,7 +490,7 @@ class TuMangaOnline {
         this.parser = new TuMangaOnlineParser_1.Parser();
         this.baseUrl = TuMangaOnline_Base;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 3,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

@@ -8906,7 +8906,7 @@ const COMICK_DOMAIN = 'https://comick.app';
 const COMICK_API = 'https://api.comick.fun';
 const SEARCH_PAGE_LIMIT = 100;
 exports.ComicKInfo = {
-    version: '2.1.0',
+    version: '2.1.1',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -8925,7 +8925,7 @@ exports.ComicKInfo = {
 class ComicK {
     constructor() {
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {

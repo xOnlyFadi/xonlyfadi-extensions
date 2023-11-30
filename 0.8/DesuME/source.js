@@ -1442,7 +1442,7 @@ require("../scopes");
 const DOMAIN = 'https://desu.me';
 const API = `${DOMAIN}/manga/api`;
 exports.DesuMEInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -1462,7 +1462,7 @@ exports.DesuMEInfo = {
 class DesuME {
     constructor() {
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
+            requestsPerSecond: 4,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {
