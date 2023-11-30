@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { 
     PagedResults,
     SourceManga,
@@ -63,7 +61,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
                     ...(request.headers ?? {}),
                     ...{
                         'user-agent': this.userAgent,
-                        'referer': `${TuMangaOnline_Base}/`,
+                        'referer': `${TuMangaOnline_Base}/`
                     }
                 }
                 return request
@@ -85,7 +83,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             id: 'main',
             header: 'Source Settings',
             rows: async () => [
-                contentSettings(this.stateManager),
+                contentSettings(this.stateManager)
             ],
             isHidden: false
         })
@@ -97,7 +95,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             method: 'GET',
             headers: {
                 'referer': `${TuMangaOnline_Base}/`,
-                'user-agent': this.userAgent,
+                'user-agent': this.userAgent
             }
         })
     }
@@ -128,7 +126,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
                     containsMoreItems: true,
                     type: 'singleRowNormal'
                 })
-            },
+            }
         ]
         
         const promises: Promise<void>[] = []

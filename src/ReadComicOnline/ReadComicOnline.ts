@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     SourceManga,
     Chapter,
@@ -62,7 +60,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
                     ...(request.headers ?? {}),
                     ...{
                         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-                        'referer': `${RCO_DOMAIN}/`,
+                        'referer': `${RCO_DOMAIN}/`
                     }
                 }
                 return request
@@ -79,7 +77,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             method: 'GET',
             headers: {
                 'referer': `${RCO_DOMAIN}/`,
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15'
             }
         })
     }

@@ -9,7 +9,7 @@ import {
     Request,
     Response, 
     SourceIntents,
-    ChapterProviding,
+    ChapterProviding
 } from '@paperback/types'
 
 import { Parser } from './TCBScansParser'

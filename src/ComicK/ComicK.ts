@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { 
     MangaProviding,
     SourceManga,
@@ -91,7 +89,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 languageSettings(this.stateManager),
                 chapterSettings(this.stateManager),
                 uploadersSettings(this.stateManager),
-                resetSettings(this.stateManager),
+                resetSettings(this.stateManager)
             ]
         }))
     }

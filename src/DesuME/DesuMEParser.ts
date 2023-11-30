@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { 
     Chapter,
     ChapterDetails,
     Tag,
     SourceManga,
     PartialSourceManga,
-    TagSection,
+    TagSection
 } from '@paperback/types'
 
 import { 
@@ -398,6 +395,6 @@ export const parseTags = (): TagSection[] => {
     return [
         App.createTagSection({ id: 'genres', label: 'Жанр', tags: Genres.map(x => App.createTag(x)) }),
         App.createTagSection({ id: 'types', label: 'Тип', tags: Types.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: 'order', label: 'Сортировка', tags: Order.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'order', label: 'Сортировка', tags: Order.map(x => App.createTag(x)) })
     ]
 }

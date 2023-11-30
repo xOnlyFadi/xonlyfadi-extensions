@@ -35,7 +35,7 @@ export class Parser {
             Top5.push(App.createPartialSourceManga({
                 image,
                 title: this.decodeHTMLEntity(title),
-                mangaId: id,
+                mangaId: id
             }))
         }
         
