@@ -31,7 +31,7 @@ export const TuMangaOnlineInfo: SourceInfo = {
     description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '2.0.2',
+    version: '2.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TuMangaOnline_Base,
     contentRating: ContentRating.ADULT,

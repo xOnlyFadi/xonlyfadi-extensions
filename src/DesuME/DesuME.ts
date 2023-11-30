@@ -37,7 +37,7 @@ import '../scopes'
 const DOMAIN = 'https://desu.me'
 const API = `${DOMAIN}/manga/api`
 export const DesuMEInfo: SourceInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',

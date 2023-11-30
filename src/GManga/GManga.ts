@@ -38,7 +38,7 @@ const DOMAIN = 'gmanga.org'
 const GMANGA_BASE = `https://${DOMAIN}`
 const GMANGA_API = `https://api.${DOMAIN}/api`
 export const GMangaInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'GManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',

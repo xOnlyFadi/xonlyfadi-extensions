@@ -31,7 +31,7 @@ import {
 
 const DOMAIN = 'https://mangasect.com'
 export const MangaSectInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'MangaSect',
     icon: 'icon.png',
     author: 'xOnlyFadi',

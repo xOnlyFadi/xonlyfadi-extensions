@@ -27,7 +27,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
