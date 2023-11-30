@@ -57,7 +57,7 @@ export const DesuMEInfo: SourceInfo = {
 
 export class DesuME implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

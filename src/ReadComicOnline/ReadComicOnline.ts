@@ -52,7 +52,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
     constructor(public cheerio: CheerioAPI) { }
     
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

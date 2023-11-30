@@ -33,7 +33,7 @@ export class TCBScans implements ChapterProviding {
 
     private readonly parser: Parser = new Parser();
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

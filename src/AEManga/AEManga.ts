@@ -56,7 +56,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
 
     baseUrl = AEManga_DOMAIN;
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

@@ -49,7 +49,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
     baseCdn = MangaFreak_CDN;
     
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 45000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

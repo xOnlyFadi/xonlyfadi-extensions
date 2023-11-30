@@ -52,7 +52,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
     private readonly parser: Parser = new Parser();
     readonly baseUrl = TuMangaOnline_Base;
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

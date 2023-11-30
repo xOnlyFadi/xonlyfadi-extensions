@@ -54,7 +54,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
     private readonly popularPerPage: number = 30;
     
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
