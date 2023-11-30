@@ -16,7 +16,7 @@ import {
     HomePageSectionsProviding,
     MangaProviding,
     SearchResultsProviding,
-    SourceIntents,
+    SourceIntents
 } from '@paperback/types'
 
 import { 
@@ -56,7 +56,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
                     ...(request.headers ?? {}),
                     ...{
                         'user-agent': await this.requestManager.getDefaultUserAgent(),
-                        'referer': `${DOMAIN}/`,
+                        'referer': `${DOMAIN}/`
                     }
                 }
                 return request
@@ -73,7 +73,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
             method: 'GET',
             headers: {
                 'referer': `${DOMAIN}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         })
     }

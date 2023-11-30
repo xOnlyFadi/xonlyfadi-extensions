@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Chapter,
     ChapterDetails,
     SourceManga,
@@ -173,31 +171,31 @@ export class Parser {
         const arrayTags2: Tag[] = [
             {
                 id: 'types.manga',
-                label: 'Manga',
+                label: 'Manga'
             },
             {
                 id: 'types.manhua',
-                label: 'Manhua',
+                label: 'Manhua'
             },
             {
                 id: 'types.manhwa',
-                label: 'Manhwa',
+                label: 'Manhwa'
             },
             {
                 id: 'types.novel',
-                label: 'Novela',
+                label: 'Novela'
             },
             {
                 id: 'types.one_shot',
-                label: 'One shot',
+                label: 'One shot'
             },
             {
                 id: 'types.doujinshi',
-                label: 'Doujinshi',
+                label: 'Doujinshi'
             },
             {
                 id: 'types.oel',
-                label: 'Oel',
+                label: 'Oel'
             }
         ]
         

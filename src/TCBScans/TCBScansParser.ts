@@ -3,7 +3,7 @@ import {
     ChapterDetails,
     HomeSection,
     SourceManga,
-    PartialSourceManga,
+    PartialSourceManga
 } from '@paperback/types'
 
 export class Parser {

@@ -44,7 +44,7 @@ export class Parser {
             items.push(App.createPartialSourceManga({
                 image,
                 title: title,
-                mangaId: `${id}`,
+                mangaId: `${id}`
             }))
         }
         
@@ -235,7 +235,7 @@ export class Parser {
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
                 time: new Date(release_date),
                 langCode: '🇬🇧',
-                sortingIndex,
+                sortingIndex
             }))
             sortingIndex--
         }

@@ -154,7 +154,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     return [
         App.createTagSection({ id: 'status', label: 'Status', tags: Status.map(x => App.createTag(x)) }),
         App.createTagSection({ id: 'sort', label: 'Sort', tags: Sort.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map(x => App.createTag(x)) })
     ]
 }
 
@@ -172,7 +172,7 @@ export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             title: decodeHTMLEntity(title),
-            mangaId: id,
+            mangaId: id
         }))
     }
     

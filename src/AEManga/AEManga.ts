@@ -15,7 +15,7 @@ import {
     HomePageSectionsProviding,
     MangaProviding,
     SearchResultsProviding,
-    SourceIntents,
+    SourceIntents
 } from '@paperback/types'
 
 import { 
@@ -24,7 +24,7 @@ import {
     parseTags,
     parseChapters,
     parseMangaDetails,
-    parseSearch,
+    parseSearch
 } from './AEMangaParser'
 
 const AEManga_DOMAIN = 'https://manga.ae'
@@ -64,7 +64,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
                     ...(request.headers ?? {}),
                     ...{
                         'user-agent': await this.requestManager.getDefaultUserAgent(),
-                        'referer': `${this.baseUrl}/`,
+                        'referer': `${this.baseUrl}/`
                     }
                 }
                 return request
@@ -138,7 +138,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
                     containsMoreItems: true,
                     type: 'singleRowNormal'
                 })
-            },
+            }
         ]
         
         const promises: Promise<void>[] = []
@@ -275,7 +275,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         })
     }

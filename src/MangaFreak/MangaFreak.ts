@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { 
     PagedResults,
     SourceManga,
@@ -80,7 +78,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         })
     }

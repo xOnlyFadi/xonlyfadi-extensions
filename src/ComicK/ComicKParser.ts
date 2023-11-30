@@ -1,4 +1,3 @@
-
 import { 
     Chapter,
     ChapterDetails,
@@ -272,7 +271,7 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
         {
             label: '1 year',
             id: 'createdat.365'
-        },
+        }
     ]
 
     return [

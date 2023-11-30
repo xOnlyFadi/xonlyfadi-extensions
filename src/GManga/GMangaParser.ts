@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { 
     Chapter,
     ChapterDetails,
@@ -717,5 +714,5 @@ export const months: {[date: string]: number} = {
     'September': 9,
     'October': 10,
     'November': 11,
-    'December': 12,
+    'December': 12
 }

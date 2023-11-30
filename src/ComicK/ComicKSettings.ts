@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { 
     DUIButton,
     DUINavigationButton,
@@ -62,7 +61,7 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
                                 get: async () => await stateManager.retrieve('languages') ?? CMLanguages.getDefault(),
                                 set: async (newValue) => await stateManager.store('languages', newValue)
                             }),
-                            allowsMultiselect: true,
+                            allowsMultiselect: true
                         }),
                         App.createDUISwitch({
                             id: 'language_home_filter',
@@ -70,7 +69,7 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
                             value: App.createDUIBinding({
                                 get: async () => await stateManager.retrieve('language_home_filter') ?? false,
                                 set: async (newValue) => await stateManager.store('language_home_filter', newValue)
-                            }),
+                            })
                         })
                     ]
                 })
@@ -109,7 +108,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             value: App.createDUIBinding({
                                 get: async () => await stateManager.retrieve('uploaders_toggled') ?? false,
                                 set: async (newValue: boolean) => await stateManager.store('uploaders_toggled', newValue)
-                            }),
+                            })
                         }),
                         App.createDUISelect({
                             id: 'uploaders',
@@ -138,7 +137,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                     await stateManager.store('uploaders', uploaders)
                                 }
                             }),
-                            allowsMultiselect: true,
+                            allowsMultiselect: true
                         }),
                         App.createDUISwitch({
                             id: 'uploaders_switch',
@@ -146,7 +145,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             value: App.createDUIBinding({
                                 get: async () => await stateManager.retrieve('uploaders_whitelisted') ?? false,
                                 set: async (newValue: boolean) => await stateManager.store('uploaders_whitelisted', newValue)
-                            }),
+                            })
                         }),
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering_aggressiveness',
@@ -164,7 +163,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                     return false
                                 },
                                 set: async (newValue: boolean) => await stateManager.store('aggressive_uploaders_filtering', newValue)
-                            }),
+                            })
                         }),
                         App.createDUISwitch({
                             id: 'strict_name_matching',
@@ -172,7 +171,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             value: App.createDUIBinding({
                                 get: async () => await stateManager.retrieve('strict_name_matching') ?? false,
                                 set: async (newValue: boolean) => await stateManager.store('strict_name_matching', newValue)
-                            }),
+                            })
                         })
                     ]
                 }),
@@ -187,7 +186,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             value: App.createDUIBinding({
                                 get: async () => '',
                                 set: async (newValue: string) => await stateManager.store('uploader', newValue)
-                            }),
+                            })
                         }),
                         App.createDUIButton({
                             id: 'add_uploader',
@@ -235,7 +234,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 })
                                 await stateManager.store('uploaders', uploaders)
                             }
-                        }),
+                        })
                     ]
                 })
             ]
