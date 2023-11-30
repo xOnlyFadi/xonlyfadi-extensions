@@ -499,7 +499,7 @@ class AEManga {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${this.baseUrl}/`,
+                            'referer': `${this.baseUrl}/`
                         }
                     };
                     return request;
@@ -572,7 +572,7 @@ class AEManga {
                     containsMoreItems: true,
                     type: 'singleRowNormal'
                 })
-            },
+            }
         ];
         const promises = [];
         for (const section of sections) {
@@ -687,7 +687,7 @@ class AEManga {
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         });
     }

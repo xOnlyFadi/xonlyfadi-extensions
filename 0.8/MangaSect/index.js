@@ -491,7 +491,7 @@ class MangaSect {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${DOMAIN}/`,
+                            'referer': `${DOMAIN}/`
                         }
                     };
                     return request;
@@ -508,7 +508,7 @@ class MangaSect {
             method: 'GET',
             headers: {
                 'referer': `${DOMAIN}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         });
     }
@@ -761,7 +761,7 @@ const parseTags = ($) => {
     return [
         App.createTagSection({ id: 'status', label: 'Status', tags: Status.map(x => App.createTag(x)) }),
         App.createTagSection({ id: 'sort', label: 'Sort', tags: Sort.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map(x => App.createTag(x)) })
     ];
 };
 exports.parseTags = parseTags;
@@ -777,7 +777,7 @@ const parseSearch = ($) => {
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             title: decodeHTMLEntity(title),
-            mangaId: id,
+            mangaId: id
         }));
     }
     return results;

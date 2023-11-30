@@ -461,8 +461,6 @@ __exportStar(require("./compat/DyamicUI"), exports);
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaFreak = exports.MangaFreakInfo = void 0;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const MangaFreakParser_1 = require("./MangaFreakParser");
 const MangaFreak_BASE = 'https://w15.mangafreak.net';
@@ -520,7 +518,7 @@ class MangaFreak {
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         });
     }
@@ -725,7 +723,7 @@ class Parser {
             Top5.push(App.createPartialSourceManga({
                 image,
                 title: this.decodeHTMLEntity(title),
-                mangaId: id,
+                mangaId: id
             }));
         }
         top5Section.items = Top5;

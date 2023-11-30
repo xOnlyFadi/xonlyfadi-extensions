@@ -461,8 +461,6 @@ __exportStar(require("./compat/DyamicUI"), exports);
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TuMangaOnline = exports.TuMangaOnlineInfo = void 0;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const TuMangaOnlineParser_1 = require("./TuMangaOnlineParser");
 const TuMangaOnlineSettings_1 = require("./TuMangaOnlineSettings");
@@ -501,7 +499,7 @@ class TuMangaOnline {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': this.userAgent,
-                            'referer': `${TuMangaOnline_Base}/`,
+                            'referer': `${TuMangaOnline_Base}/`
                         }
                     };
                     return request;
@@ -521,7 +519,7 @@ class TuMangaOnline {
             id: 'main',
             header: 'Source Settings',
             rows: async () => [
-                (0, TuMangaOnlineSettings_1.contentSettings)(this.stateManager),
+                (0, TuMangaOnlineSettings_1.contentSettings)(this.stateManager)
             ],
             isHidden: false
         });
@@ -532,7 +530,7 @@ class TuMangaOnline {
             method: 'GET',
             headers: {
                 'referer': `${TuMangaOnline_Base}/`,
-                'user-agent': this.userAgent,
+                'user-agent': this.userAgent
             }
         });
     }
@@ -562,7 +560,7 @@ class TuMangaOnline {
                     containsMoreItems: true,
                     type: 'singleRowNormal'
                 })
-            },
+            }
         ];
         const promises = [];
         for (const section of sections) {
@@ -921,31 +919,31 @@ class Parser {
         const arrayTags2 = [
             {
                 id: 'types.manga',
-                label: 'Manga',
+                label: 'Manga'
             },
             {
                 id: 'types.manhua',
-                label: 'Manhua',
+                label: 'Manhua'
             },
             {
                 id: 'types.manhwa',
-                label: 'Manhwa',
+                label: 'Manhwa'
             },
             {
                 id: 'types.novel',
-                label: 'Novela',
+                label: 'Novela'
             },
             {
                 id: 'types.one_shot',
-                label: 'One shot',
+                label: 'One shot'
             },
             {
                 id: 'types.doujinshi',
-                label: 'Doujinshi',
+                label: 'Doujinshi'
             },
             {
                 id: 'types.oel',
-                label: 'Oel',
+                label: 'Oel'
             }
         ];
         const arrayTags3 = [

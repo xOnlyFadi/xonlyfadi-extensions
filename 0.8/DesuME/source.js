@@ -1436,8 +1436,6 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DesuME = exports.DesuMEInfo = void 0;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const DesuMEParser_1 = require("./DesuMEParser");
 require("../scopes");
@@ -2042,7 +2040,7 @@ const parseTags = () => {
     return [
         App.createTagSection({ id: 'genres', label: 'Жанр', tags: Genres.map(x => App.createTag(x)) }),
         App.createTagSection({ id: 'types', label: 'Тип', tags: Types.map(x => App.createTag(x)) }),
-        App.createTagSection({ id: 'order', label: 'Сортировка', tags: Order.map(x => App.createTag(x)) }),
+        App.createTagSection({ id: 'order', label: 'Сортировка', tags: Order.map(x => App.createTag(x)) })
     ];
 };
 exports.parseTags = parseTags;

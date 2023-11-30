@@ -2481,8 +2481,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadComicOnline = exports.ReadComicOnlineInfo = void 0;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
@@ -2515,7 +2513,7 @@ class ReadComicOnline {
                         ...(request.headers ?? {}),
                         ...{
                             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-                            'referer': `${RCO_DOMAIN}/`,
+                            'referer': `${RCO_DOMAIN}/`
                         }
                     };
                     return request;
@@ -2532,7 +2530,7 @@ class ReadComicOnline {
             method: 'GET',
             headers: {
                 'referer': `${RCO_DOMAIN}/`,
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15'
             }
         });
     }
@@ -2661,8 +2659,6 @@ exports.ReadComicOnline = ReadComicOnline;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLastPage = exports.parseSearch = exports.parseTags = exports.parseViewMore = exports.parseHomeSections = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const types_1 = require("@paperback/types");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 const parseMangaDetails = ($, mangaId) => {
