@@ -37,7 +37,7 @@ import '../scopes'
 const DOMAIN = 'https://desu.me'
 const API = `${DOMAIN}/manga/api`
 export const DesuMEInfo: SourceInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -57,7 +57,7 @@ export const DesuMEInfo: SourceInfo = {
 
 export class DesuME implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

@@ -31,7 +31,7 @@ import {
 
 const RCO_DOMAIN = 'https://readcomiconline.li'
 export const ReadComicOnlineInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -52,7 +52,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
     constructor(public cheerio: CheerioAPI) { }
     
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

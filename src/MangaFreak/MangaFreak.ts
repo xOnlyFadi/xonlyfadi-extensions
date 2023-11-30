@@ -27,7 +27,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -49,7 +49,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
     baseCdn = MangaFreak_CDN;
     
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 45000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

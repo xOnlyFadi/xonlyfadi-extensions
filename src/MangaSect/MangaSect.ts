@@ -31,7 +31,7 @@ import {
 
 const DOMAIN = 'https://mangasect.com'
 export const MangaSectInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'MangaSect',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -48,7 +48,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
 
     baseUrl = DOMAIN;
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

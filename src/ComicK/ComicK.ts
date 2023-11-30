@@ -41,7 +41,7 @@ const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.0',
+    version: '2.1.1',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -59,7 +59,7 @@ export const ComicKInfo: SourceInfo = {
 }
 export class ComicK implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

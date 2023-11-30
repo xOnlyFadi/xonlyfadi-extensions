@@ -41,7 +41,7 @@ export const VoyceMEInfo: SourceInfo = {
     description: 'Extension that pulls manga from voyce.me',
     icon: 'icon.png',
     name: 'Voyce.Me',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: VoyceME_Base,
     contentRating: ContentRating.EVERYONE,
@@ -54,7 +54,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
     private readonly popularPerPage: number = 30;
     
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {

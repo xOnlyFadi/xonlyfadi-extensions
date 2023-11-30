@@ -20,7 +20,7 @@ export const TCBScansInfo: SourceInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.0',
+    version: '2.0.1',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
@@ -33,7 +33,7 @@ export class TCBScans implements ChapterProviding {
 
     private readonly parser: Parser = new Parser();
     readonly requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
