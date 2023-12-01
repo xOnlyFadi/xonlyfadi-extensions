@@ -4,28 +4,26 @@ import { Chapter,
     PartialSourceManga,
     Tag,
     TagSection } from '@paperback/types'
+
 import '../scopes'
+
+import { decodeHTML } from 'entities'
+
 export class Parser {
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
-    }
-    
     parseHomeSection($: CheerioStatic, source: any): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
         
         for (const obj of $('div.element').toArray()) {
             const info = $('div.element > a',obj)
             const id = this.idCleaner(info.attr('href')?.trim() ?? '',source) ?? ''
-            const title = this.decodeHTMLEntity($('h4.text-truncate',info).text().trim()) ?? this.decodeHTMLEntity($('h4.text-truncate',info)?.attr('title')?.trim() ?? '') ?? ''
+            const title = decodeHTML($('h4.text-truncate',info).text().trim()) ?? decodeHTML($('h4.text-truncate',info)?.attr('title')?.trim() ?? '') ?? ''
             const image = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')') ?? ''
 
             if(!id || !title) continue
 
             items.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
                 subtitle: undefined
             }))
@@ -123,17 +121,17 @@ export class Parser {
         const infotitle = $('h1.element-title').first()
         infotitle.find('small').remove()
         const title = infotitle.text().trim() ?? ''
-        const title2 = this.decodeHTMLEntity($('h2.element-subtitle').first().text().trim()) ?? ''
+        const title2 = decodeHTML($('h2.element-subtitle').first().text().trim()) ?? ''
 
         const image = $('.book-thumbnail').attr('src') ?? 'https://paperback.moe/icons/logo-alt.svg'
         
-        const desc = this.decodeHTMLEntity($('p.element-description').text().trim()) ?? ''
+        const desc = decodeHTML($('p.element-description').text().trim()) ?? ''
         
         const infoAuth = $('h5.card-title')
-        const author = this.decodeHTMLEntity(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
-        const artist = this.decodeHTMLEntity(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
+        const author = decodeHTML(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
+        const artist = decodeHTML(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
         
-        const status = this.decodeHTMLEntity($('span.book-status').text().trim()) ?? ''
+        const status = decodeHTML($('span.book-status').text().trim()) ?? ''
         
         const arrayTags: Tag[] = []
         const genreregex = /genders.*?=(\d+)?/i

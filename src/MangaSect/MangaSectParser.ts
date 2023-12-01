@@ -8,10 +8,13 @@ import {
     HomeSection,
     HomeSectionType 
 } from '@paperback/types'
+
+import { decodeHTML } from 'entities'
+
 const DOMAIN = 'https://mangasect.com'
 
 export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
-    const title = decodeHTMLEntity($('header h1').text().trim())
+    const title = decodeHTML($('header h1').text().trim())
 
     let image = $('.a1 figure img')?.attr('src') ?? ''
     image = image.startsWith('/') ? DOMAIN + image : image
@@ -46,7 +49,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
         })
     }
 
-    const description: string = decodeHTMLEntity($('article #syn-target').text().trim() ?? '')
+    const description: string = decodeHTML($('article #syn-target').text().trim() ?? '')
     
     return App.createSourceManga({
         id: mangaId,
@@ -79,7 +82,7 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
 
         chapters.push(App.createChapter({
             id: chapterId,
-            name: decodeHTMLEntity(title),
+            name: decodeHTML(title),
             chapNum: chapNum ? !isNaN(Number(chapNum)) ? Number(chapNum) : 0 : 0,
             time: time ? new Date(Number(time) * 1000) : undefined,
             langCode: '🇬🇧'
@@ -171,7 +174,7 @@ export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
 
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id
         }))
     }
@@ -317,10 +320,4 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     daily_section.items = daily
     sectionCallback(daily_section)
-}
-
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
 }

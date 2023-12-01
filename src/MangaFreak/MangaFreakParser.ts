@@ -9,6 +9,8 @@ import {
     TagSection 
 } from '@paperback/types'
 
+import { decodeHTML } from 'entities'
+
 export class Parser {
     private readonly chapterTitleRegex = /Chapter ([\d.]+)/i;
     
@@ -34,7 +36,7 @@ export class Parser {
 
             Top5.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id
             }))
         }
@@ -52,9 +54,9 @@ export class Parser {
 
             Popular.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             }))
         }
         
@@ -71,9 +73,9 @@ export class Parser {
 
             TodayManga.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             }))
         }
         
@@ -90,9 +92,9 @@ export class Parser {
 
             YesterdayManga.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             }))
         }
         
@@ -109,9 +111,9 @@ export class Parser {
 
             OlderManga.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             }))
         }
         
@@ -132,9 +134,9 @@ export class Parser {
 
             results.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
+                subtitle: decodeHTML(subtitle ? `Chapter ${subtitle}` : '')
             }))
         }
         
@@ -154,9 +156,9 @@ export class Parser {
 
             results.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: this.decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
+                subtitle: decodeHTML(subtitle ? `Chapter ${subtitle}` : '')
             }))
         }
         
@@ -239,11 +241,11 @@ export class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [this.decodeHTMLEntity(title)],
+                titles: [decodeHTML(title)],
                 image,
                 status: this.parseStatus(status),
-                author: this.decodeHTMLEntity(author),
-                artist: this.decodeHTMLEntity(artist),
+                author: decodeHTML(author),
+                artist: decodeHTML(artist),
                 tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })],
                 desc
             })
@@ -336,13 +338,7 @@ export class Parser {
             image = imageObj?.attr('src')
         }
         
-        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
-    }
-    
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
+        return encodeURI(decodeURI(decodeHTML(image?.trim() ?? '')))
     }
     
     parseStatus(str: string): string {

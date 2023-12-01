@@ -17,9 +17,10 @@ import {
 } from './ComicKHelper'
 
 import { CMLanguages } from './ComicKHelper'
+import { Uploader } from './ComicKSettings'
+
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
-import { Uploader } from './ComicKSettings'
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const comic = data?.comic
@@ -297,16 +298,11 @@ export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
         
         results.push(App.createPartialSourceManga({
             image,
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id,
-            subtitle: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
+            subtitle: decodeHTML(subtitle ? `Chapter ${subtitle}` : '')
         }))
     }
 
     return results
-}
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
 }

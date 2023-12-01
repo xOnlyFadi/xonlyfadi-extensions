@@ -25,12 +25,6 @@ import '../scopes'
 export class Parser {
     private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net';
     
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
-    }
-    
     parseSearch(VoyceD: SearchData): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
         
@@ -206,10 +200,10 @@ export class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [this.decodeHTMLEntity(title)],
+                titles: [decodeHTML(title)],
                 image,
                 status: this.parseStatus(status),
-                author: this.decodeHTMLEntity(author),
+                author: decodeHTML(author),
                 tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })],
                 desc: convert(decodeHTML(desc), { wordwrap: 130 })
             })

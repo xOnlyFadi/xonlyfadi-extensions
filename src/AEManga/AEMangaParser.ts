@@ -7,10 +7,12 @@ import {
     TagSection 
 } from '@paperback/types'
 
+import { decodeHTML } from 'entities'
+
 export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
     const contentSection = $('.indexcontainer').first()
 
-    const titles: string[] = [decodeHTMLEntity($('h1.EnglishName',contentSection).text().trim().replace('(','').replace(')',''))]
+    const titles: string[] = [decodeHTML($('h1.EnglishName',contentSection).text().trim().replace('(','').replace(')',''))]
 
     const image = $('img.manga-cover', contentSection).attr('src') ?? ''
     const authors: string[] = []
@@ -21,7 +23,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
 
         authors.push(author)
     }
-    const description: string = decodeHTMLEntity($('div.manga-details-extended h4', contentSection).eq(4).text().trim() ?? '')
+    const description: string = decodeHTML($('div.manga-details-extended h4', contentSection).eq(4).text().trim() ?? '')
 
     const arrayTags: Tag[] = []
     for (const tag of $('div.manga-details-extended a[href*=tag]', contentSection).toArray()) {
@@ -74,7 +76,7 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
 
         chapters.push(App.createChapter({
             id: `${chapterId}/0/allpages`,
-            name: decodeHTMLEntity(title),
+            name: decodeHTML(title),
             chapNum: isNaN(chapNum) ? 0 : chapNum,
             time: new Date(LastUpdated),
             langCode: '🇸🇦'
@@ -174,19 +176,13 @@ export const parseSearch = ($: CheerioStatic, source: any): PartialSourceManga[]
         
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id,
             subtitle: subtitle ? `أخر فصل : ${subtitle}` : ''
         }))
     }
     
     return results
-}
-
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
 }
 
 export const NextPage = ($: CheerioSelector): boolean => {

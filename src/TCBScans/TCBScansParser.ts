@@ -6,14 +6,10 @@ import {
     PartialSourceManga
 } from '@paperback/types'
 
+import { decodeHTML } from 'entities'
+
 export class Parser {
     private readonly chapterTitleRegex = /Chapter ([\d.]+)/i;
-    
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
-    }
     
     async parseHomeSections($: CheerioStatic, sectionCallback: (section: HomeSection) => void): Promise<void> {
         const section1 = App.createHomeSection({ id: '1', title: 'Projects', containsMoreItems: false, type: 'singleRowNormal'})
@@ -30,7 +26,7 @@ export class Parser {
 
             projects.push(App.createPartialSourceManga({
                 image,
-                title: this.decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
                 subtitle: undefined
             }))
@@ -103,7 +99,7 @@ export class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [this.decodeHTMLEntity(title)],
+                titles: [decodeHTML(title)],
                 image,
                 status: 'ONGOING',
                 desc
