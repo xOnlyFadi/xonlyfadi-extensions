@@ -310,7 +310,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
         
-        return parseChapters(data, mangaId)
+        return parseChapters(data)
     }
     
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
