@@ -120,12 +120,16 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const chapters: Chapter[] = []
         
         let page = 1
-        let json = null
-        do {
-            json = await this.createChapterRequest(mangaId, page)
+        let json = await this.createChapterRequest(mangaId, page++)
+        let resultSize = json.chapters.length
+
+        chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
+
+        while (json.total > resultSize) {
+            json = await this.createChapterRequest(mangaId, page++)
+            resultSize += json.chapters.length
             chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
-            page += 1
-        } while (json.chapters.length === SEARCH_PAGE_LIMIT)
+        }
 
         return chapters
     }
@@ -133,7 +137,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     async createChapterRequest(mangaId: string, page: number): Promise<any> {
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
