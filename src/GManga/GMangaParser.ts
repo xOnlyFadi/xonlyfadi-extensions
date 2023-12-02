@@ -582,15 +582,11 @@ export const parseMetadata = (query: SearchRequest, metadata: any): SearchForm =
             'exclude': []
         },
         'chapters': {
-            // @ts-ignore
             'min': query?.parameters?.['min_chapter_count'] ?? '',
-            // @ts-ignore
             'max': query?.parameters?.['max_chapter_count'] ?? ''
         },
         'dates': {
-            // @ts-ignore
             'start': query?.parameters?.['start_date'] ?? null,
-            // @ts-ignore
             'end': query?.parameters?.['end_date'] ?? null
         }
     }
