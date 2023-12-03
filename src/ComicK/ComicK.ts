@@ -36,20 +36,20 @@ import {
 
 import { CMLanguages } from './ComicKHelper'
 
-const COMICK_DOMAIN = 'https://comick.app'
+const COMICK_DOMAIN = 'https://comick.ink'
 const COMICK_API = 'https://api.comick.fun'
 const SEARCH_PAGE_LIMIT = 100
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.1',
+    version: '2.1.2',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.app.',
+    description: 'Extension that pulls manga from comick.ink.',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
-    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS,
+    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: [
         {
             text: 'Multi Language',
@@ -102,6 +102,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -141,6 +142,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -159,6 +161,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -177,6 +180,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -237,6 +241,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         for (const section of sections) {
             sectionCallback(section.section)
             promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
+                this.CloudFlareError(response.status)
+
                 let data
                 try {
                     data = JSON.parse(response.data ?? '')
@@ -275,6 +281,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -342,6 +349,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             })
         }
         const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
         
         let data
         try {
@@ -356,6 +364,23 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         return App.createPagedResults({
             results: manga,
             metadata
+        })
+    }
+
+    CloudFlareError(status: number): void {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${ComicKInfo.name}> and press the cloud icon.`)
+        }
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: COMICK_DOMAIN,
+            method: 'GET',
+            headers: {
+                'referer': `${COMICK_DOMAIN}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
         })
     }
 }
