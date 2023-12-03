@@ -24,7 +24,8 @@ import {
     parseTags,
     parseChapters,
     parseMangaDetails,
-    parseSearch 
+    parseSearch,
+    parseHomeSections
 } from './ComicKParser'
 
 import { 
@@ -196,80 +197,58 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     async supportsTagExclusion(): Promise<boolean> {
         return true
     }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        const createSectionRequest = (sort: string) => ({
+            id: sort,
+            request: App.createRequest({
+                url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=${sort}&t=false`,
+                method: 'GET'
+            })
+        })
+
         const sections = [
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'views',
-                    title: 'Most Viewed',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'follow',
-                    title: 'Most Follows',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'latest',
-                    title: 'Latest Uploads',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            }
+            createSectionRequest('view'),
+            createSectionRequest('follow'),
+            createSectionRequest('uploaded')
         ]
 
-        const promises: Promise<void>[] = []
-        for (const section of sections) {
-            sectionCallback(section.section)
-            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
-                this.CloudFlareError(response.status)
+        const promises = sections.map(s =>
+            this.requestManager.schedule(s.request, 1)
+                .then(async response => {
+                    this.CloudFlareError(response.status)
 
-                let data
-                try {
-                    data = JSON.parse(response.data ?? '')
-                }
-                catch (e) {
-                    throw new Error(`${e}`)
-                }
-                
-                section.section.items = parseSearch(data)
-                sectionCallback(section.section)
-            }))
-        }
-        
-        await Promise.all(promises)
+                    if (response.data) {
+                        let data
+                        try {
+                            data = JSON.parse(response.data ?? '')
+                        }
+                        catch (e) {
+                            throw new Error(`${e}`)
+                        }
+
+                        parseHomeSections(data, s.id, sectionCallback)
+                    }
+                })
+                .catch(e => {
+                    throw new Error(`Error creating HomeSection (${s.id}): ${e}`)
+                })
+        )
+
+        await Promise.allSettled(promises)
     }
     
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let param
         switch (homepageSectionId) {
-            case 'views':
+            case 'view':
                 param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`
                 break
             case 'follow':
                 param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`
                 break
-            case 'latest':
+            case 'uploaded':
                 param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`
                 break
             default:

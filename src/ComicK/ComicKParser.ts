@@ -5,7 +5,9 @@ import {
     SourceManga,
     PartialSourceManga,
     TagSection, 
-    SourceStateManager
+    SourceStateManager,
+    HomeSection,
+    HomeSectionType
 } from '@paperback/types'
 
 import { 
@@ -283,6 +285,42 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
         App.createTagSection({ id: '4', label: 'Type', tags: Types.map(x => App.createTag(x)) }),
         App.createTagSection({ id: '5', label: 'Created At', tags: CreatedAt.map(x => App.createTag(x)) })
     ]
+}
+
+export const parseHomeSections = (data: SearchData[], id: string, sectionCallback: (section: HomeSection) => void): void => {
+    let section: HomeSection
+    
+    switch (id) {
+        case 'view':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Viewed',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowLarge
+            })
+            break
+        case 'follow':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Followed',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowNormal
+            })
+            break
+        case 'uploaded':
+            section = App.createHomeSection({
+                id,
+                title: 'Latest Uploads',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowNormal
+            })
+            break
+        default:
+            return
+    }
+
+    section.items = parseSearch(data)
+    sectionCallback(section)
 }
 
 export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
