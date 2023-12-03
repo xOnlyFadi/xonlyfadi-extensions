@@ -134,17 +134,17 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         let page = 1
         let data = await this.createChapterRequest(mangaId, page++)
 
-        chapters.push(...(
-            parseChapters(
-                data,
-                showTitle,
-                showVol,
-                uploadersToggled,
-                uploadersWhitelisted,
-                aggressiveUploadersFilter,
-                strictNameMatching,
-                uploaders
-            )))
+        parseChapters(
+            chapters,
+            data,
+            showTitle,
+            showVol,
+            uploadersToggled,
+            uploadersWhitelisted,
+            aggressiveUploadersFilter,
+            strictNameMatching,
+            uploaders
+        )
 
         // Try next page if number of chapters is same as limit
         while (data.chapters.length === LIMIT) {
@@ -153,17 +153,17 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             // Break if there are no more chapters
             if (data.chapters.length === 0) break
 
-            chapters.push(...(
-                parseChapters(
-                    data,
-                    showTitle,
-                    showVol,
-                    uploadersToggled,
-                    uploadersWhitelisted,
-                    aggressiveUploadersFilter,
-                    strictNameMatching,
-                    uploaders
-                )))
+            parseChapters(
+                chapters,
+                data,
+                showTitle,
+                showVol,
+                uploadersToggled,
+                uploadersWhitelisted,
+                aggressiveUploadersFilter,
+                strictNameMatching,
+                uploaders
+            )
         }
 
         return chapters
