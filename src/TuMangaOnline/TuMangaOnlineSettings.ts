@@ -1,6 +1,6 @@
-import { 
+import {
     SourceStateManager,
-    DUINavigationButton 
+    DUINavigationButton
 } from '@paperback/types'
 
 export const getNSFW = async (stateManager: SourceStateManager): Promise<boolean> => {
@@ -15,7 +15,7 @@ export const contentSettings = (stateManager: SourceStateManager): DUINavigation
             sections: async () => [
                 App.createDUISection({
                     id: 'content',
-                    footer: 'Activa el NSFW en la aplicación',                    
+                    footer: 'Activa el NSFW en la aplicación',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
@@ -29,7 +29,7 @@ export const contentSettings = (stateManager: SourceStateManager): DUINavigation
                     ]
                 })
             ]
-            
+
         })
     })
 }

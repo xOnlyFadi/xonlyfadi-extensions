@@ -7,7 +7,7 @@ export interface SearchData {
                 thumbnail: string
                 title:     string
             }
-        ] 
+        ]
     }
 }
 
@@ -42,7 +42,7 @@ export interface VoyceChapterData {
     data: {
         series: [
             {
-                chapters: [ 
+                chapters: [
                     {
                         id:         number
                         title:      string
@@ -90,13 +90,13 @@ export interface SearchType {
             {
                 title: string
                 id:    number
-            } 
+            }
         ]
         genres: [
             {
                 title: string
                 id:    number
-            } 
-        ] 
+            }
+        ]
     }
 }

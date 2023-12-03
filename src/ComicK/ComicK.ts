@@ -1,4 +1,4 @@
-import { 
+import {
     MangaProviding,
     SourceManga,
     Chapter,
@@ -12,14 +12,14 @@ import {
     Request,
     Response,
     DUISection,
-    BadgeColor, 
+    BadgeColor,
     ChapterProviding,
     SourceIntents,
     SearchResultsProviding,
     HomePageSectionsProviding
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     parseTags,
     parseChapters,
@@ -28,10 +28,10 @@ import {
     parseHomeSections
 } from './ComicKParser'
 
-import { 
+import {
     chapterSettings,
     languageSettings,
-    resetSettings, 
+    resetSettings,
     uploadersSettings
 } from './ComicKSettings'
 
@@ -82,7 +82,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             }
         }
     })
-    
+
     stateManager = App.createSourceStateManager()
 
     async getSourceMenu(): Promise<DUISection> {
@@ -98,9 +98,9 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             ]
         }))
     }
-    
+
     getMangaShareUrl(mangaId: string): string { return `${COMICK_DOMAIN}/comic/${mangaId}` }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${COMICK_API}/comic/${mangaId}?tachiyomi=true`,
@@ -108,7 +108,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -116,10 +116,10 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseMangaDetails(data, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const showTitle: boolean = await this.stateManager.retrieve('show_title') ?? false
         const showVol: boolean = await this.stateManager.retrieve('show_volume_number') ?? false
@@ -177,7 +177,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -188,7 +188,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
 
         return data
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${COMICK_API}/chapter/${chapterId}/?tachiyomi=true`,
@@ -196,7 +196,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -204,10 +204,10 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseChapterDetails(data, mangaId, chapterId)
     }
-    
+
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
             url: `${COMICK_API}/genre/`,
@@ -215,7 +215,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -226,7 +226,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
 
         return parseTags(data)
     }
-    
+
     async supportsTagExclusion(): Promise<boolean> {
         return true
     }
@@ -266,7 +266,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             }
         })
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let param
@@ -283,14 +283,14 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist')
         }
-        
+
         const request = App.createRequest({
             url: COMICK_API + param,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -298,7 +298,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         const manga = parseSearch(data)
         metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({
@@ -335,7 +335,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 Demographic.push(`&demographic=${SplittedID}`)
             }
         })
-        
+
         query.excludedTags?.map((x) => {
             const id = x.id
             const SplittedID = id?.split('.')?.pop() ?? ''
@@ -343,7 +343,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 excludedGenres.push(`&excludes=${SplittedID}`)
             }
         })
-        
+
         let request
         if (query.title) {
             request = App.createRequest({
@@ -358,7 +358,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         }
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -366,7 +366,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         const manga = parseSearch(data)
         metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({

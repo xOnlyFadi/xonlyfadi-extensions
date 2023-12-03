@@ -1,4 +1,4 @@
-import { 
+import {
     SourceManga,
     Chapter,
     ChapterDetails,
@@ -12,7 +12,7 @@ import {
     HomeSectionType,
     TagSection,
     SearchField,
-    BadgeColor, 
+    BadgeColor,
     SourceIntents,
     ChapterProviding,
     HomePageSectionsProviding,
@@ -20,7 +20,7 @@ import {
     SearchResultsProviding
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     parseChapters,
     parseHompage,
@@ -82,9 +82,9 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
             }
         }
     })
-    
+
     getMangaShareUrl(mangaId: string): string { return `${GMANGA_BASE}/mangas/${mangaId}` }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
@@ -152,7 +152,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
                 ]
             }
         ]
-        
+
         const promises: Promise<void>[] = []
         for (const section of sections) {
             for (const dsection of section.info) {
@@ -166,22 +166,22 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
                     catch (e) {
                         throw new Error(`${e}`)
                     }
-                    
+
                     data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
                     data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-                    
+
                     dsection.section.items = parseHompage(data, dsection.selector)
                     sectionCallback(dsection.section)
                 }))
             }
         }
-        
+
         await Promise.all(promises)
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        
+
         let request: Request
         let selector = 'undefined'
         if (homepageSectionId === 'latest') {
@@ -214,7 +214,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         }
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data as string)
@@ -222,11 +222,11 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
         const manga = parseHompage(data, selector)
-        
+
         if (homepageSectionId === 'popular') {
             metadata = data.mangas.length === 50 ? { page: page + 1 } : undefined
         } else if (homepageSectionId === 'latest') {
@@ -234,7 +234,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         } else {
             metadata = undefined
         }
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
@@ -252,7 +252,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data as string)
@@ -260,13 +260,13 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
         const manga = parseSearch(data)
-        
+
         metadata = data.mangas.length === 50 ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
@@ -279,7 +279,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data as string)
@@ -287,10 +287,10 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseMangaDetails(data, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = App.createRequest({
             url: `${GMANGA_API}/mangas/${mangaId}/releases`,
@@ -298,7 +298,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data as string)
@@ -306,13 +306,13 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         data = data['iv'] ? GMangaUtil.haqiqa(data.data) : data
         data = data['isCompact'] ? GMangaUtil.unpack(data) : data
-        
+
         return parseChapters(data)
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${GMANGA_BASE}/r/${chapterId}`,
@@ -321,26 +321,26 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseChapterDetails($, mangaId, chapterId)
     }
-    
+
     async getSearchTags(): Promise<TagSection[]> {
         return parseTags()
     }
-    
+
     async getSearchFields(): Promise<SearchField[]> {
         return parseSearchFields()
     }
-    
+
     async supportsTagExclusion(): Promise<boolean> {
         return true
     }
-    
+
     async supportsSearchOperators(): Promise<boolean> {
         return true
     }
-    
+
     CloudFlareError(status: number): void {
         if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${GMangaInfo.name} and press Cloudflare Bypass`)

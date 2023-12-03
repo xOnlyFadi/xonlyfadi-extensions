@@ -13,6 +13,7 @@
   "author": "xOnlyFadi",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^1.4.1",
     "@tsconfig/recommended": "^1.0.1",
     "@types/cheerio": "^0.22.21",
     "@types/crypto-js": "^4.2.1",

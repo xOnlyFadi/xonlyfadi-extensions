@@ -1,4 +1,4 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
@@ -9,12 +9,12 @@ import {
     HomeSectionType
 } from '@paperback/types'
 
-import { 
+import {
     ChapterList,
     GenresDa,
     MangaDetails,
     PageList,
-    SearchData 
+    SearchData
 } from './ComicKHelper'
 
 import {
@@ -79,7 +79,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
             arrayTags.push({ id: id, label: label })
         }
     }
-   
+
     let status = 'ONGOING'
     if (comic?.status) {
         switch (comic.status) {
@@ -124,7 +124,7 @@ export const parseChapters = (
 
         const chapNum = Number(chap)
         const volume = Number(vol)
-        
+
         const groups = []
         if (chapter?.group_name) {
             for (const group of chapter.group_name) {
@@ -173,7 +173,7 @@ export const parseChapters = (
 }
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-    
+
     for (const images of data.chapter.images) {
         const url = images.url
 
@@ -187,7 +187,7 @@ export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: 
         mangaId: mangaId,
         pages: pages
     })
-    
+
     return chapterDetails
 }
 
@@ -201,7 +201,7 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
             continue
         arrayTags.push({ id: `genre.${id}`, label: label })
     }
-    
+
     const Sort: Tag[] = [
         {
             label: 'Most follows',
@@ -286,7 +286,7 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
 
 export const parseHomeSections = (data: SearchData[], id: string, sectionCallback: (section: HomeSection) => void): void => {
     let section: HomeSection
-    
+
     switch (id) {
         case 'view':
             section = App.createHomeSection({
@@ -328,9 +328,9 @@ export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
         const title = manga?.title ?? ''
         const image = manga?.cover_url ?? ''
         const subtitle = manga?.last_chapter ?? ''
-        
+
         if (!id) continue
-        
+
         results.push(App.createPartialSourceManga({
             image,
             title: decodeHTML(title),

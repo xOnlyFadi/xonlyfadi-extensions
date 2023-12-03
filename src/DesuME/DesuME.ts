@@ -18,7 +18,7 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     parseChapters,
     parseSearch,
@@ -26,7 +26,7 @@ import {
     parseTags
 } from './DesuMEParser'
 
-import { 
+import {
     ChapterDetailsImages,
     MangaDetails,
     SearchData
@@ -75,11 +75,11 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
             }
         }
     })
-    
+
     limit = 50
-    
+
     getMangaShareUrl(mangaId: string): string { return `${DOMAIN}/manga/${mangaId}` }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
@@ -119,9 +119,9 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
                 })
             }
         ]
-        
+
         const promises: Promise<void>[] = []
-        
+
         for (const section of sections) {
             sectionCallback(section.section)
             promises.push(this.requestManager.schedule(section.request, 1).then(response => {
@@ -137,10 +137,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
                 sectionCallback(section.section)
             }))
         }
-        
+
         await Promise.all(promises)
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         const request = App.createRequest({
@@ -149,71 +149,71 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data: SearchData
         try {
             data = JSON.parse(response.data as string)
         }
         catch (e) {
             throw new Error(`${e}`)
-        } 
+        }
         const manga = parseSearch(data)
-        
+
         metadata = data.pageNavParams.count > data.pageNavParams.page * data.pageNavParams.limit ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let url = `${API}/?limit=${this.limit}&page=${page}`
-        
+
         const Genres: string[] = []
         const Types: string[] = []
         const Order: string[] = []
         query.includedTags?.map(x => {
             const id = x?.id
             const SplittedID = id?.split('.')?.pop() ?? ''
-            
+
             if (id.includes('genres.')) {
                 Genres.push(SplittedID)
             }
-            
+
             if (id.includes('types.')) {
                 Types.push(SplittedID)
             }
-            
+
             if (id.includes('order.')) {
                 Order.push(SplittedID)
             }
         })
-        
+
         if (query?.title) {
             url += `&search=${query?.title.replace(/ /g, '+').replace(/%20/g, '+')}`
         }
-        
+
         if (Genres.isNotEmpty()) {
             url += `&genres=${Genres.join(',')}`
         }
-        
+
         if (Types.isNotEmpty()) {
             url += `&kinds=${Types.join(',')}`
         }
-        
+
         if (Order.isNotEmpty()) {
             url += `&order=${Order[0]}`
         }
-        
+
         const request = App.createRequest({
             url: url,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data: SearchData
         try {
             data = JSON.parse(response.data as string)
@@ -222,15 +222,15 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
             throw new Error(`${e}`)
         }
         const manga = parseSearch(data)
-        
+
         metadata = data.pageNavParams.count > data.pageNavParams.page * data.pageNavParams.limit ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${API}/${mangaId}`,
@@ -238,7 +238,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data: MangaDetails
         try {
             data = JSON.parse(response.data as string)
@@ -246,10 +246,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseMangaDetails(data, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = App.createRequest({
             url: `${API}/${mangaId}`,
@@ -257,7 +257,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data: MangaDetails
         try {
             data = JSON.parse(response.data as string)
@@ -265,10 +265,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseChapters(data)
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${API}/${mangaId}/chapter/${chapterId}`,
@@ -276,7 +276,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data: ChapterDetailsImages
         try {
             data = JSON.parse(response.data as string)
@@ -284,14 +284,14 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseChapterDetails(data, mangaId, chapterId)
     }
 
     async getSearchTags(): Promise<TagSection[]> {
         return parseTags()
     }
-    
+
     CloudFlareError(status: number): void {
         if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${DesuMEInfo.name} and press Cloudflare Bypass`)

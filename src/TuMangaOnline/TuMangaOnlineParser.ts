@@ -12,7 +12,7 @@ import { decodeHTML } from 'entities'
 export class Parser {
     parseHomeSection($: CheerioStatic, baseUrl: string): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
-        
+
         for (const obj of $('div.element').toArray()) {
             const info = $('div.element > a',obj)
             const id = this.idCleaner(info.attr('href')?.trim() ?? '', baseUrl) ?? ''
@@ -28,10 +28,10 @@ export class Parser {
                 subtitle: undefined
             }))
         }
-        
+
         return items
     }
-    
+
     parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
 
@@ -50,11 +50,11 @@ export class Parser {
             pages: pages
         })
     }
-    
+
     parseChapters($: CheerioStatic, mangaId: string, baseUrl: string): Chapter[] {
         const chapters: Chapter[] = []
         const ChapterNumRegex = /capítulo ([\d.]+)?|capitulo ([\d.]+)?/i
-        
+
         if($('div.chapters').contents().length == 0){
             for(const obj of $('div.chapter-list-element > ul.list-group li.list-group-item').toArray()){
                 const id = this.idCleaner($('div.row > .text-right > a',obj).attr('href') ?? '', baseUrl)
@@ -113,10 +113,10 @@ export class Parser {
                 }
             }
         }
-        
+
         return chapters
     }
-    
+
     parseMangaDetails($: CheerioStatic, mangaId: string): SourceManga {
         const infotitle = $('h1.element-title').first()
         infotitle.find('small').remove()
@@ -124,15 +124,15 @@ export class Parser {
         const title2 = decodeHTML($('h2.element-subtitle').first().text().trim()) ?? ''
 
         const image = $('.book-thumbnail').attr('src') ?? 'https://paperback.moe/icons/logo-alt.svg'
-        
+
         const desc = decodeHTML($('p.element-description').text().trim()) ?? ''
-        
+
         const infoAuth = $('h5.card-title')
         const author = decodeHTML(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
         const artist = decodeHTML(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
-        
+
         const status = decodeHTML($('span.book-status').text().trim()) ?? ''
-        
+
         const arrayTags: Tag[] = []
         const genreregex = /genders.*?=(\d+)?/i
 
@@ -162,10 +162,10 @@ export class Parser {
             })
         })
     }
-    
+
     parseTags($: CheerioStatic, isNSFW: boolean): TagSection[]{
         const arrayTags: Tag[] = []
-        
+
         const arrayTags2: Tag[] = [
             {
                 id: 'types.manga',
@@ -196,7 +196,7 @@ export class Parser {
                 label: 'Oel'
             }
         ]
-        
+
         const arrayTags3: Tag[] = [
             {
                 id: 'status.publishing',
@@ -215,7 +215,7 @@ export class Parser {
                 label: 'Pausado'
             }
         ]
-        
+
         const arrayTags4: Tag[] = [
             {
                 id: 'trstatus.publishing',
@@ -230,7 +230,7 @@ export class Parser {
                 label: 'Abandonado'
             }
         ]
-        
+
         const arrayTags5: Tag[] = [
             {
                 id: 'demog.seinen',
@@ -253,7 +253,7 @@ export class Parser {
                 label: 'Kodomo'
             }
         ]
-        
+
         const arrayTags6: Tag[] = [
             {
                 id: 'filby.title',
@@ -268,7 +268,7 @@ export class Parser {
                 label: 'Compañia'
             }
         ]
-        
+
         const arrayTags7: Tag[] = [
             {
                 id: 'sorting.likes_count',
@@ -295,7 +295,7 @@ export class Parser {
                 label: 'Núm. Capítulos'
             }
         ]
-        
+
         const arrayTags8: Tag[] = [
             {
                 id: 'byaplha.asc',
@@ -304,9 +304,9 @@ export class Parser {
             {
                 id: 'byaplha.desc',
                 label: 'Descendente'
-            }  
+            }
         ]
-        
+
         const arrayTags9: Tag[] = [
             {
                 id: 'contenttype.webcomic',
@@ -325,19 +325,19 @@ export class Parser {
                 label: 'Erótico'
             }
         ]
-        
+
         const NSFWids = []
-        
+
         isNSFW ? NSFWids.push() : NSFWids.push('6', '17', '18', '19')
         for (const tag of $('#books-genders .col-auto .custom-control').toArray()) {
             const label = $('label', tag).text().trim()
             const id = $('input', tag).attr('value') ?? '0'
-            if (!NSFWids.includes(id)){ 
+            if (!NSFWids.includes(id)){
                 if (!id || !label) continue
                 arrayTags.push({ id: id, label: label })
             }
         }
-        
+
         return [
             App.createTagSection({ id: '0', label: 'Géneros', tags: arrayTags.map(x => App.createTag(x)) }),
             App.createTagSection({ id: '1', label: 'Filtrar por tipo', tags: arrayTags2.map(x => App.createTag(x)) }),
@@ -352,7 +352,7 @@ export class Parser {
             App.createTagSection({ id: '10', label: 'Filtrar por tipo de contenido', tags: arrayTags9.map(x => App.createTag(x)) })
         ]
     }
-    
+
     NextPage($: CheerioSelector) {
         const nextPage = $('a.page-link')
         if (nextPage.contents().length !== 0) {
@@ -362,7 +362,7 @@ export class Parser {
             return false
         }
     }
-    
+
     idCleaner = (str: string, baseUrl: string): string => {
         const base = baseUrl.split('://').pop()
         str = str.replace(/(https:\/\/|http:\/\/)/, '')

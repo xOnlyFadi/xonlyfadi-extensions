@@ -1,7 +1,7 @@
-import { 
+import {
     DUIButton,
     DUINavigationButton,
-    SourceStateManager 
+    SourceStateManager
 } from '@paperback/types'
 
 import {
@@ -131,7 +131,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                             }
                                         })
                                     })
-                                    
+
                                     await stateManager.store('uploaders', uploaders)
                                 }
                             }),
@@ -152,7 +152,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 // default to true if no value is set
                                 get: async () => {
                                     const value = await stateManager.retrieve('aggressive_uploaders_filtering')
-                                    
+
 
                                     if (value !== false) {
                                         return true
@@ -224,7 +224,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 uploaders.forEach((uploader: Uploader) => {
                                     if (uploader.value === targetUploader) {
                                         const index = uploaders.indexOf(uploader)
-                                        
+
                                         if (index > -1) {
                                             uploaders.splice(index, 1)
                                         }

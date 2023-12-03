@@ -1,4 +1,4 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
@@ -7,7 +7,7 @@ import {
     TagSection
 } from '@paperback/types'
 
-import { 
+import {
     ChapterDetailsImages,
     MangaDetails,
     SearchData
@@ -19,15 +19,15 @@ import '../scopes'
 
 export const parseSearch = (data: SearchData): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
-    
+
     for (const obj of data.response) {
         const id = obj?.id ?? ''
         const title = obj?.name ?? ''
         const image = obj.image.original ? obj.image.original : ''
         const subtitle = obj?.chapters?.updated?.ch ?? ''
-        
+
         if (!id) continue
-        
+
         results.push(App.createPartialSourceManga({
             title: decodeHTML(title),
             image,
@@ -35,20 +35,20 @@ export const parseSearch = (data: SearchData): PartialSourceManga[] => {
             subtitle: subtitle ? `Глава ${subtitle}` : ''
         }))
     }
-    
+
     return results
 }
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const details = data.response
-    
+
     const titles: string[] = []
     if (details?.name) titles.push(details?.name.trim())
     if (details?.russian) titles.push(details?.russian.trim())
-    
+
     const image = details.image.original ? details.image.original : ''
     const author = details.authors ?? ''
-    
+
     const arrayTags: Tag[] = []
     if (details?.genres) {
         for (const category of details.genres) {
@@ -62,7 +62,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
             })
         }
     }
-    
+
     let status = 'ONGOING'
     if (details?.trans_status) {
         switch (details?.trans_status) {
@@ -84,7 +84,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
                 break
         }
     }
-    
+
     return App.createSourceManga({
         id: mangaId,
         mangaInfo: App.createMangaInfo({
@@ -102,16 +102,16 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
 export const parseChapters = (data: MangaDetails): Chapter[] => {
     const chapters: Chapter[] = []
     let sortingIndex = 0
-    
+
     for (const chapter of data.response.chapters.list) {
         const id = chapter?.id ?? ''
         const chapNum = chapter?.ch ? Number(chapter.ch) : 0
         const chapVol = chapter?.ch ? Number(chapter.vol) : 0
-        const time = chapter?.date ? new Date(chapter?.date * 1000) ?? new Date() : new Date() 
+        const time = chapter?.date ? new Date(chapter?.date * 1000) ?? new Date() : new Date()
         const name = chapter?.title ? chapter?.title : ''
-        
+
         if (!id) continue
-        
+
         chapters.push({
             id: `${id}`,
             name,
@@ -133,15 +133,15 @@ export const parseChapters = (data: MangaDetails): Chapter[] => {
 
 export const parseChapterDetails = (data: ChapterDetailsImages, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-    
+
     for (const page of data.response.pages.list) {
         const url = page.img ?? ''
-        
+
         if (!url) continue
-        
+
         pages.push(url)
     }
-    
+
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,

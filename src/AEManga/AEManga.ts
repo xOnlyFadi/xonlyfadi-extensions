@@ -18,7 +18,7 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     NextPage,
     parseTags,
@@ -74,9 +74,9 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
             }
         }
     })
-    
+
     getMangaShareUrl(mangaId: string): string { return `${AEMANGA_DOMAIN}/${mangaId}` }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
@@ -140,9 +140,9 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
                 })
             }
         ]
-        
+
         const promises: Promise<void>[] = []
-        
+
         for (const section of sections) {
             sectionCallback(section.section)
             promises.push(this.requestManager.schedule(section.request, 1).then(response => {
@@ -155,34 +155,34 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
 
         await Promise.all(promises)
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        
+
         const request = App.createRequest({
             url: encodeURI(`${AEMANGA_DOMAIN}/manga/page:${page}|order:${homepageSectionId}`),
             method: 'GET'
         })
-        
+
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseSearch($, AEMANGA_DOMAIN)
-        
+
         metadata = NextPage($) ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         const Genres: string[] = []
         const Order: string[] = []
         const Sort: string[] = []
-        
+
         query.includedTags?.map((x) => {
             if (x.id.includes('genres.')) {
                 Genres.push(`|tag:${x.id?.split('.')?.pop()}`)
@@ -194,7 +194,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
                 Sort.push(`|arrange:${x.id?.split('.')?.pop()}`)
             }
         })
-        
+
         let request
         if (query.title) {
             request = App.createRequest({
@@ -208,19 +208,19 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
                 method: 'GET'
             })
         }
-        
+
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseSearch($, AEMANGA_DOMAIN)
-        
+
         metadata = NextPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
             url: `${AEMANGA_DOMAIN}/manga/`,
@@ -229,10 +229,10 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseTags($)
     }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${AEMANGA_DOMAIN}/${mangaId}`,
@@ -241,10 +241,10 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseMangaDetails($, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = App.createRequest({
             url: `${AEMANGA_DOMAIN}/${mangaId}`,
@@ -253,7 +253,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseChapters($)
     }
 
@@ -265,7 +265,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseChapterDetails($, mangaId, chapterId)
     }
 
@@ -279,7 +279,7 @@ export class AEManga implements MangaProviding, ChapterProviding, SearchResultsP
             }
         })
     }
-    
+
     CloudFlareError(status: number): void {
         if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${AEMangaInfo.name} and press Cloudflare Bypass`)
