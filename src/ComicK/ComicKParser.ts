@@ -10,7 +10,7 @@ import {
 } from '@paperback/types'
 
 import { 
-    ChapterDetailsT,
+    ChapterList,
     GenresDa,
     MangaDetails,
     PageList,
@@ -107,7 +107,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     })
 }
 export const parseChapters = (
-    data: ChapterDetailsT, 
+    data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
     uploadersToggled: boolean,

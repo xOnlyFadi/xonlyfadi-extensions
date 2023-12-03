@@ -36,6 +36,7 @@ import {
 } from './ComicKSettings'
 
 import {
+    ChapterList,
     CMLanguages,
     Uploader
 } from './ComicKHelper'
@@ -131,11 +132,11 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const chapters: Chapter[] = []
 
         let page = 1
-        let json = await this.createChapterRequest(mangaId, page++)
+        let data = await this.createChapterRequest(mangaId, page++)
 
         chapters.push(...(
             parseChapters(
-                json,
+                data,
                 showTitle,
                 showVol,
                 uploadersToggled,
@@ -146,15 +147,15 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             )))
 
         // Try next page if number of chapters is same as limit
-        while (json.chapters.length === LIMIT) {
-            json = await this.createChapterRequest(mangaId, page++)
+        while (data.chapters.length === LIMIT) {
+            data = await this.createChapterRequest(mangaId, page++)
 
             // Break if there are no more chapters
-            if (json.chapters.length === 0) break
+            if (data.chapters.length === 0) break
 
             chapters.push(...(
                 parseChapters(
-                    json,
+                    data,
                     showTitle,
                     showVol,
                     uploadersToggled,
@@ -168,7 +169,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         return chapters
     }
 
-    async createChapterRequest(mangaId: string, page: number): Promise<any> {
+    async createChapterRequest(mangaId: string, page: number): Promise<ChapterList> {
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
             url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
@@ -319,7 +320,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const Type: string[] = []
         const Demographic: string[] = []
 
-        query.includedTags?.map((x: any) => {
+        query.includedTags?.map((x) => {
             const id = x.id
             const SplittedID = id?.split('.')?.pop() ?? ''
             if (id.includes('genre.')) {
@@ -339,7 +340,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             }
         })
         
-        query.excludedTags?.map((x: any) => {
+        query.excludedTags?.map((x) => {
             const id = x.id
             const SplittedID = id?.split('.')?.pop() ?? ''
             if (id.includes('genre.')) {
