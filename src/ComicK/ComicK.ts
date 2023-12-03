@@ -39,7 +39,7 @@ import { CMLanguages } from './ComicKHelper'
 
 const COMICK_DOMAIN = 'https://comick.ink'
 const COMICK_API = 'https://api.comick.fun'
-const SEARCH_PAGE_LIMIT = 100
+const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
     version: '2.1.2',
@@ -60,7 +60,7 @@ export const ComicKInfo: SourceInfo = {
 }
 export class ComicK implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     requestManager = App.createRequestManager({
-        requestsPerSecond: 4,
+        requestsPerSecond: 10,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
@@ -123,23 +123,26 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         
         let page = 1
         let json = await this.createChapterRequest(mangaId, page++)
-        let resultSize = json.chapters.length
 
         chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
 
-        while (json.total > resultSize) {
+        // Try next page if number of chapters is same as limit
+        while (json.chapters.length === LIMIT) {
             json = await this.createChapterRequest(mangaId, page++)
-            resultSize += json.chapters.length
+
+            // Break if there are no more chapters
+            if (json.chapters.length === 0) break
+
             chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
         }
 
         return chapters
     }
-    
+
     async createChapterRequest(mangaId: string, page: number): Promise<any> {
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
@@ -202,7 +205,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const createSectionRequest = (sort: string) => ({
             id: sort,
             request: App.createRequest({
-                url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=${sort}&t=false`,
+                url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${LIMIT}&sort=${sort}&t=false`,
                 method: 'GET'
             })
         })
@@ -243,13 +246,13 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         let param
         switch (homepageSectionId) {
             case 'view':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=view&t=false`
                 break
             case 'follow':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=follow&t=false`
                 break
             case 'uploaded':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=uploaded&t=false`
                 break
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist')
@@ -271,7 +274,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         }
         
         const manga = parseSearch(data)
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: manga,
             metadata
@@ -318,12 +321,12 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         let request
         if (query.title) {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${SEARCH_PAGE_LIMIT}&page=${page}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${LIMIT}&page=${page}&tachiyomi=true`,
                 method: 'GET'
             })
         } else {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
                 method: 'GET'
             })
         }
@@ -339,7 +342,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         }
         
         const manga = parseSearch(data)
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: manga,
             metadata
