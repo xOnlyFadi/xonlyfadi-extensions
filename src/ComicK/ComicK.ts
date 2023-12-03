@@ -232,6 +232,9 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        // Show only 20 titles on HomeSection, override global LIMIT to 20
+        const LIMIT = 20
+
         const createSectionRequest = (sort: string) => ({
             id: sort,
             request: App.createRequest({
