@@ -51,7 +51,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     
     const arrayTags: Tag[] = []
     if (details?.genres) {
-        for (const category of details?.genres) {
+        for (const category of details.genres) {
             const id = category.text.replace(/ /g, '+').replace(/%20/g, '+') ?? ''
             const label = category?.russian ?? ''
             if (!id || !label)
@@ -103,7 +103,7 @@ export const parseChapters = (data: MangaDetails): Chapter[] => {
     const chapters: Chapter[] = []
     let sortingIndex = 0
     
-    for (const chapter of data?.response?.chapters?.list) {
+    for (const chapter of data.response.chapters.list) {
         const id = chapter?.id ?? ''
         const chapNum = chapter?.ch ? Number(chapter.ch) : 0
         const chapVol = chapter?.ch ? Number(chapter.vol) : 0

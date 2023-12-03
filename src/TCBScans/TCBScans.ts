@@ -31,7 +31,7 @@ export const TCBScansInfo: SourceInfo = {
 export class TCBScans implements ChapterProviding {
     constructor(public cheerio: CheerioAPI) { }
 
-    private readonly parser: Parser = new Parser();
+    private readonly parser: Parser = new Parser()
     readonly requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -49,7 +49,7 @@ export class TCBScans implements ChapterProviding {
                 return response
             }
         }
-    });
+    })
     
     getMangaShareUrl(mangaId: string): string {
         return `${TCBScans_Base}/mangas/${mangaId}`

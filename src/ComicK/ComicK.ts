@@ -81,7 +81,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 return response
             }
         }
-    });
+    })
     
     stateManager = App.createSourceStateManager()
 

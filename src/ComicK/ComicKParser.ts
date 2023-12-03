@@ -30,7 +30,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     const titles: string[] = [comic?.title]
 
     if (comic?.md_titles) {
-        for (const altTitles of comic?.md_titles) {
+        for (const altTitles of comic.md_titles) {
             titles.push(altTitles.title)
         }
     }
@@ -38,15 +38,15 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     const image = comic?.cover_url
     const author = []
     if (data?.authors) {
-        for (const authors of data?.authors) {
-            author.push(authors?.name)
+        for (const authors of data.authors) {
+            author.push(authors.name)
         }
     }
 
     const artist = []
     if (data?.artists) {
-        for (const authors of data?.artists) {
-            artist.push(authors?.name)
+        for (const artists of data.artists) {
+            artist.push(artists.name)
         }
     }
 
@@ -71,7 +71,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     }
 
     if (data?.genres) {
-        for (const tag of data?.genres) {
+        for (const tag of data.genres) {
             const label = tag?.name
             const id = `genre.${tag?.slug}`
             if (!id || !label)
@@ -82,7 +82,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
    
     let status = 'ONGOING'
     if (comic?.status) {
-        switch (comic?.status) {
+        switch (comic.status) {
             case 1:
                 status = 'ONGOING'
                 break
@@ -117,7 +117,7 @@ export const parseChapters = (
     strictNameMatching: boolean,
     uploaders: Uploader[]
 ): void => {
-    for (const chapter of data?.chapters) {
+    for (const chapter of data.chapters) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
         const vol = chapter?.vol
@@ -127,7 +127,7 @@ export const parseChapters = (
         
         const groups = []
         if (chapter?.group_name) {
-            for (const group of chapter?.group_name) {
+            for (const group of chapter.group_name) {
                 groups.push(group)
             }
         }
@@ -174,8 +174,8 @@ export const parseChapters = (
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
     
-    for (const images of data?.chapter?.images) {
-        const url = images?.url
+    for (const images of data.chapter.images) {
+        const url = images.url
 
         if(!url) continue
 

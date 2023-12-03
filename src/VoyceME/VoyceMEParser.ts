@@ -23,12 +23,12 @@ import { convert } from 'html-to-text'
 import '../scopes'
 
 export class Parser {
-    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net';
+    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net'
     
     parseSearch(VoyceD: SearchData): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
         
-        for(const data of VoyceD?.data?.voyce_series){
+        for(const data of VoyceD.data.voyce_series){
             const id = data?.id ?? ''
             const title = data?.title?.trim() ?? ''
             const image = data?.thumbnail ? encodeURI(`${this.staticURL}/${data?.thumbnail}`) : ''
@@ -264,7 +264,7 @@ export class Parser {
     parseTags(data: SearchType): TagSection[] {
         const Genres: Tag[] = []
 
-        for(const genre of data?.data?.genres){
+        for(const genre of data.data.genres){
             const id = genre?.id ?? ''
             const label = genre?.title ?? ''
 
@@ -278,7 +278,7 @@ export class Parser {
 
         const Types: Tag[] = []
 
-        for(const type of data?.data?.types){
+        for(const type of data.data.types){
             const id = type?.id ?? ''
             const label = type?.title ?? ''
 

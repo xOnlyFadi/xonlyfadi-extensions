@@ -12,9 +12,9 @@ import {
 import { decodeHTML } from 'entities'
 
 export class Parser {
-    private readonly chapterTitleRegex = /Chapter ([\d.]+)/i;
+    private readonly chapterTitleRegex = /Chapter ([\d.]+)/i
     
-    async parseHomeSections($: CheerioStatic, sectionCallback: (section: HomeSection) => void, source: any): Promise<void> {
+    async parseHomeSections($: CheerioStatic, sectionCallback: (section: HomeSection) => void, cdnUrl: string): Promise<void> {
         const top5Section = App.createHomeSection({ id: 'top5', title: 'Top 5', containsMoreItems: false, type: HomeSectionType.featured })
         const popularSection = App.createHomeSection({ id: 'popular', title: 'Popular', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
         const TodayMangaSection = App.createHomeSection({ id: 'today_manga', title: 'Today\'s Manga', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
@@ -30,7 +30,7 @@ export class Parser {
         for (const obj of $('li', $('.slide_box .rslides')).toArray()) {
             const id = $('a',obj).attr('href')?.split('/').pop() ?? ''
             const title = $('div', obj).text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
 
             if (!id) continue
 
@@ -47,7 +47,7 @@ export class Parser {
         for (const obj of $('.featured_item_info', $('.box .featured_list div')).toArray()) {
             const id = $('a',obj).first().attr('href')?.split('/').pop() ?? ''
             const title = $('a', obj).first().text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = $('a#chapter', obj).text().trim()
 
             if (!id) continue
@@ -66,7 +66,7 @@ export class Parser {
         for (const obj of $('.latest_list div',$('.right div:contains(TODAY\'S MANGA)').next()).toArray()) {
             const id = $('a.image',obj).attr('href')?.split('/').pop() ?? ''
             const title = $('a.name', obj).text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = $('.chapter_box a', obj).text().trim()
 
             if (!id) continue
@@ -85,7 +85,7 @@ export class Parser {
         for (const obj of $('.latest_list div',$('.right div:contains(YESTERDAY\'S MANGA)').next()).toArray()) {
             const id = $('a.image',obj).attr('href')?.split('/').pop() ?? ''
             const title = $('a.name', obj).text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = $('.chapter_box a', obj).text().trim()
 
             if (!id) continue
@@ -104,7 +104,7 @@ export class Parser {
         for (const obj of $('.latest_list div',$('.right div:contains(OLDER MANGA)').next()).toArray()) {
             const id = $('a.image',obj).attr('href')?.split('/').pop() ?? ''
             const title = $('a.name', obj).text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = $('.chapter_box a', obj).text().trim()
 
             if (!id) continue
@@ -121,13 +121,13 @@ export class Parser {
         sectionCallback(OlderMangaSection)
     }
     
-    ViewMoreParse($: CheerioSelector, source: any, isPopular: boolean): PartialSourceManga[] {
+    ViewMoreParse($: CheerioSelector, cdnUrl: string, isPopular: boolean): PartialSourceManga[] {
         const results: PartialSourceManga[] = []
         
         for (const obj of $(isPopular ? '.ranking_list .ranking_item' : '.latest_releases_list .latest_releases_item').toArray()) {
             const id = $('a',obj).attr('href')?.split('/').pop() ?? ''
             const title = $('a h3, a strong', obj).text().trim() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = isPopular ? $('.ranking_item_info div:contains(Published)', obj).text().trim().split(' ').shift() ?? '' : $('.latest_releases_info div a', obj).first().text().trim().split(' ').pop() ?? ''
 
             if (!id) continue
@@ -143,13 +143,13 @@ export class Parser {
         return results
     }
     
-    parseSearchResults($: CheerioSelector, source: any, UsesDeatils: boolean): PartialSourceManga[] {
+    parseSearchResults($: CheerioSelector, cdnUrl: string, UsesDeatils: boolean): PartialSourceManga[] {
         const results: PartialSourceManga[] = []
         
         for (const obj of $(UsesDeatils ? '.ranking_list .ranking_item' :'div.manga_search_item, div.mangaka_search_item').toArray()) {
             const id = $('h3 a, h5 a, a', obj).attr('href')?.split('/').pop() ?? ''
             const title = $('h3 a, h5 a, a h3', obj).text() ?? ''
-            const image = `${source.baseCdn}/manga_images/${id.toLowerCase()}.jpg`
+            const image = `${cdnUrl}/manga_images/${id.toLowerCase()}.jpg`
             const subtitle = $('div:contains(Published), .ranking_item_info div:contains(Published)', obj).text().trim().split(' ').shift()
 
             if (!id) continue
@@ -210,9 +210,9 @@ export class Parser {
         return chapters
     }
     
-    parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
+    parseMangaDetails($: CheerioStatic, mangaId: string, cdnUrl: string): SourceManga {
         const title = $('div.manga_series_data h5').first().text().trim() ?? ''
-        const image = `${source.baseCdn}/manga_images/${mangaId.toLowerCase()}.jpg`
+        const image = `${cdnUrl}/manga_images/${mangaId.toLowerCase()}.jpg`
 
 
         const author = $('div.manga_series_data > div').eq(2).text().trim() ?? ''

@@ -44,9 +44,9 @@ export const MangaFreakInfo: SourceInfo = {
 export class MangaFreak implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     constructor(public cheerio: CheerioAPI) { }
 
-    private readonly parser: Parser = new Parser();
-    baseUrl = MangaFreak_BASE;
-    baseCdn = MangaFreak_CDN;
+    private readonly parser: Parser = new Parser()
+    baseUrl = MangaFreak_BASE
+    baseCdn = MangaFreak_CDN
     
     readonly requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -66,7 +66,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
                 return response
             }
         }
-    });
+    })
     
     getMangaShareUrl(mangaId: string): string {
         return `${MangaFreak_BASE}/Manga/${mangaId}`
@@ -92,7 +92,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         const $ = this.cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
         
-        return this.parser.parseHomeSections($, sectionCallback, this)
+        return this.parser.parseHomeSections($, sectionCallback, MangaFreak_CDN)
     }
     
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
@@ -119,7 +119,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
-        const manga = this.parser.ViewMoreParse($, this, isPopular)
+        const manga = this.parser.ViewMoreParse($, MangaFreak_CDN, isPopular)
         
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
         
@@ -150,7 +150,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         
-        return this.parser.parseMangaDetails($, mangaId, this)
+        return this.parser.parseMangaDetails($, mangaId, MangaFreak_CDN)
     }
     
     async getChapters(mangaId: string): Promise<Chapter[]> {
@@ -260,7 +260,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data as string)
-        const manga = this.parser.parseSearchResults($, this, UsesDeatils)
+        const manga = this.parser.parseSearchResults($, MangaFreak_CDN, UsesDeatils)
         
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
         

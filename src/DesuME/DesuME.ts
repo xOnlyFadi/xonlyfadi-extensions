@@ -74,9 +74,9 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
                 return response
             }
         }
-    });
+    })
     
-    limit = 50;
+    limit = 50
     
     getMangaShareUrl(mangaId: string): string { return `${DOMAIN}/manga/${mangaId}` }
     

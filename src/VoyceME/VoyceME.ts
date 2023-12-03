@@ -49,9 +49,9 @@ export const VoyceMEInfo: SourceInfo = {
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS
 }
 export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    private readonly parser: Parser = new Parser();
-    private readonly graphqlURL: string = 'https://graphql.voyce.me/v1/graphql';
-    private readonly popularPerPage: number = 30;
+    private readonly parser: Parser = new Parser()
+    private readonly graphqlURL: string = 'https://graphql.voyce.me/v1/graphql'
+    private readonly popularPerPage: number = 30
     
     readonly requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -74,7 +74,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
                 return response
             }
         }
-    });
+    })
     
     getMangaShareUrl(mangaId: string): string {
         return `${VoyceME_Base}/series/${mangaId}`
@@ -84,7 +84,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: HomePageQuery(0, this)
+            data: HomePageQuery(0, this.popularPerPage)
         })
         const response = await this.requestManager.schedule(request, 1)
         
@@ -104,7 +104,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: HomePageQuery(page, this)
+            data: HomePageQuery(page, this.popularPerPage)
         })
         const response = await this.requestManager.schedule(request, 1)
         
@@ -192,7 +192,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: SearchQuery(query, metadata, this)
+            data: SearchQuery(query, page, this.popularPerPage)
         })
         const response = await this.requestManager.schedule(request, 2)
         

@@ -79,12 +79,14 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
     return chapters
 }
 
-export const parseChapterDetails = (data: any, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = (data: string, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
     const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi)
     for (const match of imageMatches) {
+        if (!match[1]) continue
+
         let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g')
-        
+
         if (url.startsWith('https')) {
             pages.push(url)
         } else {

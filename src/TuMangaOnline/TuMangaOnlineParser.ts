@@ -10,12 +10,12 @@ import '../scopes'
 import { decodeHTML } from 'entities'
 
 export class Parser {
-    parseHomeSection($: CheerioStatic, source: any): PartialSourceManga[] {
+    parseHomeSection($: CheerioStatic, baseUrl: string): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
         
         for (const obj of $('div.element').toArray()) {
             const info = $('div.element > a',obj)
-            const id = this.idCleaner(info.attr('href')?.trim() ?? '',source) ?? ''
+            const id = this.idCleaner(info.attr('href')?.trim() ?? '', baseUrl) ?? ''
             const title = decodeHTML($('h4.text-truncate',info).text().trim()) ?? decodeHTML($('h4.text-truncate',info)?.attr('title')?.trim() ?? '') ?? ''
             const image = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')') ?? ''
 
@@ -51,13 +51,13 @@ export class Parser {
         })
     }
     
-    parseChapters($: CheerioStatic, mangaId: string, source: any): Chapter[] {
+    parseChapters($: CheerioStatic, mangaId: string, baseUrl: string): Chapter[] {
         const chapters: Chapter[] = []
         const ChapterNumRegex = /capítulo ([\d.]+)?|capitulo ([\d.]+)?/i
         
         if($('div.chapters').contents().length == 0){
             for(const obj of $('div.chapter-list-element > ul.list-group li.list-group-item').toArray()){
-                const id = this.idCleaner($('div.row > .text-right > a',obj).attr('href') ?? '',source)
+                const id = this.idCleaner($('div.row > .text-right > a',obj).attr('href') ?? '', baseUrl)
 
                 const name = 'One Shot'
 
@@ -92,7 +92,7 @@ export class Parser {
                 const scanelement = $('ul.chapter-list > li',obj).toArray()
 
                 for(const allchaps of scanelement){
-                    const id = this.idCleaner($('div.row > .text-right > a',allchaps).attr('href') ?? '',source)
+                    const id = this.idCleaner($('div.row > .text-right > a',allchaps).attr('href') ?? '', baseUrl)
 
                     const scanlator = $('div.col-md-6.text-truncate',allchaps).text().trim() ?? ''
 
@@ -363,13 +363,13 @@ export class Parser {
         }
     }
     
-    idCleaner = (str: string, source: any): string => {
-        const base = source.baseUrl.split('://').pop()
+    idCleaner = (str: string, baseUrl: string): string => {
+        const base = baseUrl.split('://').pop()
         str = str.replace(/(https:\/\/|http:\/\/)/, '')
         str = str.replace(/\/$/, '')
         str = str.replace(`${base}/`, '')
         str = str.replace('library/', '')
         str = str.replace('view_uploads/', '')
         return str
-    };
+    }
 }

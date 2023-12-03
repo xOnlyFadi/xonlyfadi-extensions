@@ -81,7 +81,7 @@ implements
                 return response
             }
         }
-    });
+    })
 
     getMangaShareUrl(mangaId: string): string {
         return `${VYVY_DOMAIN}/manga/${mangaId}`

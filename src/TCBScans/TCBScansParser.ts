@@ -9,7 +9,7 @@ import {
 import { decodeHTML } from 'entities'
 
 export class Parser {
-    private readonly chapterTitleRegex = /Chapter ([\d.]+)/i;
+    private readonly chapterTitleRegex = /Chapter ([\d.]+)/i
     
     async parseHomeSections($: CheerioStatic, sectionCallback: (section: HomeSection) => void): Promise<void> {
         const section1 = App.createHomeSection({ id: '1', title: 'Projects', containsMoreItems: false, type: 'singleRowNormal'})

@@ -38,7 +38,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     
     const authors: string[] = []
     if (details?.authors) {
-        for (const author of details?.authors) {
+        for (const author of details.authors) {
             const name = author?.name
             if (!name)
                 continue
@@ -48,10 +48,9 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     
     const artists: string[] = []
     if (details?.artists) {
-        for (const artist of details?.artists) {
+        for (const artist of details.artists) {
             const name = artist?.name
-            if (!name)
-                continue
+            if (!name) continue
             artists.push(name)
         }
     }
@@ -69,7 +68,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     }
     
     if (details?.categories) {
-        for (const category of details?.categories) {
+        for (const category of details.categories) {
             const id = category.id ?? ''
             const label = category?.name ?? ''
             if (!id || !label)
@@ -83,9 +82,9 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     
     let status = 'مستمرة'
     if (details?.story_status) {
-        if (details?.story_status === 2)
+        if (details.story_status === 2)
             status = 'مستمرة'
-        if (details?.story_status === 3)
+        if (details.story_status === 3)
             status = 'منتهية'
     }
     

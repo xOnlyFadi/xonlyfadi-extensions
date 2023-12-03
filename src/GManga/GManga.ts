@@ -81,7 +81,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
                 return response
             }
         }
-    });
+    })
     
     getMangaShareUrl(mangaId: string): string { return `${GMANGA_BASE}/mangas/${mangaId}` }
     

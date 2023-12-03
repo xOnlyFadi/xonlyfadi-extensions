@@ -69,7 +69,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
                 return response
             }
         }
-    });
+    })
     
     async getCloudflareBypassRequestAsync(): Promise<Request> {
         return App.createRequest({
@@ -191,7 +191,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             request = App.createRequest({
                 url: `${RCO_DOMAIN}/Genre/`,
                 method: 'GET',
-                param: `${query?.includedTags?.map((x: any) => x.id)[0]}?page=${page}`
+                param: `${query?.includedTags?.map((x) => x.id)[0]}?page=${page}`
             })
         }
         const response = await this.requestManager.schedule(request, 1)

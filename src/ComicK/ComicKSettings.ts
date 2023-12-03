@@ -85,7 +85,8 @@ const getUploaders = async (stateManager: SourceStateManager): Promise<Uploader[
     return (await stateManager.retrieve('uploaders') ?? [])
 }
 const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
-    return (await getUploaders(stateManager) ?? []).filter((uploader: any) => uploader.selected).map((uploader: any) => uploader.value)
+    const uploaders = await getUploaders(stateManager)
+    return (uploaders ?? []).filter((uploader) => uploader.selected).map((uploader) => ({ value: uploader.value, selected: true }))
 }
 
 export const uploadersSettings = (stateManager: SourceStateManager): DUINavigationButton => {

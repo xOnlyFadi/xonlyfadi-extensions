@@ -17,11 +17,11 @@
     "@types/cheerio": "^0.22.21",
     "@types/crypto-js": "^4.2.1",
     "@types/html-to-text": "^9.0.4",
-    "@typescript-eslint/eslint-plugin": "^5.1.0",
-    "@typescript-eslint/parser": "^5.57.1",
-    "eslint": "^7.27.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.54.0",
     "eslint-plugin-modules-newline": "^0.0.6",
-    "typescript": "^4.9.5"
+    "typescript": "^5.3.2"
   },
   "dependencies": {
     "@paperback/toolchain": "^0.8.0-alpha.47",
@@ -30,7 +30,7 @@
     "crypto-js": "^4.2.0",
     "entities": "^4.4.0",
     "html-to-text": "^9.0.5",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.2",
     "ts-node": "^10.2.1"
   }
 }

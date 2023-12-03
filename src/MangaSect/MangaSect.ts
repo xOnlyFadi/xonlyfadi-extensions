@@ -46,7 +46,7 @@ export const MangaSectInfo: SourceInfo = {
 export class MangaSect implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     constructor(public cheerio: CheerioAPI) { }
 
-    baseUrl = DOMAIN;
+    baseUrl = DOMAIN
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -65,7 +65,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
                 return response
             }
         }
-    });
+    })
     
     async getCloudflareBypassRequestAsync(): Promise<Request> {
         return App.createRequest({

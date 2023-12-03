@@ -162,12 +162,12 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     ]
 }
 
-export const parseSearch = ($: CheerioStatic, source: any): PartialSourceManga[] => {
+export const parseSearch = ($: CheerioStatic, url: string): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
     
     for (const obj of $('div.mangacontainer').toArray()) {
         const title = $('a.manga', obj).first().text().trim() ?? ''
-        const id = $('a.manga', obj).first().attr('href')?.replace(`${source.baseUrl}/`, '')?.split('?').shift()?.replace(/\/+$/, '') ?? ''
+        const id = $('a.manga', obj).first().attr('href')?.replace(`${url}/`, '')?.split('?').shift()?.replace(/\/+$/, '') ?? ''
         const lazysrc = $('img', obj)?.attr('data-pagespeed-lazy-src') ?? ''
         const image = !lazysrc ? $('img', obj).attr('src') : lazysrc
         const subtitle = $('.details a', obj).last().text().trim()
