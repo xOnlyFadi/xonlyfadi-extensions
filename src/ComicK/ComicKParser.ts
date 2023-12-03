@@ -4,8 +4,7 @@ import {
     Tag,
     SourceManga,
     PartialSourceManga,
-    TagSection, 
-    SourceStateManager,
+    TagSection,
     HomeSection,
     HomeSectionType
 } from '@paperback/types'
@@ -18,8 +17,10 @@ import {
     SearchData 
 } from './ComicKHelper'
 
-import { CMLanguages } from './ComicKHelper'
-import { Uploader } from './ComicKSettings'
+import {
+    CMLanguages,
+    Uploader
+} from './ComicKHelper'
 
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
@@ -105,13 +106,16 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
         })
     })
 }
-export const parseChapters = async (data: ChapterDetailsT, chapSettings: { show_volume: boolean; show_title: boolean; }, stateManager: SourceStateManager): Promise<Chapter[]> => {
-    const uploadersToggled: boolean = await stateManager.retrieve('uploaders_toggled') ?? false
-    const uploadersWhitelisted: boolean = await stateManager.retrieve('uploaders_whitelisted') ?? false
-    const aggressiveUploadersFilter: boolean = await stateManager.retrieve('aggressive_uploaders_filtering') ?? false
-    const strictNameMatching: boolean = await stateManager.retrieve('strict_name_matching') ?? false
-    const uploaders: Uploader[] = await stateManager.retrieve('uploaders') ?? []
-
+export const parseChapters = (
+    data: ChapterDetailsT, 
+    showTitle: boolean,
+    showVol: boolean,
+    uploadersToggled: boolean,
+    uploadersWhitelisted: boolean,
+    aggressiveUploadersFilter: boolean,
+    strictNameMatching: boolean,
+    uploaders: Uploader[]
+): Chapter[] => {
     const chapters: Chapter[] = []
 
     for (const chapter of data?.chapters) {
@@ -159,13 +163,13 @@ export const parseChapters = async (data: ChapterDetailsT, chapSettings: { show_
                 }
             }
         }
-        
+
         if (!pushChapter) continue
         chapters.push(App.createChapter({
             id,
-            name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
-            chapNum: !isNaN(chapNum) ? chapNum : NaN,
-            volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
+            name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
+            chapNum: chapNum,
+            volume: showVol ? !isNaN(volume) ? volume : undefined : undefined,
             time: new Date(chapter?.created_at),
             group: groups?.length !== 0 ? groups?.join(',') : '',
             langCode: CMLanguages?.getEmoji(chapter?.lang)

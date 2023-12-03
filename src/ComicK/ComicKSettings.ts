@@ -4,7 +4,10 @@ import {
     SourceStateManager 
 } from '@paperback/types'
 
-import { CMLanguages } from './ComicKHelper'
+import {
+    CMLanguages,
+    Uploader
+} from './ComicKHelper'
 
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
@@ -78,17 +81,11 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
     })
 }
 
-
 const getUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
     return (await stateManager.retrieve('uploaders') ?? [])
 }
 const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
     return (await getUploaders(stateManager) ?? []).filter((uploader: any) => uploader.selected).map((uploader: any) => uploader.value)
-}
-
-export type Uploader = {
-    selected: boolean
-    value: string
 }
 
 export const uploadersSettings = (stateManager: SourceStateManager): DUINavigationButton => {

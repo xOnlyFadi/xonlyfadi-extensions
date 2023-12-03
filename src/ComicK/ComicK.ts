@@ -35,7 +35,10 @@ import {
     uploadersSettings
 } from './ComicKSettings'
 
-import { CMLanguages } from './ComicKHelper'
+import {
+    CMLanguages,
+    Uploader
+} from './ComicKHelper'
 
 const COMICK_DOMAIN = 'https://comick.ink'
 const COMICK_API = 'https://api.comick.fun'
@@ -117,14 +120,30 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     }
     
     async getChapters(mangaId: string): Promise<Chapter[]> {
-        const showVol = await this.stateManager.retrieve('show_volume_number') ?? false
-        const showTitle = await this.stateManager.retrieve('show_title') ?? false
+        const showTitle: boolean = await this.stateManager.retrieve('show_title') ?? false
+        const showVol: boolean = await this.stateManager.retrieve('show_volume_number') ?? false
+        const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') ?? false
+        const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') ?? false
+        const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
+        const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') ?? false
+        const uploaders: Uploader[] = await this.stateManager.retrieve('uploaders') ?? []
+
         const chapters: Chapter[] = []
-        
+
         let page = 1
         let json = await this.createChapterRequest(mangaId, page++)
 
-        chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
+        chapters.push(...(
+            parseChapters(
+                json,
+                showTitle,
+                showVol,
+                uploadersToggled,
+                uploadersWhitelisted,
+                aggressiveUploadersFilter,
+                strictNameMatching,
+                uploaders
+            )))
 
         // Try next page if number of chapters is same as limit
         while (json.chapters.length === LIMIT) {
@@ -133,7 +152,17 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             // Break if there are no more chapters
             if (json.chapters.length === 0) break
 
-            chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
+            chapters.push(...(
+                parseChapters(
+                    json,
+                    showTitle,
+                    showVol,
+                    uploadersToggled,
+                    uploadersWhitelisted,
+                    aggressiveUploadersFilter,
+                    strictNameMatching,
+                    uploaders
+                )))
         }
 
         return chapters

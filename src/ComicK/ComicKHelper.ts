@@ -357,3 +357,8 @@ class LanguagesClass {
 }
 
 export const CMLanguages = new LanguagesClass
+
+export interface Uploader {
+    selected: boolean,
+    value: string
+}
