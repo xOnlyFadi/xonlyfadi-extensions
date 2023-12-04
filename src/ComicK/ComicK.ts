@@ -249,22 +249,20 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             createSectionRequest('uploaded')
         ]
 
-        sections.forEach(async (s) => {
+        for (const s of sections) {
             const response = await this.requestManager.schedule(s.request, 1)
             this.CloudFlareError(response.status)
 
-            if (response.data) {
-                let data
-                try {
-                    data = JSON.parse(response.data ?? '')
-                }
-                catch (e) {
-                    throw new Error(`${e}`)
-                }
-
-                parseHomeSections(data, s.id, sectionCallback)
+            let data
+            try {
+                data = JSON.parse(response.data ?? '')
             }
-        })
+            catch (e) {
+                throw new Error(`${e}`)
+            }
+
+            parseHomeSections(data, s.id, sectionCallback)
+        }
     }
 
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
