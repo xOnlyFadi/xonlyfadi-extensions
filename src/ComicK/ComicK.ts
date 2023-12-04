@@ -129,13 +129,11 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') ?? false
         const uploaders: Uploader[] = await this.stateManager.retrieve('uploaders') ?? []
 
-        const chapters: Chapter[] = []
+        let data = await this.createChapterRequest(mangaId, 1)
+        const total = data.total
+        data = await this.createChapterRequest(mangaId, total)
 
-        let page = 1
-        let data = await this.createChapterRequest(mangaId, page++)
-
-        parseChapters(
-            chapters,
+        return parseChapters(
             data,
             showTitle,
             showVol,
@@ -145,34 +143,13 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             strictNameMatching,
             uploaders
         )
-
-        // Try next page if number of chapters is same as limit
-        while (data.chapters.length === LIMIT) {
-            data = await this.createChapterRequest(mangaId, page++)
-
-            // Break if there are no more chapters
-            if (data.chapters.length === 0) break
-
-            parseChapters(
-                chapters,
-                data,
-                showTitle,
-                showVol,
-                uploadersToggled,
-                uploadersWhitelisted,
-                aggressiveUploadersFilter,
-                strictNameMatching,
-                uploaders
-            )
-        }
-
-        return chapters
     }
 
-    async createChapterRequest(mangaId: string, page: number): Promise<ChapterList> {
+    async createChapterRequest(mangaId: string, limit: number): Promise<ChapterList> {
+        const LIMIT = limit
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=1&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
@@ -283,7 +260,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         }
 
         const request = App.createRequest({
-            url: COMICK_API + param,
+            url: COMICK_API,
+            param: param,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)

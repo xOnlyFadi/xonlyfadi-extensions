@@ -107,7 +107,6 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     })
 }
 export const parseChapters = (
-    chapters: Chapter[],
     data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
@@ -116,7 +115,9 @@ export const parseChapters = (
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: Uploader[]
-): void => {
+): Chapter[] => {
+    const chapters: Chapter[] = []
+
     for (const chapter of data.chapters) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
@@ -170,6 +171,8 @@ export const parseChapters = (
             langCode: CMLanguages?.getEmoji(chapter?.lang)
         }))
     }
+
+    return chapters
 }
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
