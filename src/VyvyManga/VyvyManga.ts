@@ -207,15 +207,15 @@ implements
         if (query.title) {
             request = App.createRequest({
                 url: `${VYVY_DOMAIN}/search`,
-                method: 'GET',
-                param: `?q=${encodeURI(query.title ?? '')}&page=${page}`
+                param: `?q=${encodeURI(query.title.replace(/ /g, '+').replace(/[^a-zA-Z0-9+]/g, '') ?? '')}&page=${page}`,
+                method: 'GET'
             })
-            // Tag Search
+        // Tag Search
         } else {
             request = App.createRequest({
                 url: `${VYVY_DOMAIN}/genre/${query?.includedTags?.map((x: Tag) => x.id)[0]}`,
-                method: 'GET',
-                param: `?page=${page}`
+                param: `?page=${page}`,
+                method: 'GET'
             })
         }
 
