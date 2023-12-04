@@ -11,7 +11,7 @@ import { decodeHTML } from 'entities'
 export class Parser {
     private readonly chapterTitleRegex = /Chapter ([\d.]+)/i
 
-    async parseHomeSections($: CheerioStatic, sectionCallback: (section: HomeSection) => void): Promise<void> {
+    async parseHomeSections($: cheerio.Root, sectionCallback: (section: HomeSection) => void): Promise<void> {
         const section1 = App.createHomeSection({ id: '1', title: 'Projects', containsMoreItems: false, type: 'singleRowNormal'})
 
         const projects: PartialSourceManga[] = []
@@ -35,7 +35,7 @@ export class Parser {
         sectionCallback(section1)
     }
 
-    parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string): ChapterDetails {
+    parseChapterDetails($: cheerio.Selector, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
 
         for (const obj of $('.flex.flex-col.items-center.justify-center picture img').toArray()) {
@@ -54,7 +54,7 @@ export class Parser {
         })
     }
 
-    parseChapters($: CheerioStatic): Chapter[] {
+    parseChapters($: cheerio.Root): Chapter[] {
         const chapters: Chapter[] = []
         let lastNumber = null
 
@@ -89,7 +89,7 @@ export class Parser {
         return chapters
     }
 
-    parseMangaDetails($: CheerioStatic, mangaId: string): SourceManga {
+    parseMangaDetails($: cheerio.Root, mangaId: string): SourceManga {
         const descElement = $('.order-1.bg-card.border.border-border.rounded.py-3')
         const title = $('.my-3.font-bold.text-3xl',descElement).first().text().trim() ?? ''
         const image = $('.flex.items-center.justify-center img',descElement).attr('src') ?? 'https://paperback.moe/icons/logo-alt.svg'

@@ -49,7 +49,7 @@ export const ReadComicOnlineInfo: SourceInfo = {
 }
 
 export class ReadComicOnline implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,

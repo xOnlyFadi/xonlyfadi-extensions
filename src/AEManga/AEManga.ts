@@ -52,7 +52,7 @@ export const AEMangaInfo: SourceInfo = {
 }
 
 export class AEManga implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     baseUrl = AEMANGA_DOMAIN
     requestManager = App.createRequestManager({

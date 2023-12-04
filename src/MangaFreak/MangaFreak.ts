@@ -42,7 +42,7 @@ export const MangaFreakInfo: SourceInfo = {
 }
 
 export class MangaFreak implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     private readonly parser: Parser = new Parser()
     baseUrl = MangaFreak_BASE

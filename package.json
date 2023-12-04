@@ -15,7 +15,7 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.4.1",
     "@tsconfig/recommended": "^1.0.1",
-    "@types/cheerio": "^0.22.21",
+    "@types/cheerio": "^0.22.35",
     "@types/crypto-js": "^4.2.1",
     "@types/html-to-text": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.13.1",

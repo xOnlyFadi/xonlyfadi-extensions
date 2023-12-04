@@ -44,7 +44,7 @@ export const MangaSectInfo: SourceInfo = {
 }
 
 export class MangaSect implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     baseUrl = DOMAIN
     requestManager = App.createRequestManager({

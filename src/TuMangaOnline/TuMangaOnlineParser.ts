@@ -10,7 +10,7 @@ import '../scopes'
 import { decodeHTML } from 'entities'
 
 export class Parser {
-    parseHomeSection($: CheerioStatic, baseUrl: string): PartialSourceManga[] {
+    parseHomeSection($: cheerio.Root, baseUrl: string): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
 
         for (const obj of $('div.element').toArray()) {
@@ -32,7 +32,7 @@ export class Parser {
         return items
     }
 
-    parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string): ChapterDetails {
+    parseChapterDetails($: cheerio.Selector, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
 
         for (const obj of $('div.viewer-container img').toArray()) {
@@ -51,7 +51,7 @@ export class Parser {
         })
     }
 
-    parseChapters($: CheerioStatic, mangaId: string, baseUrl: string): Chapter[] {
+    parseChapters($: cheerio.Root, mangaId: string, baseUrl: string): Chapter[] {
         const chapters: Chapter[] = []
         const ChapterNumRegex = /capítulo ([\d.]+)?|capitulo ([\d.]+)?/i
 
@@ -117,7 +117,7 @@ export class Parser {
         return chapters
     }
 
-    parseMangaDetails($: CheerioStatic, mangaId: string): SourceManga {
+    parseMangaDetails($: cheerio.Root, mangaId: string): SourceManga {
         const infotitle = $('h1.element-title').first()
         infotitle.find('small').remove()
         const title = infotitle.text().trim() ?? ''
@@ -163,7 +163,7 @@ export class Parser {
         })
     }
 
-    parseTags($: CheerioStatic, isNSFW: boolean): TagSection[]{
+    parseTags($: cheerio.Root, isNSFW: boolean): TagSection[]{
         const arrayTags: Tag[] = []
 
         const arrayTags2: Tag[] = [
@@ -353,7 +353,7 @@ export class Parser {
         ]
     }
 
-    NextPage($: CheerioSelector) {
+    NextPage($: cheerio.Selector) {
         const nextPage = $('a.page-link')
         if (nextPage.contents().length !== 0) {
             return true

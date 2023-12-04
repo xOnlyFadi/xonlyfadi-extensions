@@ -13,7 +13,7 @@ import { decodeHTML } from 'entities'
 
 const DOMAIN = 'https://mangasect.com'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
+export const parseMangaDetails = ($: cheerio.Root, mangaId: string): SourceManga => {
     const title = decodeHTML($('header h1').text().trim())
 
     let image = $('.a1 figure img')?.attr('src') ?? ''
@@ -64,7 +64,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
     })
 }
 
-export const parseChapters = ($: CheerioStatic): Chapter[] => {
+export const parseChapters = ($: cheerio.Root): Chapter[] => {
     const chapters: Chapter[] = []
 
     for (const chapter of $('article #myUL li').toArray()) {
@@ -92,7 +92,7 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
     return chapters
 }
 
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
 
     for (const page of $('.separator a').toArray()) {
@@ -110,7 +110,7 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
     })
 }
 
-export const parseTags = ($: CheerioStatic): TagSection[] => {
+export const parseTags = ($: cheerio.Root): TagSection[] => {
     const Status: Tag[] = []
     const Sort: Tag[] = []
     const Genres: Tag[] = []
@@ -161,7 +161,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     ]
 }
 
-export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
+export const parseSearch = ($: cheerio.Root): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
 
     for (const obj of $('section .r2 .grid >').toArray()) {
@@ -182,7 +182,7 @@ export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
     return results
 }
 
-export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (section: HomeSection) => void): Promise<void> => {
+export const parseHomeSections = async ($: cheerio.Root, sectionCallback: (section: HomeSection) => void): Promise<void> => {
     const featured_section = App.createHomeSection({ id: 'featured', title: 'Featured', type: HomeSectionType.featured, containsMoreItems: false})
     const recommend_section = App.createHomeSection({ id: 'recommend', title: 'Recommend', type: HomeSectionType.singleRowNormal, containsMoreItems: false})
     const latest_section = App.createHomeSection({ id: 'latest-updated', title: 'Latest', type: HomeSectionType.singleRowNormal, containsMoreItems: true})

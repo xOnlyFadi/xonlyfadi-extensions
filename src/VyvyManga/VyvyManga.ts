@@ -61,7 +61,7 @@ implements
     ChapterProviding,
     HomePageSectionsProviding
 {
-    constructor(private cheerio: CheerioAPI) {}
+    constructor(private cheerio: cheerio.CheerioAPI) {}
 
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -117,7 +117,7 @@ implements
     ): Promise<ChapterDetails> {
         let request: Request
         let response: Response
-        let $: CheerioStatic
+        let $: cheerio.Root
 
         // Find chapterUrl
         request = App.createRequest({

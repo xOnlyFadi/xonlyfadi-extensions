@@ -9,7 +9,7 @@ import {
 
 import { decodeHTML } from 'entities'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
+export const parseMangaDetails = ($: cheerio.Root, mangaId: string): SourceManga => {
     const contentSection = $('.indexcontainer').first()
 
     const titles: string[] = [decodeHTML($('h1.EnglishName',contentSection).text().trim().replace('(','').replace(')',''))]
@@ -57,7 +57,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
     })
 }
 
-export const parseChapters = ($: CheerioStatic): Chapter[] => {
+export const parseChapters = ($: cheerio.Root): Chapter[] => {
     const chapters: Chapter[] = []
     const contentSection = $('.indexcontainer').first()
     const LastUpdated = $('div.manga-details-extended h4', contentSection).eq(3).text().trim()
@@ -85,7 +85,7 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
     return chapters
 }
 
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
 
     for (const page of $('div#showchaptercontainer img').toArray()) {
@@ -102,7 +102,7 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
     })
 }
 
-export const parseTags = ($: CheerioStatic): TagSection[] => {
+export const parseTags = ($: cheerio.Root): TagSection[] => {
     const arrayTags: Tag[] = []
 
     for (const tag of $('#filter .order:contains(أظهار المانجا التي تحتوي على:) a').toArray()) {
@@ -162,7 +162,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     ]
 }
 
-export const parseSearch = ($: CheerioStatic, url: string): PartialSourceManga[] => {
+export const parseSearch = ($: cheerio.Root, url: string): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
 
     for (const obj of $('div.mangacontainer').toArray()) {
@@ -185,7 +185,7 @@ export const parseSearch = ($: CheerioStatic, url: string): PartialSourceManga[]
     return results
 }
 
-export const NextPage = ($: CheerioSelector): boolean => {
+export const NextPage = ($: cheerio.Selector): boolean => {
     const nextPage = $('div.pagination a:last-child:not(.active)')
 
     if (nextPage.contents().length !== 0) {

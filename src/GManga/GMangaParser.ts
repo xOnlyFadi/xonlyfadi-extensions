@@ -133,7 +133,7 @@ export const parseChapters = (data: ChapterData): Chapter[] => {
 
     return chapters
 }
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
     const html = $('.js-react-on-rails-component').html() ?? ''
     const data: ChapterDetailsImages = JSON.parse(html)

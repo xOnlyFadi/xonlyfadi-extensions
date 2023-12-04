@@ -11,7 +11,7 @@ import { decodeHTML } from 'entities'
 
 const RCO_DOMAIN = 'https://readcomiconline.li'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
+export const parseMangaDetails = ($: cheerio.Root, mangaId: string): SourceManga => {
     const contentSection = $('div.barContent').first()
 
     const titles: string[] = [decodeHTML($('a.bigChar').text().trim())]
@@ -50,7 +50,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
     })
 }
 
-export const parseChapters = ($: CheerioStatic): Chapter[] => {
+export const parseChapters = ($: cheerio.Root): Chapter[] => {
     const chapters: Chapter[] = []
 
     for (const chapter of $('tr', $('.listing').first()).toArray()) {
@@ -114,7 +114,7 @@ export interface UpdatedManga {
     loadMore: boolean;
 }
 
-export const parseHomeSections = ($: CheerioStatic, sectionCallback: (section: HomeSection) => void): void => {
+export const parseHomeSections = ($: cheerio.Root, sectionCallback: (section: HomeSection) => void): void => {
     const latestSection = App.createHomeSection({ id: 'latest_comic', title: 'Latest Updated Comics', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
     const newSection = App.createHomeSection({ id: 'new_comic', title: 'New Comics', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
     const popularSection = App.createHomeSection({ id: 'popular_comic', title: 'Most Popular Comics', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
@@ -255,7 +255,7 @@ export const parseHomeSections = ($: CheerioStatic, sectionCallback: (section: H
     sectionCallback(TopMonthSection)
 }
 
-export const parseViewMore = ($: CheerioStatic): PartialSourceManga[] => {
+export const parseViewMore = ($: cheerio.Root): PartialSourceManga[] => {
     const comics: PartialSourceManga[] = []
     const collectedIds: string[] = []
 
@@ -280,7 +280,7 @@ export const parseViewMore = ($: CheerioStatic): PartialSourceManga[] => {
     return comics
 }
 
-export const parseTags = ($: CheerioStatic): TagSection[] => {
+export const parseTags = ($: cheerio.Root): TagSection[] => {
     const arrayTags: Tag[] = []
 
     const rightBox = $('#rightside div.barContent').get(1)
@@ -296,7 +296,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     return [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })]
 }
 
-export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
+export const parseSearch = ($: cheerio.Root): PartialSourceManga[] => {
     const comics: PartialSourceManga[] = []
     const collectedIds: string[] = []
     //Thanks Aurora!
@@ -341,7 +341,7 @@ export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
     return comics
 }
 
-export const isLastPage = ($: CheerioStatic): boolean => {
+export const isLastPage = ($: cheerio.Root): boolean => {
     const lastPage = $('.pager').text().includes('Next')
     return !lastPage
 }

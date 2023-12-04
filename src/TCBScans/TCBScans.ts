@@ -29,7 +29,7 @@ export const TCBScansInfo: SourceInfo = {
 }
 
 export class TCBScans implements ChapterProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     private readonly parser: Parser = new Parser()
     readonly requestManager = App.createRequestManager({
