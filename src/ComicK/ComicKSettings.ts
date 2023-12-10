@@ -9,6 +9,18 @@ import {
     Uploader
 } from './ComicKHelper'
 
+export const getUploader = async (stateManager: SourceStateManager): Promise<string> => {
+    return (await stateManager.retrieve('uploader') as string) ?? ''
+}
+
+const getUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
+    return (await stateManager.retrieve('uploaders') ?? [])
+}
+const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
+    const uploaders = await getUploaders(stateManager)
+    return (uploaders ?? []).filter((uploader) => uploader.selected).map((uploader) => ({ value: uploader.value, selected: true }))
+}
+
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
@@ -79,14 +91,6 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
             ]
         })
     })
-}
-
-const getUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
-    return (await stateManager.retrieve('uploaders') ?? [])
-}
-const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
-    const uploaders = await getUploaders(stateManager)
-    return (uploaders ?? []).filter((uploader) => uploader.selected).map((uploader) => ({ value: uploader.value, selected: true }))
 }
 
 export const uploadersSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -182,7 +186,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             id: 'uploader',
                             label: 'Uploader',
                             value: App.createDUIBinding({
-                                get: async () => '',
+                                get: () => getUploader(stateManager),
                                 set: async (newValue: string) => await stateManager.store('uploader', newValue)
                             })
                         }),
@@ -190,7 +194,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             id: 'add_uploader',
                             label: 'Add Uploader',
                             onTap: async () => {
-                                const targetUploader: string = await stateManager.retrieve('uploader') ?? ''
+                                const targetUploader = await getUploader(stateManager)
 
                                 if (targetUploader === '') {
                                     throw new Error('Uploader cannot be empty!')
@@ -214,7 +218,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             id: 'remove_uploader',
                             label: 'Remove Uploader',
                             onTap: async () => {
-                                const targetUploader: string = await stateManager.retrieve('uploader') ?? ''
+                                const targetUploader = await getUploader(stateManager)
 
                                 if (targetUploader === '') {
                                     throw new Error('Uploader cannot be empty!')
@@ -245,16 +249,18 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
         id: 'reset',
         label: 'Reset to Default',
         onTap: async () => {
-            stateManager.store('show_volume_number', null),
-            stateManager.store('show_title', null),
-            stateManager.store('languages', null),
-            stateManager.store('language_home_filter', null),
-            stateManager.store('uploaders', null),
-            stateManager.store('uploaders_whitelisted', null),
-            stateManager.store('aggressive_uploaders_filtering', null),
-            stateManager.store('uploaders_toggled', null),
-            stateManager.store('uploader', null),
-            stateManager.store('strict_name_matching', null)
+            await Promise.all([
+                stateManager.store('show_volume_number', null),
+                stateManager.store('show_title', null),
+                stateManager.store('languages', null),
+                stateManager.store('language_home_filter', null),
+                stateManager.store('uploaders', null),
+                stateManager.store('uploaders_whitelisted', null),
+                stateManager.store('aggressive_uploaders_filtering', null),
+                stateManager.store('uploaders_toggled', null),
+                stateManager.store('uploader', null),
+                stateManager.store('strict_name_matching', null)
+            ])
         }
     })
 }
