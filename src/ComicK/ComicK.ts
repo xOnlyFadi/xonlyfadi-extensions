@@ -41,17 +41,17 @@ import {
     Uploader
 } from './ComicKHelper'
 
-const COMICK_DOMAIN = 'https://comick.ink'
+const COMICK_DOMAIN = 'https://comick.cc'
 const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.2',
+    version: '2.1.3',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.ink.',
+    description: 'Extension that pulls manga from comick.cc.',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
     intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
