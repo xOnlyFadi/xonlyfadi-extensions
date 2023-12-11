@@ -37,8 +37,7 @@ import {
 
 import {
     ChapterList,
-    CMLanguages,
-    Uploader
+    CMLanguages
 } from './ComicKHelper'
 
 const COMICK_DOMAIN = 'https://comick.cc'
@@ -127,7 +126,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') ?? false
         const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
         const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') ?? false
-        const uploaders: Uploader[] = await this.stateManager.retrieve('uploaders') ?? []
+        const uploaders: string[] = await this.stateManager.retrieve('uploaders_selected') ?? []
 
         let data = await this.createChapterRequest(mangaId, 1)
         const total = data.total

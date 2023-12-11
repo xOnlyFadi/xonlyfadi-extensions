@@ -18,8 +18,7 @@ import {
 } from './ComicKHelper'
 
 import {
-    CMLanguages,
-    Uploader
+    CMLanguages
 } from './ComicKHelper'
 
 import { decodeHTML } from 'entities'
@@ -114,7 +113,7 @@ export const parseChapters = (
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
-    uploaders: Uploader[]
+    uploaders: string[]
 ): Chapter[] => {
     const chapters: Chapter[] = []
 
@@ -137,24 +136,24 @@ export const parseChapters = (
             if (aggressiveUploadersFilter) {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
                         continue
                     }
                 } else {
                     // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
-                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
                         continue
                     }
                 }
             } else {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
                         continue
                     }
                 } else {
                     // Only if all the uploaders are in the blacklist, we don't push the chapter
-                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
+                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
                         continue
                     }
                 }

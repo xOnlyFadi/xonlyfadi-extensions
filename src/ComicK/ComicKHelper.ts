@@ -77,11 +77,6 @@ export interface SearchData {
     md_comics: MDComics;
 }
 
-export interface Uploader {
-    selected: boolean;
-    value: string;
-}
-
 interface Language {
     name: string;
     CMCode: string;
