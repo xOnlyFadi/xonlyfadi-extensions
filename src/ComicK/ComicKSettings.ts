@@ -131,21 +131,13 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
         form: App.createDUIForm({
             sections: async () => [
                 App.createDUISection({
-                    id: 'select_uploaders',
-                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the corresponding switch above.',
+                    id: 'modify_uploaders',
+                    header: 'Uploaders',
                     isHidden: false,
                     rows: async () => [
-                        App.createDUISwitch({
-                            id: 'toggle_uploaders_filtering',
-                            label: 'Enable uploaders filtering',
-                            value: App.createDUIBinding({
-                                get: () => getUploadersFiltering(stateManager),
-                                set: async (newValue: boolean) => await stateManager.store('uploaders_toggled', newValue)
-                            })
-                        }),
                         App.createDUISelect({
                             id: 'uploaders',
-                            label: 'Uploaders',
+                            label: 'Select Uploaders',
                             options: await getUploaders(stateManager),
                             value: App.createDUIBinding({
                                 get: () => getSelectedUploaders(stateManager),
@@ -154,41 +146,9 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             labelResolver: async (value) => value,
                             allowsMultiselect: true
                         }),
-                        App.createDUISwitch({
-                            id: 'uploaders_switch',
-                            label: 'Blacklist / Whitelist Uploaders',
-                            value: App.createDUIBinding({
-                                get: () => getUploadersWhitelisted(stateManager),
-                                set: async (newValue: boolean) => await stateManager.store('uploaders_whitelisted', newValue)
-                            })
-                        }),
-                        App.createDUISwitch({
-                            id: 'toggle_uploaders_filtering_aggressiveness',
-                            label: 'Toggle aggressive filtering',
-                            value: App.createDUIBinding({
-                                // default to true if no value is set
-                                get: () => getAggresiveUploadersFiltering(stateManager),
-                                set: async (newValue: boolean) => await stateManager.store('aggressive_uploaders_filtering', newValue)
-                            })
-                        }),
-                        App.createDUISwitch({
-                            id: 'strict_name_matching',
-                            label: 'Strict uploader name matching',
-                            value: App.createDUIBinding({
-                                get: () => getStrictNameMatching(stateManager),
-                                set: async (newValue: boolean) => await stateManager.store('strict_name_matching', newValue)
-                            })
-                        })
-                    ]
-                }),
-                App.createDUISection({
-                    id: 'modify_uploaders',
-                    footer: 'Edit list of uploaders.',
-                    isHidden: false,
-                    rows: async () => [
                         App.createDUIInputField({
                             id: 'uploader',
-                            label: 'Uploader',
+                            label: 'Uploader Name',
                             value: App.createDUIBinding({
                                 get: () => getUploaderInput(stateManager),
                                 set: async (newValue: string) => await stateManager.store('uploader', newValue)
@@ -212,8 +172,9 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 } else {
                                     uploaders.push(targetUploader)
                                     await stateManager.store('uploaders', uploaders)
-                                    await stateManager.store('uploader', '')
                                 }
+
+                                await stateManager.store('uploader', '')
                             }
                         }),
                         App.createDUIButton({
@@ -232,11 +193,52 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 if (uploadersSet.has(targetUploader)) {
                                     uploaders.splice(uploaders.indexOf(targetUploader), 1)
                                     await stateManager.store('uploaders', uploaders)
-                                    await stateManager.store('uploader', '')
                                 } else {
                                     throw new Error(`Uploader ${targetUploader} does not exists!`)
                                 }
+                                await stateManager.store('uploader', '')
                             }
+                        })
+                    ]
+                }),
+                App.createDUISection({
+                    id: 'select_uploaders',
+                    header: 'Filtering Settings',
+                    footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISwitch({
+                            id: 'toggle_uploaders_filtering',
+                            label: 'Enable Uploader filtering',
+                            value: App.createDUIBinding({
+                                get: () => getUploadersFiltering(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('uploaders_toggled', newValue)
+                            })
+                        }),
+                        App.createDUISwitch({
+                            id: 'uploaders_switch',
+                            label: 'Enable whitelist mode',
+                            value: App.createDUIBinding({
+                                get: () => getUploadersWhitelisted(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('uploaders_whitelisted', newValue)
+                            })
+                        }),
+                        App.createDUISwitch({
+                            id: 'toggle_uploaders_filtering_aggressiveness',
+                            label: 'Toggle aggressive filtering',
+                            value: App.createDUIBinding({
+                                // default to true if no value is set
+                                get: () => getAggresiveUploadersFiltering(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('aggressive_uploaders_filtering', newValue)
+                            })
+                        }),
+                        App.createDUISwitch({
+                            id: 'strict_name_matching',
+                            label: 'Strict uploader name matching',
+                            value: App.createDUIBinding({
+                                get: () => getStrictNameMatching(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('strict_name_matching', newValue)
+                            })
                         })
                     ]
                 })
