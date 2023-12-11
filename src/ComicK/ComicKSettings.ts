@@ -125,6 +125,11 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
 }
 
 export const uploadersSettings = (stateManager: SourceStateManager): DUINavigationButton => {
+    const uploaderInputBinding = App.createDUIBinding({
+        get: () => getUploaderInput(stateManager),
+        set: async (newValue: string) => await stateManager.store('uploader', newValue)
+    })
+
     return App.createDUINavigationButton({
         id: 'uploaders_settings',
         label: 'Uploaders Settings',
@@ -149,10 +154,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                         App.createDUIInputField({
                             id: 'uploader',
                             label: 'Uploader Name',
-                            value: App.createDUIBinding({
-                                get: () => getUploaderInput(stateManager),
-                                set: async (newValue: string) => await stateManager.store('uploader', newValue)
-                            })
+                            value: uploaderInputBinding
                         }),
                         App.createDUIButton({
                             id: 'add_uploader',
@@ -174,7 +176,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                     await stateManager.store('uploaders', uploaders)
                                 }
 
-                                await stateManager.store('uploader', '')
+                                await uploaderInputBinding.set('')
                             }
                         }),
                         App.createDUIButton({
@@ -196,7 +198,8 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                                 } else {
                                     throw new Error(`Uploader ${targetUploader} does not exists!`)
                                 }
-                                await stateManager.store('uploader', '')
+
+                                await uploaderInputBinding.set('')
                             }
                         })
                     ]
