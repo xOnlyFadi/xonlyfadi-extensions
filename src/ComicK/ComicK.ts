@@ -169,6 +169,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     }
 
     async createChapterRequest(mangaId: string, page: number): Promise<ChapterList> {
+        const LIMIT = 100000
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
             url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
