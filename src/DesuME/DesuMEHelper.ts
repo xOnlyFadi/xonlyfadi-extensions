@@ -41,7 +41,7 @@ export interface MangaDetails {
             {
                 text:    string
                 russian: string
-            }        
+            }
         ]
         authors:        string
         chapters: {

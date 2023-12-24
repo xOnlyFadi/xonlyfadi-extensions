@@ -5,7 +5,7 @@ export interface GraphQLQuery {
     variables?: unknown;
 }
 
-export const HomePageQuery = (page: number, source: any): GraphQLQuery => ({
+export const HomePageQuery = (page: number, popularPerPage: number): GraphQLQuery => ({
     query: `query ($offset: Int, $limit: Int) {
       featured: voyce_series(
         where: {
@@ -87,11 +87,10 @@ export const HomePageQuery = (page: number, source: any): GraphQLQuery => ({
       title
       chapter_count
     }`,
-    variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
+    variables: { 'offset': page * popularPerPage, 'limit': popularPerPage }
 })
 
-export const SearchQuery = (query: SearchRequest, metadata: any, source: any): GraphQLQuery => {
-    const page: number = metadata?.page ?? 0 
+export const SearchQuery = (query: SearchRequest, page: number, popularPerPage: number): GraphQLQuery => {
     const Genres: number[] = []
     const Types: number[] = []
     const Status: string[] = []
@@ -147,7 +146,7 @@ export const SearchQuery = (query: SearchRequest, metadata: any, source: any): G
                 title
             }
         }`,
-        variables: {'offset': page * source.popularPerPage, 'limit':source.popularPerPage}
+        variables: {'offset': page * popularPerPage, 'limit': popularPerPage}
     }
 }
 

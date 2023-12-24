@@ -1,10 +1,56 @@
-import { 
+import {
     DUIButton,
     DUINavigationButton,
-    SourceStateManager 
+    SourceStateManager
 } from '@paperback/types'
 
-import { CMLanguages } from './ComicKHelper'
+import {
+    CMLanguages
+} from './ComicKHelper'
+
+export const getLanguages = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('languages') ?? CMLanguages.getDefault())
+}
+
+export const getLanguageHomeFilter = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('language_home_filter') ?? false)
+}
+
+export const getUploaderInput = async (stateManager: SourceStateManager): Promise<string> => {
+    return (await stateManager.retrieve('uploader') as string) ?? ''
+}
+
+const getUploaders = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('uploaders') ?? [])
+}
+
+const getUploadersWhitelisted = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('uploaders_whitelisted') ?? false)
+}
+
+const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('uploaders_selected') ?? [])
+}
+
+const getUploadersFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('uploaders_toggled') ?? false)
+}
+
+const getAggresiveUploadersFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('aggressive_uploaders_filtering') ?? false)
+}
+
+const getStrictNameMatching = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('strict_name_matching') ?? false)
+}
+
+const showTitle = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('show_title') ?? false)
+}
+
+const showVolumeNumber = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('show_volume_number') ?? false)
+}
 
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
@@ -21,7 +67,7 @@ export const chapterSettings = (stateManager: SourceStateManager): DUINavigation
                             id: 'show_volume_number',
                             label: 'Show Chapter Volume',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('show_volume_number') ?? false,
+                                get: () => showVolumeNumber(stateManager),
                                 set: async (newValue) => await stateManager.store('show_volume_number', newValue)
                             })
                         }),
@@ -29,7 +75,7 @@ export const chapterSettings = (stateManager: SourceStateManager): DUINavigation
                             id: 'show_title',
                             label: 'Show Chapter Title',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('show_title') ?? false,
+                                get: () => showTitle(stateManager),
                                 set: async (newValue) => await stateManager.store('show_title', newValue)
                             })
                         })
@@ -58,7 +104,7 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
                             options: CMLanguages.getCMCodeList(),
                             labelResolver: async (option) => CMLanguages.getName(option),
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('languages') ?? CMLanguages.getDefault(),
+                                get: () => getLanguages(stateManager),
                                 set: async (newValue) => await stateManager.store('languages', newValue)
                             }),
                             allowsMultiselect: true
@@ -67,7 +113,7 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
                             id: 'language_home_filter',
                             label: 'Filter Homepage Language',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('language_home_filter') ?? false,
+                                get: () => getLanguageHomeFilter(stateManager),
                                 set: async (newValue) => await stateManager.store('language_home_filter', newValue)
                             })
                         })
@@ -78,72 +124,105 @@ export const languageSettings = (stateManager: SourceStateManager): DUINavigatio
     })
 }
 
-
-const getUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
-    return (await stateManager.retrieve('uploaders') ?? [])
-}
-const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<Uploader[]> => {
-    return (await getUploaders(stateManager) ?? []).filter((uploader: any) => uploader.selected).map((uploader: any) => uploader.value)
-}
-
-export type Uploader = {
-    selected: boolean
-    value: string
-}
-
 export const uploadersSettings = (stateManager: SourceStateManager): DUINavigationButton => {
+    const uploaderInputBinding = App.createDUIBinding({
+        get: () => getUploaderInput(stateManager),
+        set: async (newValue: string) => await stateManager.store('uploader', newValue)
+    })
+
     return App.createDUINavigationButton({
         id: 'uploaders_settings',
         label: 'Uploaders Settings',
         form: App.createDUIForm({
             sections: async () => [
                 App.createDUISection({
+                    id: 'modify_uploaders',
+                    header: 'Uploaders',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISelect({
+                            id: 'uploaders',
+                            label: 'Select Uploaders',
+                            options: await getUploaders(stateManager),
+                            value: App.createDUIBinding({
+                                get: () => getSelectedUploaders(stateManager),
+                                set: async (newValue) => { await stateManager.store('uploaders_selected', newValue) }
+                            }),
+                            labelResolver: async (value) => value,
+                            allowsMultiselect: true
+                        }),
+                        App.createDUIInputField({
+                            id: 'uploader',
+                            label: 'Uploader Name',
+                            value: uploaderInputBinding
+                        }),
+                        App.createDUIButton({
+                            id: 'add_uploader',
+                            label: 'Add Uploader',
+                            onTap: async () => {
+                                const targetUploader = await getUploaderInput(stateManager)
+
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!')
+                                }
+
+                                const uploaders = await getUploaders(stateManager)
+                                const uploadersSet = new Set(uploaders)
+
+                                if (uploadersSet.has(targetUploader)) {
+                                    throw new Error(`Uploader ${targetUploader} already exists!`)
+                                } else {
+                                    uploaders.push(targetUploader)
+                                    await stateManager.store('uploaders', uploaders)
+                                }
+
+                                await uploaderInputBinding.set('')
+                            }
+                        }),
+                        App.createDUIButton({
+                            id: 'remove_uploader',
+                            label: 'Remove Uploader',
+                            onTap: async () => {
+                                const targetUploader = await getUploaderInput(stateManager)
+
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!')
+                                }
+
+                                const uploaders = await getUploaders(stateManager)
+                                const uploadersSet = new Set(uploaders)
+
+                                if (uploadersSet.has(targetUploader)) {
+                                    uploaders.splice(uploaders.indexOf(targetUploader), 1)
+                                    await stateManager.store('uploaders', uploaders)
+                                } else {
+                                    throw new Error(`Uploader ${targetUploader} does not exists!`)
+                                }
+
+                                await uploaderInputBinding.set('')
+                            }
+                        })
+                    ]
+                }),
+                App.createDUISection({
                     id: 'select_uploaders',
-                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the corresponding switch above.',
+                    header: 'Filtering Settings',
+                    footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering',
-                            label: 'Toggle uploaders filtering',
+                            label: 'Enable Uploader filtering',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('uploaders_toggled') ?? false,
+                                get: () => getUploadersFiltering(stateManager),
                                 set: async (newValue: boolean) => await stateManager.store('uploaders_toggled', newValue)
                             })
                         }),
-                        App.createDUISelect({
-                            id: 'uploaders',
-                            label: 'Uploaders',
-                            options: (await getUploaders(stateManager)).map((uploader: Uploader) => uploader.value),
-                            labelResolver: async (option) => {
-                                return option
-                            },
-                            value: App.createDUIBinding({
-                                get: async () => await getSelectedUploaders(stateManager),
-                                set: async (selectedUploaders: string[]) => {
-                                    const uploaders: Uploader[] = await getUploaders(stateManager)
-
-                                    uploaders.forEach((uploader: Uploader) => {
-                                        uploader.selected = false
-                                    })
-
-                                    selectedUploaders.forEach((selectedUploader: string) => {
-                                        uploaders.forEach((uploader: Uploader) => {
-                                            if (uploader.value === selectedUploader) {
-                                                uploader.selected = true
-                                            }
-                                        })
-                                    })
-                                    
-                                    await stateManager.store('uploaders', uploaders)
-                                }
-                            }),
-                            allowsMultiselect: true
-                        }),
                         App.createDUISwitch({
                             id: 'uploaders_switch',
-                            label: 'Blacklist / Whitelist Uploaders',
+                            label: 'Enable whitelist mode',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('uploaders_whitelisted') ?? false,
+                                get: () => getUploadersWhitelisted(stateManager),
                                 set: async (newValue: boolean) => await stateManager.store('uploaders_whitelisted', newValue)
                             })
                         }),
@@ -152,16 +231,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             label: 'Toggle aggressive filtering',
                             value: App.createDUIBinding({
                                 // default to true if no value is set
-                                get: async () => {
-                                    const value = await stateManager.retrieve('aggressive_uploaders_filtering')
-                                    
-
-                                    if (value !== false) {
-                                        return true
-                                    }
-
-                                    return false
-                                },
+                                get: () => getAggresiveUploadersFiltering(stateManager),
                                 set: async (newValue: boolean) => await stateManager.store('aggressive_uploaders_filtering', newValue)
                             })
                         }),
@@ -169,71 +239,9 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             id: 'strict_name_matching',
                             label: 'Strict uploader name matching',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('strict_name_matching') ?? false,
+                                get: () => getStrictNameMatching(stateManager),
                                 set: async (newValue: boolean) => await stateManager.store('strict_name_matching', newValue)
                             })
-                        })
-                    ]
-                }),
-                App.createDUISection({
-                    id: 'modify_uploaders',
-                    footer: 'Edit list of uploaders.',
-                    isHidden: false,
-                    rows: async () => [
-                        App.createDUIInputField({
-                            id: 'uploader',
-                            label: 'Uploader',
-                            value: App.createDUIBinding({
-                                get: async () => '',
-                                set: async (newValue: string) => await stateManager.store('uploader', newValue)
-                            })
-                        }),
-                        App.createDUIButton({
-                            id: 'add_uploader',
-                            label: 'Add Uploader',
-                            onTap: async () => {
-                                const targetUploader: string = await stateManager.retrieve('uploader') ?? ''
-
-                                if (targetUploader === '') {
-                                    throw new Error('Uploader cannot be empty!')
-                                }
-
-                                const uploaders: Uploader[] = await getUploaders(stateManager)
-
-                                if (uploaders.filter((uploader: Uploader) => uploader.value === targetUploader).length > 0) {
-                                    console.log(`Uploader '${targetUploader}' already exists in list. (${uploaders.map((uploader: Uploader) => uploader.value).join(', ')})`)
-                                    throw new Error('Uploader already exists in your list!')
-                                } else {
-                                    uploaders.push({
-                                        selected: false,
-                                        value: targetUploader
-                                    })
-                                    await stateManager.store('uploaders', uploaders)
-                                }
-                            }
-                        }),
-                        App.createDUIButton({
-                            id: 'remove_uploader',
-                            label: 'Remove Uploader',
-                            onTap: async () => {
-                                const targetUploader: string = await stateManager.retrieve('uploader') ?? ''
-
-                                if (targetUploader === '') {
-                                    throw new Error('Uploader cannot be empty!')
-                                }
-
-                                const uploaders: Uploader[] = await getUploaders(stateManager)
-                                uploaders.forEach((uploader: Uploader) => {
-                                    if (uploader.value === targetUploader) {
-                                        const index = uploaders.indexOf(uploader)
-                                        
-                                        if (index > -1) {
-                                            uploaders.splice(index, 1)
-                                        }
-                                    }
-                                })
-                                await stateManager.store('uploaders', uploaders)
-                            }
                         })
                     ]
                 })
@@ -247,16 +255,18 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
         id: 'reset',
         label: 'Reset to Default',
         onTap: async () => {
-            stateManager.store('show_volume_number', null),
-            stateManager.store('show_title', null),
-            stateManager.store('languages', null),
-            stateManager.store('language_home_filter', null),
-            stateManager.store('uploaders', null),
-            stateManager.store('uploaders_whitelisted', null),
-            stateManager.store('aggressive_uploaders_filtering', null),
-            stateManager.store('uploaders_toggled', null),
-            stateManager.store('uploader', null),
-            stateManager.store('strict_name_matching', null)
+            await Promise.all([
+                stateManager.store('show_volume_number', null),
+                stateManager.store('show_title', null),
+                stateManager.store('languages', null),
+                stateManager.store('language_home_filter', null),
+                stateManager.store('uploaders', null),
+                stateManager.store('uploaders_whitelisted', null),
+                stateManager.store('aggressive_uploaders_filtering', null),
+                stateManager.store('uploaders_toggled', null),
+                stateManager.store('uploader', null),
+                stateManager.store('strict_name_matching', null)
+            ])
         }
     })
 }

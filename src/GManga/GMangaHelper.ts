@@ -41,7 +41,7 @@ export interface SearchForm {
 }
 
 export interface MangaDetails {
-    mangaData: {   
+    mangaData: {
         arabic_title: string
         artists: [
             {
@@ -112,7 +112,7 @@ export interface ChapterDetailsImages {
                 pages: string[]
                 webp_pages: string[]
                 storage_key: string
-            } 
+            }
         }
     }
 }

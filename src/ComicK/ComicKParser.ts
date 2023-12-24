@@ -1,32 +1,35 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
     SourceManga,
     PartialSourceManga,
-    TagSection, 
-    SourceStateManager
+    TagSection,
+    HomeSection,
+    HomeSectionType
 } from '@paperback/types'
 
-import { 
-    ChapterDetailsT,
+import {
+    ChapterList,
     GenresDa,
     MangaDetails,
     PageList,
-    SearchData 
+    SearchData
 } from './ComicKHelper'
 
-import { CMLanguages } from './ComicKHelper'
+import {
+    CMLanguages
+} from './ComicKHelper'
+
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
-import { Uploader } from './ComicKSettings'
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const comic = data?.comic
     const titles: string[] = [comic?.title]
 
     if (comic?.md_titles) {
-        for (const altTitles of comic?.md_titles) {
+        for (const altTitles of comic.md_titles) {
             titles.push(altTitles.title)
         }
     }
@@ -34,15 +37,15 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     const image = comic?.cover_url
     const author = []
     if (data?.authors) {
-        for (const authors of data?.authors) {
-            author.push(authors?.name)
+        for (const authors of data.authors) {
+            author.push(authors.name)
         }
     }
 
     const artist = []
     if (data?.artists) {
-        for (const authors of data?.artists) {
-            artist.push(authors?.name)
+        for (const artists of data.artists) {
+            artist.push(artists.name)
         }
     }
 
@@ -67,7 +70,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     }
 
     if (data?.genres) {
-        for (const tag of data?.genres) {
+        for (const tag of data.genres) {
             const label = tag?.name
             const id = `genre.${tag?.slug}`
             if (!id || !label)
@@ -75,10 +78,10 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
             arrayTags.push({ id: id, label: label })
         }
     }
-   
+
     let status = 'ONGOING'
     if (comic?.status) {
-        switch (comic?.status) {
+        switch (comic.status) {
             case 1:
                 status = 'ONGOING'
                 break
@@ -102,80 +105,77 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
         })
     })
 }
-export const parseChapters = async (data: ChapterDetailsT, chapSettings: { show_volume: boolean; show_title: boolean; }, stateManager: SourceStateManager): Promise<Chapter[]> => {
-    const uploadersToggled: boolean = await stateManager.retrieve('uploaders_toggled') ?? false
-    const uploadersWhitelisted: boolean = await stateManager.retrieve('uploaders_whitelisted') ?? false
-    const aggressiveUploadersFilter: boolean = await stateManager.retrieve('aggressive_uploaders_filtering') ?? false
-    const strictNameMatching: boolean = await stateManager.retrieve('strict_name_matching') ?? false
-    const uploaders: Uploader[] = await stateManager.retrieve('uploaders') ?? []
-
-    const chapters: Chapter[] = []
-
-    for (const chapter of data?.chapters) {
+export const parseChapters = (
+    chapters: Chapter[],
+    data: ChapterList,
+    showTitle: boolean,
+    showVol: boolean,
+    uploadersToggled: boolean,
+    uploadersWhitelisted: boolean,
+    aggressiveUploadersFilter: boolean,
+    strictNameMatching: boolean,
+    uploaders: string[]
+): void => {
+    for (const chapter of data.chapters) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
         const vol = chapter?.vol
 
         const chapNum = Number(chap)
         const volume = Number(vol)
-        
+
         const groups = []
         if (chapter?.group_name) {
-            for (const group of chapter?.group_name) {
+            for (const group of chapter.group_name) {
                 groups.push(group)
             }
         }
-        
-        if (!id) continue
 
-        let pushChapter = true
         if (uploadersToggled && uploaders.length > 0) {
             if (aggressiveUploadersFilter) {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false
+                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue
                     }
                 } else {
                     // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
-                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false
+                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue
                     }
                 }
             } else {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false
+                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue
                     }
                 } else {
                     // Only if all the uploaders are in the blacklist, we don't push the chapter
-                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false
+                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue
                     }
                 }
             }
         }
-        
-        if (!pushChapter) continue
+
         chapters.push(App.createChapter({
             id,
-            name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
-            chapNum: !isNaN(chapNum) ? chapNum : NaN,
-            volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
+            name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
+            chapNum: chapNum,
+            volume: showVol ? !isNaN(volume) ? volume : undefined : undefined,
             time: new Date(chapter?.created_at),
             group: groups?.length !== 0 ? groups?.join(',') : '',
             langCode: CMLanguages?.getEmoji(chapter?.lang)
         }))
     }
-
-    return chapters
 }
+
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-    
-    for (const images of data?.chapter?.images) {
-        const url = images?.url
+
+    for (const images of data.chapter.images) {
+        const url = images.url
 
         if(!url) continue
 
@@ -187,7 +187,7 @@ export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: 
         mangaId: mangaId,
         pages: pages
     })
-    
+
     return chapterDetails
 }
 
@@ -201,7 +201,7 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
             continue
         arrayTags.push({ id: `genre.${id}`, label: label })
     }
-    
+
     const Sort: Tag[] = [
         {
             label: 'Most follows',
@@ -284,6 +284,42 @@ export const parseTags = (data: GenresDa[]): TagSection[] => {
     ]
 }
 
+export const parseHomeSections = (data: SearchData[], id: string, sectionCallback: (section: HomeSection) => void): void => {
+    let section: HomeSection
+
+    switch (id) {
+        case 'view':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Viewed',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowLarge
+            })
+            break
+        case 'follow':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Followed',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowNormal
+            })
+            break
+        case 'uploaded':
+            section = App.createHomeSection({
+                id,
+                title: 'Latest Uploads',
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowNormal
+            })
+            break
+        default:
+            return
+    }
+
+    section.items = parseSearch(data)
+    sectionCallback(section)
+}
+
 export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
 
@@ -292,21 +328,16 @@ export const parseSearch = (data: SearchData[]): PartialSourceManga[] => {
         const title = manga?.title ?? ''
         const image = manga?.cover_url ?? ''
         const subtitle = manga?.last_chapter ?? ''
-        
+
         if (!id) continue
-        
+
         results.push(App.createPartialSourceManga({
             image,
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id,
-            subtitle: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
+            subtitle: decodeHTML(subtitle ? `Chapter ${subtitle}` : '')
         }))
     }
 
     return results
-}
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
 }

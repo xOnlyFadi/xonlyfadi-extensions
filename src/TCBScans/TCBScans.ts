@@ -1,4 +1,4 @@
-import { 
+import {
 
     SourceManga,
     Chapter,
@@ -7,7 +7,7 @@ import {
     SourceInfo,
     ContentRating,
     Request,
-    Response, 
+    Response,
     SourceIntents,
     ChapterProviding
 } from '@paperback/types'
@@ -29,9 +29,9 @@ export const TCBScansInfo: SourceInfo = {
 }
 
 export class TCBScans implements ChapterProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
-    private readonly parser: Parser = new Parser();
+    private readonly parser: Parser = new Parser()
     readonly requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -49,12 +49,12 @@ export class TCBScans implements ChapterProviding {
                 return response
             }
         }
-    });
-    
+    })
+
     getMangaShareUrl(mangaId: string): string {
         return `${TCBScans_Base}/mangas/${mangaId}`
     }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const options = App.createRequest({
             url: `${TCBScans_Base}/projects`,
@@ -62,10 +62,10 @@ export class TCBScans implements ChapterProviding {
         })
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return this.parser.parseHomeSections($, sectionCallback)
     }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const options = App.createRequest({
             url: `${TCBScans_Base}/mangas/${mangaId}`,
@@ -73,10 +73,10 @@ export class TCBScans implements ChapterProviding {
         })
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return this.parser.parseMangaDetails($, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const options = App.createRequest({
             url: `${TCBScans_Base}/mangas/${mangaId}`,
@@ -84,10 +84,10 @@ export class TCBScans implements ChapterProviding {
         })
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return this.parser.parseChapters($)
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const options = App.createRequest({
             url: `${TCBScans_Base}${chapterId}`,
@@ -95,7 +95,7 @@ export class TCBScans implements ChapterProviding {
         })
         const response = await this.requestManager.schedule(options, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { 
+import {
     SourceManga,
     Chapter,
     ChapterDetails,
@@ -19,13 +19,13 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     parseTags,
     parseChapters,
     parseMangaDetails,
     parseSearch,
-    parseHomeSections 
+    parseHomeSections
 } from './MangaSectParser'
 
 
@@ -44,9 +44,9 @@ export const MangaSectInfo: SourceInfo = {
 }
 
 export class MangaSect implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
+    constructor(public cheerio: cheerio.CheerioAPI) { }
 
-    baseUrl = DOMAIN;
+    baseUrl = DOMAIN
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -65,8 +65,8 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
                 return response
             }
         }
-    });
-    
+    })
+
     async getCloudflareBypassRequestAsync(): Promise<Request> {
         return App.createRequest({
             url: DOMAIN,
@@ -79,7 +79,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
     }
 
     getMangaShareUrl(mangaId: string): string { return `${DOMAIN}/manga/${mangaId}` }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const request = App.createRequest({
             url: DOMAIN,
@@ -87,13 +87,13 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         })
         const response = await this.requestManager.schedule(request, 2)
         const $ = this.cheerio.load(response.data as string)
-        
+
         await parseHomeSections($, sectionCallback)
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        
+
         const request = App.createRequest({
             url: encodeURI(`${DOMAIN}/filter/${page}/?sort=${homepageSectionId}`),
             method: 'GET'
@@ -102,18 +102,18 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseSearch($)
-        
+
         metadata = manga.length >= 19 ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        
+
         const Status: string[] = []
         const Sort: string[] = []
         const Genres: string[] = []
@@ -121,16 +121,16 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
             if (x.id.startsWith('genres.')) {
                 Genres.push(x.id?.split('.')?.pop())
             }
-            
+
             if (x.id.startsWith('status.')) {
                 Status.push(`&status=${x.id?.split('.')?.pop()}`)
             }
-            
+
             if (x.id.startsWith('sort.')) {
                 Sort.push(x.id?.split('.')?.pop())
             }
         })
-        
+
         let request
         if (query.title) {
             request = App.createRequest({
@@ -147,15 +147,15 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseSearch($)
-        
+
         metadata = manga.length >= 19 ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
         })
     }
-    
+
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
             url: `${DOMAIN}/filter/`,
@@ -164,10 +164,10 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseTags($)
     }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${DOMAIN}/manga/${mangaId}`,
@@ -176,10 +176,10 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseMangaDetails($, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = App.createRequest({
             url: `${DOMAIN}/manga/${mangaId}`,
@@ -188,10 +188,10 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseChapters($)
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${DOMAIN}/ajax/image/list/chap/${chapterId}`,
@@ -199,7 +199,7 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        
+
         let data
         try {
             data = JSON.parse(response.data as string)
@@ -208,10 +208,10 @@ export class MangaSect implements MangaProviding, ChapterProviding, SearchResult
             throw new Error(`${e}`)
         }
         const $ = this.cheerio.load(data.html)
-        
+
         return parseChapterDetails($, mangaId, chapterId)
     }
-    
+
     CloudFlareError(status: number): void {
         if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${MangaSectInfo.name} and press Cloudflare Bypass`)

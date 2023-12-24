@@ -1,16 +1,18 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
     SourceManga,
     PartialSourceManga,
-    TagSection 
+    TagSection
 } from '@paperback/types'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
+import { decodeHTML } from 'entities'
+
+export const parseMangaDetails = ($: cheerio.Root, mangaId: string): SourceManga => {
     const contentSection = $('.indexcontainer').first()
 
-    const titles: string[] = [decodeHTMLEntity($('h1.EnglishName',contentSection).text().trim().replace('(','').replace(')',''))]
+    const titles: string[] = [decodeHTML($('h1.EnglishName',contentSection).text().trim().replace('(','').replace(')',''))]
 
     const image = $('img.manga-cover', contentSection).attr('src') ?? ''
     const authors: string[] = []
@@ -21,7 +23,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
 
         authors.push(author)
     }
-    const description: string = decodeHTMLEntity($('div.manga-details-extended h4', contentSection).eq(4).text().trim() ?? '')
+    const description: string = decodeHTML($('div.manga-details-extended h4', contentSection).eq(4).text().trim() ?? '')
 
     const arrayTags: Tag[] = []
     for (const tag of $('div.manga-details-extended a[href*=tag]', contentSection).toArray()) {
@@ -33,9 +35,9 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
 
         if (!id || !label) continue
 
-        arrayTags.push({ 
-            id: `genres.${id}`, 
-            label 
+        arrayTags.push({
+            id: `genres.${id}`,
+            label
         })
     }
 
@@ -55,7 +57,7 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
     })
 }
 
-export const parseChapters = ($: CheerioStatic): Chapter[] => {
+export const parseChapters = ($: cheerio.Root): Chapter[] => {
     const chapters: Chapter[] = []
     const contentSection = $('.indexcontainer').first()
     const LastUpdated = $('div.manga-details-extended h4', contentSection).eq(3).text().trim()
@@ -74,7 +76,7 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
 
         chapters.push(App.createChapter({
             id: `${chapterId}/0/allpages`,
-            name: decodeHTMLEntity(title),
+            name: decodeHTML(title),
             chapNum: isNaN(chapNum) ? 0 : chapNum,
             time: new Date(LastUpdated),
             langCode: '🇸🇦'
@@ -83,16 +85,16 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
     return chapters
 }
 
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
-    
+
     for (const page of $('div#showchaptercontainer img').toArray()) {
         const url = $(page).attr('src')
         if (!url)
             continue
         pages.push(url)
     }
-    
+
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
@@ -100,7 +102,7 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
     })
 }
 
-export const parseTags = ($: CheerioStatic): TagSection[] => {
+export const parseTags = ($: cheerio.Root): TagSection[] => {
     const arrayTags: Tag[] = []
 
     for (const tag of $('#filter .order:contains(أظهار المانجا التي تحتوي على:) a').toArray()) {
@@ -112,9 +114,9 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
 
         if (!id || !label) continue
 
-        arrayTags.push({ 
-            id: `genres.${id}`, 
-            label 
+        arrayTags.push({
+            id: `genres.${id}`,
+            label
         })
     }
 
@@ -130,14 +132,14 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
 
         if (!id || !label) continue
 
-        OrderBy.push({ 
-            id: `order.${id}`, 
-            label 
+        OrderBy.push({
+            id: `order.${id}`,
+            label
         })
     }
-    OrderBy.push({ 
-        id: 'order.english_name', 
-        label: 'اسم المانجا' 
+    OrderBy.push({
+        id: 'order.english_name',
+        label: 'اسم المانجا'
     })
 
 
@@ -160,38 +162,32 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     ]
 }
 
-export const parseSearch = ($: CheerioStatic, source: any): PartialSourceManga[] => {
+export const parseSearch = ($: cheerio.Root, url: string): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
-    
+
     for (const obj of $('div.mangacontainer').toArray()) {
         const title = $('a.manga', obj).first().text().trim() ?? ''
-        const id = $('a.manga', obj).first().attr('href')?.replace(`${source.baseUrl}/`, '')?.split('?').shift()?.replace(/\/+$/, '') ?? ''
+        const id = $('a.manga', obj).first().attr('href')?.replace(`${url}/`, '')?.split('?').shift()?.replace(/\/+$/, '') ?? ''
         const lazysrc = $('img', obj)?.attr('data-pagespeed-lazy-src') ?? ''
         const image = !lazysrc ? $('img', obj).attr('src') : lazysrc
         const subtitle = $('.details a', obj).last().text().trim()
-        
+
         if (!id || !title) continue
-        
+
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id,
             subtitle: subtitle ? `أخر فصل : ${subtitle}` : ''
         }))
     }
-    
+
     return results
 }
 
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
-}
-
-export const NextPage = ($: CheerioSelector): boolean => {
+export const NextPage = ($: cheerio.Selector): boolean => {
     const nextPage = $('div.pagination a:last-child:not(.active)')
-    
+
     if (nextPage.contents().length !== 0) {
         return true
     } else {

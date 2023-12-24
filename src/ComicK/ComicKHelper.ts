@@ -1,88 +1,87 @@
-export interface MangaDetails {
-    comic:         Comic
-    artists:       GenresDa[]
-    authors:       GenresDa[]
-    genres:        GenresDa[]
+export interface GenresDa {
+    name: string;
+    slug: string;
 }
 
-export interface GenresDa {
-    name: string
-    slug: string
+export interface MangaDetails {
+    comic: Comic;
+    artists: GenresDa[];
+    authors: GenresDa[];
+    genres: GenresDa[];
+}
+
+interface MDTitles {
+    title: string;
 }
 
 export interface Comic {
-    title:               string
-    status:              number
-    hentai:              boolean
-    desc:                string
-    slug:                string
-    country:             string
-    md_titles:[
-        {
-            title: string
-        }          
-    ]
-    cover_url:           string
+    title: string;
+    status: number;
+    hentai: boolean;
+    desc: string;
+    slug: string;
+    country: string;
+    md_titles: MDTitles[];
+    cover_url: string;
 }
 
-export interface ChapterDetailsT {
-    chapters: [
-        {
-            id:         number
-            chap:       string
-            title:      null | string
-            vol:        null | string
-            slug:       null | string
-            lang:       string
-            created_at: Date
-            updated_at: Date
-            up_count:   number
-            down_count: number
-            group_name: string[]
-            hid:        string
-            md_groups:[
-                {
-                    slug:  string
-                    title: string
-                }
-            ]
-        }
-    ]
-    total:    number
+interface MDGroups {
+    slug: string;
+    title: string;
 }
 
+interface ChapterData {
+    id: number;
+    chap: string;
+    title: null | string;
+    vol: null | string;
+    slug: null | string;
+    lang: string;
+    created_at: Date;
+    updated_at: Date;
+    up_count: number;
+    down_count: number;
+    group_name: string[];
+    hid: string;
+    md_groups: MDGroups[];
+}
+
+export interface ChapterList {
+    chapters: ChapterData[];
+    total: number;
+}
+
+interface PageImage {
+    url: string;
+}
 
 export interface PageList {
-    chapter:{
-        images: [
-            {
-                url: string
-            }
-        ]
-    }
+    chapter: {
+        images: PageImage[];
+    };
+}
+
+interface MDComics {
+    cover_url: string;
+    title: string;
+    hid: string;
+    last_chapter: string;
 }
 
 export interface SearchData {
-    hid:                  string
-    title:                 string
-    cover_url:             string
-    last_chapter:          string
-    updated_at?:           Date
-    md_comics:{
-        cover_url:                    string
-        title:                 string
-        hid:                  string
-        last_chapter:         string
-    }
+    hid: string;
+    title: string;
+    cover_url: string;
+    last_chapter: string;
+    updated_at?: Date;
+    md_comics: MDComics;
 }
 
-
-
 interface Language {
-    name: string,
-    CMCode: string,
-    emoji: string,
-    default?: boolean
+    name: string;
+    CMCode: string;
+    emoji: string;
+    default?: boolean;
 }
 
 class LanguagesClass {

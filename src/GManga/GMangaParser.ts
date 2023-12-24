@@ -1,4 +1,4 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
@@ -9,7 +9,7 @@ import {
     SearchField
 } from '@paperback/types'
 
-import { 
+import {
     ChapterData,
     ChapterDetailsImages,
     Chapterization,
@@ -25,37 +25,36 @@ import '../scopes'
 
 export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceManga => {
     const details = data.mangaData
-    
+
     const titles: string[] = []
     if (details?.title) titles.push(details?.title.trim())
     if (details?.synonyms) titles.push(details?.synonyms.trim())
     if (details?.arabic_title) titles.push(details?.arabic_title.trim())
     if (details?.japanese) titles.push(details?.japanese.trim())
     if (details?.english) titles.push(details?.english.trim())
-    
+
     const cover = details?.cover?.substringBeforeLast('.') ?? ''
     const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${mangaId}/medium_${cover}.webp` : ''
-    
+
     const authors: string[] = []
     if (details?.authors) {
-        for (const author of details?.authors) {
+        for (const author of details.authors) {
             const name = author?.name
             if (!name)
                 continue
             authors.push(name)
         }
     }
-    
+
     const artists: string[] = []
     if (details?.artists) {
-        for (const artist of details?.artists) {
+        for (const artist of details.artists) {
             const name = artist?.name
-            if (!name)
-                continue
+            if (!name) continue
             artists.push(name)
         }
     }
-    
+
     const arrayTags: Tag[] = []
     if (details?.type) {
         const id = details.type.id ?? ''
@@ -67,9 +66,9 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
             })
         }
     }
-    
+
     if (details?.categories) {
-        for (const category of details?.categories) {
+        for (const category of details.categories) {
             const id = category.id ?? ''
             const label = category?.name ?? ''
             if (!id || !label)
@@ -80,15 +79,15 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
             })
         }
     }
-    
+
     let status = 'مستمرة'
     if (details?.story_status) {
-        if (details?.story_status === 2)
+        if (details.story_status === 2)
             status = 'مستمرة'
-        if (details?.story_status === 3)
+        if (details.story_status === 3)
             status = 'منتهية'
     }
-    
+
     return App.createSourceManga({
         id: mangaId,
         mangaInfo: App.createMangaInfo({
@@ -108,20 +107,20 @@ export const parseChapters = (data: ChapterData): Chapter[] => {
     for (const release of chapterList.releases) {
         const chapterization: Chapterization[] = chapterList.chapterizations.filter(x => x.id === release.chapterization_id) ?? []
         const teams: Team[] = chapterList.teams.filter(x => x.id === release.team_id) ?? []
-        
+
         if (!chapterization && !chapterization[0] && !teams && !teams[0]) continue
-        
+
         const chapter = chapterization[0]
         const team = teams[0]
-       
+
         const id = release?.id ?? ''
         const chapNum = chapter?.chapter ?? 0
         const time = release?.time_stamp * 1000 ?? 0
         const group = team?.name ?? ''
         const name = chapter?.title ? chapter?.title : ''
-        
+
         if (!id) continue
-        
+
         chapters.push(App.createChapter({
             id: `${id}`,
             name,
@@ -131,20 +130,20 @@ export const parseChapters = (data: ChapterData): Chapter[] => {
             langCode: '🇸🇦'
         }))
     }
-    
+
     return chapters
 }
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
     const html = $('.js-react-on-rails-component').html() ?? ''
     const data: ChapterDetailsImages = JSON.parse(html)
-    
+
     const releaseData = data?.readerDataAction?.readerData?.release
     const hasWebP = releaseData.webp_pages.length > 0
     for (const page of hasWebP ? releaseData.webp_pages : releaseData.pages) {
         pages.push(encodeURI(`https://media.gmanga.me/uploads/releases/${releaseData.storage_key}/hq${hasWebP ? '_webp' : ''}/${page}`))
     }
-    
+
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
@@ -154,39 +153,39 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
 
 export const parseSearch = (data: SearchData): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
-    
+
     for (const obj of data.mangas) {
         const id = obj?.id?.toString() ?? ''
         const title = obj?.title ?? ''
         const cover = obj?.cover?.substringBeforeLast('.') ?? ''
         const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${id}/medium_${cover}.webp` : ''
-        
+
         if (!id) continue
-        
+
         results.push(App.createPartialSourceManga({
             title: decodeHTML(title),
             image,
             mangaId: id
         }))
     }
-    
+
     return results
 }
 
 export const parseHompage = (data: any, selector: string): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
     const collectedIds: string[] = []
-    
+
     if (selector !== 'undefined') {
         for (const obj of data[selector ?? 'undefined']) {
             const id = obj?.manga?.id ?? obj?.id ?? ''
             const title = obj?.manga?.title ?? obj?.title ?? ''
             const cover = obj?.manga?.cover ?? obj?.cover ?? ''
             const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${id}/medium_${cover.substringBeforeLast('.')}.webp` : ''
-            
+
             if (!id) continue
             if (collectedIds.includes(id)) continue
-            
+
             results.push(App.createPartialSourceManga({
                 title: decodeHTML(title),
                 image,
@@ -196,12 +195,12 @@ export const parseHompage = (data: any, selector: string): PartialSourceManga[] 
             collectedIds.push(id)
         }
     }
-    
+
     return results
 }
 
 export const parseTags = (): TagSection[] => {
-    
+
     const Genres: Tag[] = [
         {
             label: 'إثارة',
@@ -517,7 +516,7 @@ export const parseTags = (): TagSection[] => {
             id: 'storyst.3'
         }
     ]
-    
+
     const TranslationStatus: Tag[] = [
         {
             label: 'منتهية',
@@ -582,15 +581,11 @@ export const parseMetadata = (query: SearchRequest, metadata: any): SearchForm =
             'exclude': []
         },
         'chapters': {
-            // @ts-ignore
             'min': query?.parameters?.['min_chapter_count'] ?? '',
-            // @ts-ignore
             'max': query?.parameters?.['max_chapter_count'] ?? ''
         },
         'dates': {
-            // @ts-ignore
             'start': query?.parameters?.['start_date'] ?? null,
-            // @ts-ignore
             'end': query?.parameters?.['end_date'] ?? null
         }
     }

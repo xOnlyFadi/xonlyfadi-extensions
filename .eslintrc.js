@@ -14,10 +14,11 @@ module.exports = {
     },
     'plugins': [
         'modules-newline',
-        '@typescript-eslint'
+        '@typescript-eslint',
+        '@stylistic'
     ],
     'rules': {
-        '@typescript-eslint/indent': [
+        '@stylistic/indent': [
             'error',
             4
         ],
@@ -34,9 +35,10 @@ module.exports = {
             'never'
         ],
         'comma-dangle': 'off',
-        '@typescript-eslint/comma-dangle': 'error',
+        '@stylistic/comma-dangle': 'error',
         'prefer-arrow-callback': 'error',
         'modules-newline/import-declaration-newline': 'error',
-        'modules-newline/export-declaration-newline': 'error'
+        'modules-newline/export-declaration-newline': 'error',
+        '@stylistic/no-trailing-spaces': 'error'
     }
 }

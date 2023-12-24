@@ -1,4 +1,4 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     HomeSection,
@@ -6,16 +6,16 @@ import {
     SourceManga,
     PartialSourceManga,
     Tag,
-    TagSection 
+    TagSection
 } from '@paperback/types'
 
-import { 
+import {
     SearchData,
     VoyceMangaData,
     VoyceChapterData,
     SearchType,
     VoyceChapterDetailsData,
-    HomePageData 
+    HomePageData
 } from './VoyceMEHelper'
 
 import { decodeHTML } from 'entities'
@@ -23,18 +23,12 @@ import { convert } from 'html-to-text'
 import '../scopes'
 
 export class Parser {
-    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net';
-    
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
-    }
-    
+    private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net'
+
     parseSearch(VoyceD: SearchData): PartialSourceManga[] {
         const items: PartialSourceManga[] = []
-        
-        for(const data of VoyceD?.data?.voyce_series){
+
+        for(const data of VoyceD.data.voyce_series){
             const id = data?.id ?? ''
             const title = data?.title?.trim() ?? ''
             const image = data?.thumbnail ? encodeURI(`${this.staticURL}/${data?.thumbnail}`) : ''
@@ -47,10 +41,10 @@ export class Parser {
                 mangaId: `${id}`
             }))
         }
-        
+
         return items
     }
-    
+
     parseHomeSections(data: HomePageData, sectionCallback: (section: HomeSection) => void): void {
         const sections = [
             {
@@ -117,7 +111,7 @@ export class Parser {
                 const id = manga?.id ?? ''
                 const image = manga?.thumbnail ? encodeURI(`${this.staticURL}/${manga.thumbnail}`) : ''
                 const subtitle = manga?.chapter_count ? `${manga?.chapter_count} Chapters` : ''
-    
+
                 if (!id || collectedIds.includes(id)) continue
 
                 mangaItemsArray.push(App.createPartialSourceManga({
@@ -132,11 +126,11 @@ export class Parser {
             sectionCallback(section.section)
         }
     }
-    
+
     parseViewMore(homepageSectionId: string, data: HomePageData): PartialSourceManga[] {
         const collectedIds: number[] = []
         const mangaItemsArray: PartialSourceManga[] = []
-        
+
         let mangaData
         switch (homepageSectionId) {
             case 'popular':
@@ -155,16 +149,16 @@ export class Parser {
                 mangaData = data.data.fresh
                 break
         }
-    
+
         if(mangaData){
             for (const manga of mangaData) {
                 const title = manga?.title ?? ''
                 const id = manga?.id ?? ''
                 const image = manga?.thumbnail ? encodeURI(`${this.staticURL}/${manga.thumbnail}`) : ''
                 const subtitle = manga?.chapter_count ? `${manga?.chapter_count} Chapters` : ''
-    
+
                 if (!id || collectedIds.includes(id)) continue
-                
+
                 mangaItemsArray.push(App.createPartialSourceManga({
                     title: title,
                     image: image,
@@ -174,10 +168,10 @@ export class Parser {
                 collectedIds.push(id)
             }
         }
-        
+
         return mangaItemsArray
     }
-    
+
     parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string): SourceManga {
         const details = VoyceD.data.series.first()
 
@@ -202,33 +196,33 @@ export class Parser {
                 label: title
             })
         }
-        
+
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [this.decodeHTMLEntity(title)],
+                titles: [decodeHTML(title)],
                 image,
                 status: this.parseStatus(status),
-                author: this.decodeHTMLEntity(author),
+                author: decodeHTML(author),
                 tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })],
                 desc: convert(decodeHTML(desc), { wordwrap: 130 })
             })
         })
     }
-    
+
     parseChapters(VoyceD: VoyceChapterData): Chapter[] {
         const chapters: Chapter[] = []
         const data = VoyceD?.data?.series?.first()
         let sortingIndex = 0
-        
+
         for (const obj of data?.chapters ?? []) {
             const id = obj.id ?? ''
             const name = obj.title ?? 'No Chpater Name'
             const release_date = obj.created_at
             const chapNum = Number(name.match(/\d+/)?.pop()?.replace(/-/g, '.'))
-            
+
             if (!id) continue
-            
+
             chapters.push(App.createChapter({
                 id: `${id}`,
                 name: name,
@@ -239,21 +233,21 @@ export class Parser {
             }))
             sortingIndex--
         }
-        
+
         const chaps = chapters.map(chapter => {
             chapter.sortingIndex += chapters.length
             return App.createChapter(chapter)
-        
+
         })
-        
+
         const key = 'name'
         const arrayUniqueByKey = [...new Map(chaps.map(item => [item[key], item])).values()]
         return arrayUniqueByKey
     }
-    
+
     async parseChapterDetails(data: VoyceChapterDetailsData, mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const pages: string[] = []
-        
+
         for(const page of data.data.images){
             const url = page?.image ?? ''
 
@@ -270,7 +264,7 @@ export class Parser {
     parseTags(data: SearchType): TagSection[] {
         const Genres: Tag[] = []
 
-        for(const genre of data?.data?.genres){
+        for(const genre of data.data.genres){
             const id = genre?.id ?? ''
             const label = genre?.title ?? ''
 
@@ -284,7 +278,7 @@ export class Parser {
 
         const Types: Tag[] = []
 
-        for(const type of data?.data?.types){
+        for(const type of data.data.types){
             const id = type?.id ?? ''
             const label = type?.title ?? ''
 
@@ -297,7 +291,7 @@ export class Parser {
                 label
             })
         }
-        
+
         const Category: Tag[] = [
             {
                 id: 'category.1',
@@ -315,7 +309,7 @@ export class Parser {
                 label: 'Completed'
             }
         ]
-        
+
         return [
             App.createTagSection({ id: 'genres', label: 'Genres', tags: Genres.map((x) => App.createTag(x)) }),
             App.createTagSection({ id: 'category', label: 'Category', tags: Category.map((x) => App.createTag(x)) }),

@@ -18,7 +18,7 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     isLastPage,
     parseTags,
@@ -26,7 +26,7 @@ import {
     parseHomeSections,
     parseMangaDetails,
     parseViewMore,
-    parseSearch 
+    parseSearch
 } from './ReadComicOnlineParser'
 
 const RCO_DOMAIN = 'https://readcomiconline.li'
@@ -49,8 +49,8 @@ export const ReadComicOnlineInfo: SourceInfo = {
 }
 
 export class ReadComicOnline implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: CheerioAPI) { }
-    
+    constructor(public cheerio: cheerio.CheerioAPI) { }
+
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -69,8 +69,8 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
                 return response
             }
         }
-    });
-    
+    })
+
     async getCloudflareBypassRequestAsync(): Promise<Request> {
         return App.createRequest({
             url: RCO_DOMAIN,
@@ -83,7 +83,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
     }
 
     getMangaShareUrl(mangaId: string): string { return `${RCO_DOMAIN}/Comic/${mangaId}` }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${RCO_DOMAIN}/Comic/`,
@@ -92,7 +92,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
         })
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseMangaDetails($, mangaId)
     }
     async getChapters(mangaId: string): Promise<Chapter[]> {
@@ -103,7 +103,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
         })
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseChapters($)
     }
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -113,7 +113,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             param: '?readType=1&quality=hq'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+
         return parseChapterDetails(response.data as string, mangaId, chapterId)
     }
     async getSearchTags(): Promise<TagSection[]> {
@@ -124,7 +124,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         return parseTags($)
     }
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -135,12 +135,12 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
-        
+
         parseHomeSections($, sectionCallback)
     }
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        
+
         let param = ''
         switch (homepageSectionId) {
             case 'latest_comic':
@@ -155,7 +155,7 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist')
         }
-        
+
         const request = App.createRequest({
             url: `${RCO_DOMAIN}/ComicList`,
             method: 'GET',
@@ -165,9 +165,9 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseViewMore($)
-        
+
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata
@@ -191,16 +191,16 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             request = App.createRequest({
                 url: `${RCO_DOMAIN}/Genre/`,
                 method: 'GET',
-                param: `${query?.includedTags?.map((x: any) => x.id)[0]}?page=${page}`
+                param: `${query?.includedTags?.map((x) => x.id)[0]}?page=${page}`
             })
         }
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         const manga = parseSearch($)
-        
+
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
-        
+
         return App.createPagedResults({
             results: manga,
             metadata

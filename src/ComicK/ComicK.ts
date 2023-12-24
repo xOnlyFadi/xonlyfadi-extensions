@@ -1,4 +1,4 @@
-import { 
+import {
     MangaProviding,
     SourceManga,
     Chapter,
@@ -12,44 +12,48 @@ import {
     Request,
     Response,
     DUISection,
-    BadgeColor, 
+    BadgeColor,
     ChapterProviding,
     SourceIntents,
     SearchResultsProviding,
     HomePageSectionsProviding
 } from '@paperback/types'
 
-import { 
+import {
     parseChapterDetails,
     parseTags,
     parseChapters,
     parseMangaDetails,
-    parseSearch 
+    parseSearch,
+    parseHomeSections
 } from './ComicKParser'
 
-import { 
+import {
     chapterSettings,
     languageSettings,
-    resetSettings, 
+    resetSettings,
     uploadersSettings
 } from './ComicKSettings'
 
-import { CMLanguages } from './ComicKHelper'
+import {
+    ChapterList,
+    CMLanguages
+} from './ComicKHelper'
 
-const COMICK_DOMAIN = 'https://comick.app'
+const COMICK_DOMAIN = 'https://comick.cc'
 const COMICK_API = 'https://api.comick.fun'
-const SEARCH_PAGE_LIMIT = 100
+const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.1',
+    version: '2.1.3',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.app.',
+    description: 'Extension that pulls manga from comick.cc.',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
-    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS,
+    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: [
         {
             text: 'Multi Language',
@@ -59,7 +63,7 @@ export const ComicKInfo: SourceInfo = {
 }
 export class ComicK implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
     requestManager = App.createRequestManager({
-        requestsPerSecond: 4,
+        requestsPerSecond: 10,
         requestTimeout: 15000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
@@ -76,8 +80,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 return response
             }
         }
-    });
-    
+    })
+
     stateManager = App.createSourceStateManager()
 
     async getSourceMenu(): Promise<DUISection> {
@@ -93,16 +97,17 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             ]
         }))
     }
-    
+
     getMangaShareUrl(mangaId: string): string { return `${COMICK_DOMAIN}/comic/${mangaId}` }
-    
+
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${COMICK_API}/comic/${mangaId}?tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -110,34 +115,69 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseMangaDetails(data, mangaId)
     }
-    
+
     async getChapters(mangaId: string): Promise<Chapter[]> {
-        const showVol = await this.stateManager.retrieve('show_volume_number') ?? false
-        const showTitle = await this.stateManager.retrieve('show_title') ?? false
+        const showTitle: boolean = await this.stateManager.retrieve('show_title') ?? false
+        const showVol: boolean = await this.stateManager.retrieve('show_volume_number') ?? false
+        const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') ?? false
+        const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') ?? false
+        const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
+        const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') ?? false
+        const uploaders: string[] = await this.stateManager.retrieve('uploaders_selected') ?? []
+
         const chapters: Chapter[] = []
-        
+
         let page = 1
-        let json = null
-        do {
-            json = await this.createChapterRequest(mangaId, page)
-            chapters.push(...(await parseChapters(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)))
-            page += 1
-        } while (json.chapters.length === SEARCH_PAGE_LIMIT)
+        let data = await this.createChapterRequest(mangaId, page++)
+
+        parseChapters(
+            chapters,
+            data,
+            showTitle,
+            showVol,
+            uploadersToggled,
+            uploadersWhitelisted,
+            aggressiveUploadersFilter,
+            strictNameMatching,
+            uploaders
+        )
+
+        // Try next page if number of chapters is same as limit
+        while (data.chapters.length === LIMIT) {
+            data = await this.createChapterRequest(mangaId, page++)
+
+            // Break if there are no more chapters
+            if (data.chapters.length === 0) break
+
+            parseChapters(
+                chapters,
+                data,
+                showTitle,
+                showVol,
+                uploadersToggled,
+                uploadersWhitelisted,
+                aggressiveUploadersFilter,
+                strictNameMatching,
+                uploaders
+            )
+        }
 
         return chapters
     }
-    
-    async createChapterRequest(mangaId: string, page: number): Promise<any> {
+
+    async createChapterRequest(mangaId: string, page: number): Promise<ChapterList> {
+        const LIMIT = 100000
         const Languages = await this.stateManager.retrieve('languages') ?? CMLanguages.getDefault()
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -148,14 +188,15 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
 
         return data
     }
-    
+
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${COMICK_API}/chapter/${chapterId}/?tachiyomi=true`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -163,17 +204,18 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         return parseChapterDetails(data, mangaId, chapterId)
     }
-    
+
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
             url: `${COMICK_API}/genre/`,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -184,94 +226,69 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
 
         return parseTags(data)
     }
-    
+
     async supportsTagExclusion(): Promise<boolean> {
         return true
     }
-    
+
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        // Show only 20 titles on HomeSection, override global LIMIT to 20
+        const LIMIT = 20
+
+        const createSectionRequest = (sort: string) => ({
+            id: sort,
+            request: App.createRequest({
+                url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${LIMIT}&sort=${sort}&t=false`,
+                method: 'GET'
+            })
+        })
+
         const sections = [
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'views',
-                    title: 'Most Viewed',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'follow',
-                    title: 'Most Follows',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'latest',
-                    title: 'Latest Uploads',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            }
+            createSectionRequest('view'),
+            createSectionRequest('follow'),
+            createSectionRequest('uploaded')
         ]
 
-        const promises: Promise<void>[] = []
-        for (const section of sections) {
-            sectionCallback(section.section)
-            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
-                let data
-                try {
-                    data = JSON.parse(response.data ?? '')
-                }
-                catch (e) {
-                    throw new Error(`${e}`)
-                }
-                
-                section.section.items = parseSearch(data)
-                sectionCallback(section.section)
-            }))
+        for (const s of sections) {
+            const response = await this.requestManager.schedule(s.request, 1)
+            this.CloudFlareError(response.status)
+
+            let data
+            try {
+                data = JSON.parse(response.data ?? '')
+            }
+            catch (e) {
+                throw new Error(`${e}`)
+            }
+
+            parseHomeSections(data, s.id, sectionCallback)
         }
-        
-        await Promise.all(promises)
     }
-    
+
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let param
         switch (homepageSectionId) {
-            case 'views':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`
+            case 'view':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=view&t=false`
                 break
             case 'follow':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=follow&t=false`
                 break
-            case 'latest':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`
+            case 'uploaded':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=uploaded&t=false`
                 break
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist')
         }
-        
+
         const request = App.createRequest({
             url: COMICK_API + param,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -279,9 +296,9 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         const manga = parseSearch(data)
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: manga,
             metadata
@@ -297,7 +314,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const Type: string[] = []
         const Demographic: string[] = []
 
-        query.includedTags?.map((x: any) => {
+        query.includedTags?.map((x) => {
             const id = x.id
             const SplittedID = id?.split('.')?.pop() ?? ''
             if (id.includes('genre.')) {
@@ -316,29 +333,30 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 Demographic.push(`&demographic=${SplittedID}`)
             }
         })
-        
-        query.excludedTags?.map((x: any) => {
+
+        query.excludedTags?.map((x) => {
             const id = x.id
             const SplittedID = id?.split('.')?.pop() ?? ''
             if (id.includes('genre.')) {
                 excludedGenres.push(`&excludes=${SplittedID}`)
             }
         })
-        
+
         let request
         if (query.title) {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${SEARCH_PAGE_LIMIT}&page=${page}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${LIMIT}&page=${page}&tachiyomi=true`,
                 method: 'GET'
             })
         } else {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
                 method: 'GET'
             })
         }
         const response = await this.requestManager.schedule(request, 1)
-        
+        this.CloudFlareError(response.status)
+
         let data
         try {
             data = JSON.parse(response.data ?? '')
@@ -346,12 +364,29 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         catch (e) {
             throw new Error(`${e}`)
         }
-        
+
         const manga = parseSearch(data)
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: manga,
             metadata
+        })
+    }
+
+    CloudFlareError(status: number): void {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${ComicKInfo.name}> and press the cloud icon.`)
+        }
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: COMICK_DOMAIN,
+            method: 'GET',
+            headers: {
+                'referer': `${COMICK_DOMAIN}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
         })
     }
 }

@@ -1,4 +1,4 @@
-import { 
+import {
     Chapter,
     ChapterDetails,
     Tag,
@@ -6,19 +6,22 @@ import {
     PartialSourceManga,
     TagSection,
     HomeSection,
-    HomeSectionType 
+    HomeSectionType
 } from '@paperback/types'
+
+import { decodeHTML } from 'entities'
+
 const DOMAIN = 'https://mangasect.com'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceManga => {
-    const title = decodeHTMLEntity($('header h1').text().trim())
+export const parseMangaDetails = ($: cheerio.Root, mangaId: string): SourceManga => {
+    const title = decodeHTML($('header h1').text().trim())
 
     let image = $('.a1 figure img')?.attr('src') ?? ''
     image = image.startsWith('/') ? DOMAIN + image : image
-    
+
     let author
     let rawStatus
-    
+
     for(const obj of $('.y6x11p').toArray()){
         const type = $(obj).text().trim().replace(/\s+/g, ' ')
         const text = $('span', obj).text().trim()
@@ -40,14 +43,14 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
 
         if (!id) continue
 
-        arrayTags.push({ 
-            id: `mgenres.${id}`, 
-            label 
+        arrayTags.push({
+            id: `mgenres.${id}`,
+            label
         })
     }
 
-    const description: string = decodeHTMLEntity($('article #syn-target').text().trim() ?? '')
-    
+    const description: string = decodeHTML($('article #syn-target').text().trim() ?? '')
+
     return App.createSourceManga({
         id: mangaId,
         mangaInfo: App.createMangaInfo({
@@ -61,15 +64,15 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string): SourceMang
     })
 }
 
-export const parseChapters = ($: CheerioStatic): Chapter[] => {
+export const parseChapters = ($: cheerio.Root): Chapter[] => {
     const chapters: Chapter[] = []
 
-    for (const chapter of $('article #myUL li')?.toArray()) {
+    for (const chapter of $('article #myUL li').toArray()) {
         const AElement = $('a',chapter)
         const title = AElement.text().trim() ?? ''
         const chapterId = AElement.attr('href')?.replace(`${DOMAIN}/manga/`, '')?.split('/').pop() ?? ''
         const time = $('.timeago', chapter)?.attr('datetime') ?? ''
-    
+
 
         if (!chapterId) continue
 
@@ -79,17 +82,17 @@ export const parseChapters = ($: CheerioStatic): Chapter[] => {
 
         chapters.push(App.createChapter({
             id: chapterId,
-            name: decodeHTMLEntity(title),
+            name: decodeHTML(title),
             chapNum: chapNum ? !isNaN(Number(chapNum)) ? Number(chapNum) : 0 : 0,
             time: time ? new Date(Number(time) * 1000) : undefined,
             langCode: '🇬🇧'
         }))
     }
-    
+
     return chapters
 }
 
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails => {
+export const parseChapterDetails = ($: cheerio.Root, mangaId: string, chapterId: string): ChapterDetails => {
     const pages: string[] = []
 
     for (const page of $('.separator a').toArray()) {
@@ -99,7 +102,7 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
 
         pages.push(url)
     }
-    
+
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
@@ -107,31 +110,31 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
     })
 }
 
-export const parseTags = ($: CheerioStatic): TagSection[] => {
+export const parseTags = ($: cheerio.Root): TagSection[] => {
     const Status: Tag[] = []
     const Sort: Tag[] = []
     const Genres: Tag[] = []
 
-    for (const obj of $('#select-status option')?.toArray()) {
+    for (const obj of $('#select-status option').toArray()) {
         const id = $(obj).attr('value')
         const label = $(obj).text().trim()
 
         if (!id) continue
         if(label.toLocaleLowerCase() === 'all') continue
-        
+
         Status.push({
             label,
             id: `status.${id}`
         })
     }
 
-    for (const obj of $('#select-sort option')?.toArray()) {
+    for (const obj of $('#select-sort option').toArray()) {
         const id = $(obj).attr('value')
         const label = $(obj).text().trim()
 
         if (!id) continue
         if(label.toLocaleLowerCase() === 'default') continue
-        
+
         Sort.push({
             label,
             id: `sort.${id}`
@@ -139,7 +142,7 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     }
 
 
-    for (const obj of $('.advanced-genres .advance-item')?.toArray()) {
+    for (const obj of $('.advanced-genres .advance-item').toArray()) {
         const id = $('input', obj).attr('data-genre')
         const label = $('label', obj).text().trim()
 
@@ -158,10 +161,10 @@ export const parseTags = ($: CheerioStatic): TagSection[] => {
     ]
 }
 
-export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
+export const parseSearch = ($: cheerio.Root): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
 
-    for (const obj of $('section .r2 .grid >')?.toArray()) {
+    for (const obj of $('section .r2 .grid >').toArray()) {
         const id = $('.text-center a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.text-center a', obj)?.text()?.trim() ?? ''
         let image = $('.b-img img', obj)?.attr('data-src') ?? ''
@@ -171,15 +174,15 @@ export const parseSearch = ($: CheerioStatic): PartialSourceManga[] => {
 
         results.push(App.createPartialSourceManga({
             image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-            title: decodeHTMLEntity(title),
+            title: decodeHTML(title),
             mangaId: id
         }))
     }
-    
+
     return results
 }
 
-export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (section: HomeSection) => void): Promise<void> => {
+export const parseHomeSections = async ($: cheerio.Root, sectionCallback: (section: HomeSection) => void): Promise<void> => {
     const featured_section = App.createHomeSection({ id: 'featured', title: 'Featured', type: HomeSectionType.featured, containsMoreItems: false})
     const recommend_section = App.createHomeSection({ id: 'recommend', title: 'Recommend', type: HomeSectionType.singleRowNormal, containsMoreItems: false})
     const latest_section = App.createHomeSection({ id: 'latest-updated', title: 'Latest', type: HomeSectionType.singleRowNormal, containsMoreItems: true})
@@ -187,7 +190,7 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     const monthly_section = App.createHomeSection({ id: 'monthly', title: 'Top Monthly', type: HomeSectionType.singleRowNormal, containsMoreItems: false})
     const weekly_section = App.createHomeSection({ id: 'weekly', title: 'Top Weekly', type: HomeSectionType.singleRowNormal, containsMoreItems: false})
     const daily_section = App.createHomeSection({ id: 'daily', title: 'Top  Daily', type: HomeSectionType.singleRowNormal, containsMoreItems: false})
-    
+
     const featured: PartialSourceManga[] = []
     const recommend: PartialSourceManga[] = []
     const latest: PartialSourceManga[] = []
@@ -195,8 +198,8 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     const monthly: PartialSourceManga[] = []
     const weekly: PartialSourceManga[] = []
     const daily: PartialSourceManga[] = []
-    
-    for (const obj of  $('.slides .deslide-item')?.toArray()) {
+
+    for (const obj of  $('.slides .deslide-item').toArray()) {
         const id = $('.desi-head-title a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.desi-head-title a', obj)?.text()?.trim() ?? $('.desi-head-title a', obj)?.attr('title')  ?? ''
         const subTitle = $('.desi-sub-text', obj)?.text()?.trim() ?? ''
@@ -214,8 +217,8 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     featured_section.items = featured
     sectionCallback(featured_section)
-    
-    for (const obj of  $('#recommend figure')?.toArray()) {
+
+    for (const obj of  $('#recommend figure').toArray()) {
         const id = $('a.block', obj).first()?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('figcaption a', obj)?.text()?.trim() ?? ''
         let image = $('a.block img', obj)?.attr('src') ?? ''
@@ -232,7 +235,7 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     recommend_section.items = recommend
     sectionCallback(recommend_section)
 
-    for (const obj of  $('#homeLast .grid >')?.toArray()) {
+    for (const obj of  $('#homeLast .grid >').toArray()) {
         const id = $('.text-center a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.text-center a', obj)?.text()?.trim() ?? ''
         let image = $('.b-img img', obj)?.attr('data-src') ?? ''
@@ -249,7 +252,7 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
 
     latest_section.items = latest
     sectionCallback(latest_section)
-    for (const obj of $('#schedule .update-time >')?.toArray()) {
+    for (const obj of $('#schedule .update-time >').toArray()) {
         const id = $('.cover a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.data .name a', obj)?.text()?.trim() ?? ''
         let image = $('.cover img', obj)?.attr('src') ?? ''
@@ -265,8 +268,8 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     new_section.items = newm
     sectionCallback(new_section)
-    
-    for (const obj of $('#series-month article')?.toArray()) {
+
+    for (const obj of $('#series-month article').toArray()) {
         const id = $('.item-thumbnail a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.post-title a', obj)?.text()?.trim() ?? ''
         let image = $('.item-thumbnail img', obj)?.attr('src') ?? ''
@@ -282,8 +285,8 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     monthly_section.items = monthly
     sectionCallback(monthly_section)
-    
-    for (const obj of $('#series-week article')?.toArray()) {
+
+    for (const obj of $('#series-week article').toArray()) {
         const id = $('.item-thumbnail a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.post-title a', obj)?.text()?.trim() ?? ''
         let image = $('.item-thumbnail img', obj)?.attr('src') ?? ''
@@ -299,9 +302,9 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     weekly_section.items = weekly
     sectionCallback(weekly_section)
-    
 
-    for (const obj of $('#series-day article')?.toArray()) {
+
+    for (const obj of $('#series-day article').toArray()) {
         const id = $('.item-thumbnail a', obj)?.attr('href')?.replace(`${DOMAIN}/manga/`, '') ?? ''
         const title = $('.post-title a', obj)?.text()?.trim() ?? ''
         let image = $('.item-thumbnail img', obj)?.attr('src') ?? ''
@@ -317,10 +320,4 @@ export const parseHomeSections = async ($: CheerioStatic, sectionCallback: (sect
     }
     daily_section.items = daily
     sectionCallback(daily_section)
-}
-
-const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
 }
