@@ -8902,19 +8902,19 @@ const types_1 = require("@paperback/types");
 const ComicKParser_1 = require("./ComicKParser");
 const ComicKSettings_1 = require("./ComicKSettings");
 const ComicKHelper_1 = require("./ComicKHelper");
-const COMICK_DOMAIN = 'https://comick.app';
+const COMICK_DOMAIN = 'https://comick.cc';
 const COMICK_API = 'https://api.comick.fun';
-const SEARCH_PAGE_LIMIT = 100;
+const LIMIT = 300;
 exports.ComicKInfo = {
-    version: '2.1.1',
+    version: '2.1.3',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.app.',
+    description: 'Extension that pulls manga from comick.cc.',
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
-    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.MANGA_CHAPTERS,
+    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: [
         {
             text: 'Multi Language',
@@ -8925,7 +8925,7 @@ exports.ComicKInfo = {
 class ComicK {
     constructor() {
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 4,
+            requestsPerSecond: 10,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {
@@ -8965,6 +8965,7 @@ class ComicK {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -8975,25 +8976,36 @@ class ComicK {
         return (0, ComicKParser_1.parseMangaDetails)(data, mangaId);
     }
     async getChapters(mangaId) {
-        const showVol = await this.stateManager.retrieve('show_volume_number') ?? false;
         const showTitle = await this.stateManager.retrieve('show_title') ?? false;
+        const showVol = await this.stateManager.retrieve('show_volume_number') ?? false;
+        const uploadersToggled = await this.stateManager.retrieve('uploaders_toggled') ?? false;
+        const uploadersWhitelisted = await this.stateManager.retrieve('uploaders_whitelisted') ?? false;
+        const aggressiveUploadersFilter = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false;
+        const strictNameMatching = await this.stateManager.retrieve('strict_name_matching') ?? false;
+        const uploaders = await this.stateManager.retrieve('uploaders_selected') ?? [];
         const chapters = [];
         let page = 1;
-        let json = null;
-        do {
-            json = await this.createChapterRequest(mangaId, page);
-            chapters.push(...(await (0, ComicKParser_1.parseChapters)(json, { show_title: showTitle, show_volume: showVol }, this.stateManager)));
-            page += 1;
-        } while (json.chapters.length === SEARCH_PAGE_LIMIT);
+        let data = await this.createChapterRequest(mangaId, page++);
+        (0, ComicKParser_1.parseChapters)(chapters, data, showTitle, showVol, uploadersToggled, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders);
+        // Try next page if number of chapters is same as limit
+        while (data.chapters.length === LIMIT) {
+            data = await this.createChapterRequest(mangaId, page++);
+            // Break if there are no more chapters
+            if (data.chapters.length === 0)
+                break;
+            (0, ComicKParser_1.parseChapters)(chapters, data, showTitle, showVol, uploadersToggled, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders);
+        }
         return chapters;
     }
     async createChapterRequest(mangaId, page) {
+        const LIMIT = 100000;
         const Languages = await this.stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault();
         const request = App.createRequest({
-            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${SEARCH_PAGE_LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
+            url: `${COMICK_API}/comic/${mangaId}/chapters?page=${page}&limit=${LIMIT}${!Languages.includes('all') ? `&lang=${Languages}` : ''}&tachiyomi=true`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -9009,6 +9021,7 @@ class ComicK {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -9024,6 +9037,7 @@ class ComicK {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -9037,73 +9051,45 @@ class ComicK {
         return true;
     }
     async getHomePageSections(sectionCallback) {
+        // Show only 20 titles on HomeSection, override global LIMIT to 20
+        const LIMIT = 20;
+        const createSectionRequest = (sort) => ({
+            id: sort,
+            request: App.createRequest({
+                url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${LIMIT}&sort=${sort}&t=false`,
+                method: 'GET'
+            })
+        });
         const sections = [
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'views',
-                    title: 'Most Viewed',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'follow',
-                    title: 'Most Follows',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${COMICK_API}/v1.0/search/?tachiyomi=true&page=1&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: 'latest',
-                    title: 'Latest Uploads',
-                    containsMoreItems: true,
-                    type: 'singleRowNormal'
-                })
-            }
+            createSectionRequest('view'),
+            createSectionRequest('follow'),
+            createSectionRequest('uploaded')
         ];
-        const promises = [];
-        for (const section of sections) {
-            sectionCallback(section.section);
-            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
-                let data;
-                try {
-                    data = JSON.parse(response.data ?? '');
-                }
-                catch (e) {
-                    throw new Error(`${e}`);
-                }
-                section.section.items = (0, ComicKParser_1.parseSearch)(data);
-                sectionCallback(section.section);
-            }));
+        for (const s of sections) {
+            const response = await this.requestManager.schedule(s.request, 1);
+            this.CloudFlareError(response.status);
+            let data;
+            try {
+                data = JSON.parse(response.data ?? '');
+            }
+            catch (e) {
+                throw new Error(`${e}`);
+            }
+            (0, ComicKParser_1.parseHomeSections)(data, s.id, sectionCallback);
         }
-        await Promise.all(promises);
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
         let param;
         switch (homepageSectionId) {
-            case 'views':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=view&t=false`;
+            case 'view':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=view&t=false`;
                 break;
             case 'follow':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=follow&t=false`;
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=follow&t=false`;
                 break;
-            case 'latest':
-                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${SEARCH_PAGE_LIMIT}&sort=uploaded&t=false`;
+            case 'uploaded':
+                param = `/v1.0/search/?tachiyomi=true&page=${page}&limit=${LIMIT}&sort=uploaded&t=false`;
                 break;
             default:
                 throw new Error('Requested to getViewMoreItems for a section ID which doesn\'t exist');
@@ -9113,6 +9099,7 @@ class ComicK {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -9121,7 +9108,7 @@ class ComicK {
             throw new Error(`${e}`);
         }
         const manga = (0, ComicKParser_1.parseSearch)(data);
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
             metadata
@@ -9164,17 +9151,18 @@ class ComicK {
         let request;
         if (query.title) {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${SEARCH_PAGE_LIMIT}&page=${page}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?q=${query.title.replace(/ /g, '%20')}&limit=${LIMIT}&page=${page}&tachiyomi=true`,
                 method: 'GET'
             });
         }
         else {
             request = App.createRequest({
-                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${SEARCH_PAGE_LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
+                url: `${COMICK_API}/v1.0/search?page=${page}&limit=${LIMIT}${includedGenres.length > 0 ? includedGenres.join('') : ''}${excludedGenres.length > 0 ? excludedGenres.join('') : ''}${Sort.length > 0 ? Sort.join('') : ''}${CreatedAt.length > 0 ? CreatedAt.join('') : ''}${Type.length > 0 ? Type.join('') : ''}${Demographic.length > 0 ? Demographic.join('') : ''}&tachiyomi=true`,
                 method: 'GET'
             });
         }
         const response = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(response.status);
         let data;
         try {
             data = JSON.parse(response.data ?? '');
@@ -9183,10 +9171,25 @@ class ComicK {
             throw new Error(`${e}`);
         }
         const manga = (0, ComicKParser_1.parseSearch)(data);
-        metadata = data.length === SEARCH_PAGE_LIMIT ? { page: page + 1 } : undefined;
+        metadata = data.length === LIMIT ? { page: page + 1 } : undefined;
         return App.createPagedResults({
             results: manga,
             metadata
+        });
+    }
+    CloudFlareError(status) {
+        if (status == 503 || status == 403) {
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${exports.ComicKInfo.name}> and press the cloud icon.`);
+        }
+    }
+    async getCloudflareBypassRequestAsync() {
+        return App.createRequest({
+            url: COMICK_DOMAIN,
+            method: 'GET',
+            headers: {
+                'referer': `${COMICK_DOMAIN}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
         });
     }
 }
@@ -9465,7 +9468,8 @@ exports.CMLanguages = new LanguagesClass;
 },{}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseSearch = exports.parseTags = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
+exports.parseSearch = exports.parseHomeSections = exports.parseTags = exports.parseChapterDetails = exports.parseChapters = exports.parseMangaDetails = void 0;
+const types_1 = require("@paperback/types");
 const ComicKHelper_1 = require("./ComicKHelper");
 const entities_1 = require("entities");
 const html_to_text_1 = require("html-to-text");
@@ -9473,21 +9477,21 @@ const parseMangaDetails = (data, mangaId) => {
     const comic = data?.comic;
     const titles = [comic?.title];
     if (comic?.md_titles) {
-        for (const altTitles of comic?.md_titles) {
+        for (const altTitles of comic.md_titles) {
             titles.push(altTitles.title);
         }
     }
     const image = comic?.cover_url;
     const author = [];
     if (data?.authors) {
-        for (const authors of data?.authors) {
-            author.push(authors?.name);
+        for (const authors of data.authors) {
+            author.push(authors.name);
         }
     }
     const artist = [];
     if (data?.artists) {
-        for (const authors of data?.artists) {
-            artist.push(authors?.name);
+        for (const artists of data.artists) {
+            artist.push(artists.name);
         }
     }
     const description = comic?.desc ? (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(comic?.desc), { wordwrap: 130 }) : '';
@@ -9508,7 +9512,7 @@ const parseMangaDetails = (data, mangaId) => {
         }
     }
     if (data?.genres) {
-        for (const tag of data?.genres) {
+        for (const tag of data.genres) {
             const label = tag?.name;
             const id = `genre.${tag?.slug}`;
             if (!id || !label)
@@ -9518,7 +9522,7 @@ const parseMangaDetails = (data, mangaId) => {
     }
     let status = 'ONGOING';
     if (comic?.status) {
-        switch (comic?.status) {
+        switch (comic.status) {
             case 1:
                 status = 'ONGOING';
                 break;
@@ -9542,14 +9546,8 @@ const parseMangaDetails = (data, mangaId) => {
     });
 };
 exports.parseMangaDetails = parseMangaDetails;
-const parseChapters = async (data, chapSettings, stateManager) => {
-    const uploadersToggled = await stateManager.retrieve('uploaders_toggled') ?? false;
-    const uploadersWhitelisted = await stateManager.retrieve('uploaders_whitelisted') ?? false;
-    const aggressiveUploadersFilter = await stateManager.retrieve('aggressive_uploaders_filtering') ?? false;
-    const strictNameMatching = await stateManager.retrieve('strict_name_matching') ?? false;
-    const uploaders = await stateManager.retrieve('uploaders') ?? [];
-    const chapters = [];
-    for (const chapter of data?.chapters) {
+const parseChapters = (chapters, data, showTitle, showVol, uploadersToggled, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders) => {
+    for (const chapter of data.chapters) {
         const id = chapter?.hid ?? '';
         const chap = chapter?.chap;
         const vol = chapter?.vol;
@@ -9557,62 +9555,56 @@ const parseChapters = async (data, chapSettings, stateManager) => {
         const volume = Number(vol);
         const groups = [];
         if (chapter?.group_name) {
-            for (const group of chapter?.group_name) {
+            for (const group of chapter.group_name) {
                 groups.push(group);
             }
         }
-        if (!id)
-            continue;
-        let pushChapter = true;
         if (uploadersToggled && uploaders.length > 0) {
             if (aggressiveUploadersFilter) {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false;
+                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue;
                     }
                 }
                 else {
                     // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
-                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false;
+                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue;
                     }
                 }
             }
             else {
                 if (uploadersWhitelisted) {
                     // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false;
+                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue;
                     }
                 }
                 else {
                     // Only if all the uploaders are in the blacklist, we don't push the chapter
-                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader.value === group) || (!strictNameMatching && uploader.value.toLowerCase().includes(group.toLowerCase())))))) {
-                        pushChapter = false;
+                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                        continue;
                     }
                 }
             }
         }
-        if (!pushChapter)
-            continue;
         chapters.push(App.createChapter({
             id,
-            name: `Chapter ${chap}${chapSettings?.show_title ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
-            chapNum: !isNaN(chapNum) ? chapNum : NaN,
-            volume: chapSettings?.show_volume ? !isNaN(volume) ? volume : undefined : undefined,
+            name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
+            chapNum: chapNum,
+            volume: showVol ? !isNaN(volume) ? volume : undefined : undefined,
             time: new Date(chapter?.created_at),
             group: groups?.length !== 0 ? groups?.join(',') : '',
             langCode: ComicKHelper_1.CMLanguages?.getEmoji(chapter?.lang)
         }));
     }
-    return chapters;
 };
 exports.parseChapters = parseChapters;
 const parseChapterDetails = (data, mangaId, chapterId) => {
     const pages = [];
-    for (const images of data?.chapter?.images) {
-        const url = images?.url;
+    for (const images of data.chapter.images) {
+        const url = images.url;
         if (!url)
             continue;
         pages.push(url);
@@ -9712,6 +9704,40 @@ const parseTags = (data) => {
     ];
 };
 exports.parseTags = parseTags;
+const parseHomeSections = (data, id, sectionCallback) => {
+    let section;
+    switch (id) {
+        case 'view':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Viewed',
+                containsMoreItems: true,
+                type: types_1.HomeSectionType.singleRowLarge
+            });
+            break;
+        case 'follow':
+            section = App.createHomeSection({
+                id,
+                title: 'Most Followed',
+                containsMoreItems: true,
+                type: types_1.HomeSectionType.singleRowNormal
+            });
+            break;
+        case 'uploaded':
+            section = App.createHomeSection({
+                id,
+                title: 'Latest Uploads',
+                containsMoreItems: true,
+                type: types_1.HomeSectionType.singleRowNormal
+            });
+            break;
+        default:
+            return;
+    }
+    section.items = (0, exports.parseSearch)(data);
+    sectionCallback(section);
+};
+exports.parseHomeSections = parseHomeSections;
 const parseSearch = (data) => {
     const results = [];
     for (const manga of data) {
@@ -9723,25 +9749,56 @@ const parseSearch = (data) => {
             continue;
         results.push(App.createPartialSourceManga({
             image,
-            title: decodeHTMLEntity(title),
+            title: (0, entities_1.decodeHTML)(title),
             mangaId: id,
-            subtitle: decodeHTMLEntity(subtitle ? `Chapter ${subtitle}` : '')
+            subtitle: (0, entities_1.decodeHTML)(subtitle ? `Chapter ${subtitle}` : '')
         }));
     }
     return results;
 };
 exports.parseSearch = parseSearch;
-const decodeHTMLEntity = (str) => {
-    return str.replace(/&#(\d+)/g, (_match, dec) => {
-        return String.fromCharCode(dec);
-    });
-};
 
-},{"./ComicKHelper":96,"entities":84,"html-to-text":85}],98:[function(require,module,exports){
+},{"./ComicKHelper":96,"@paperback/types":61,"entities":84,"html-to-text":85}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetSettings = exports.uploadersSettings = exports.languageSettings = exports.chapterSettings = void 0;
+exports.resetSettings = exports.uploadersSettings = exports.languageSettings = exports.chapterSettings = exports.getUploaderInput = exports.getLanguageHomeFilter = exports.getLanguages = void 0;
 const ComicKHelper_1 = require("./ComicKHelper");
+const getLanguages = async (stateManager) => {
+    return (await stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault());
+};
+exports.getLanguages = getLanguages;
+const getLanguageHomeFilter = async (stateManager) => {
+    return (await stateManager.retrieve('language_home_filter') ?? false);
+};
+exports.getLanguageHomeFilter = getLanguageHomeFilter;
+const getUploaderInput = async (stateManager) => {
+    return await stateManager.retrieve('uploader') ?? '';
+};
+exports.getUploaderInput = getUploaderInput;
+const getUploaders = async (stateManager) => {
+    return (await stateManager.retrieve('uploaders') ?? []);
+};
+const getUploadersWhitelisted = async (stateManager) => {
+    return (await stateManager.retrieve('uploaders_whitelisted') ?? false);
+};
+const getSelectedUploaders = async (stateManager) => {
+    return (await stateManager.retrieve('uploaders_selected') ?? []);
+};
+const getUploadersFiltering = async (stateManager) => {
+    return (await stateManager.retrieve('uploaders_toggled') ?? false);
+};
+const getAggresiveUploadersFiltering = async (stateManager) => {
+    return (await stateManager.retrieve('aggressive_uploaders_filtering') ?? false);
+};
+const getStrictNameMatching = async (stateManager) => {
+    return (await stateManager.retrieve('strict_name_matching') ?? false);
+};
+const showTitle = async (stateManager) => {
+    return (await stateManager.retrieve('show_title') ?? false);
+};
+const showVolumeNumber = async (stateManager) => {
+    return (await stateManager.retrieve('show_volume_number') ?? false);
+};
 const chapterSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
@@ -9757,7 +9814,7 @@ const chapterSettings = (stateManager) => {
                             id: 'show_volume_number',
                             label: 'Show Chapter Volume',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('show_volume_number') ?? false,
+                                get: () => showVolumeNumber(stateManager),
                                 set: async (newValue) => await stateManager.store('show_volume_number', newValue)
                             })
                         }),
@@ -9765,7 +9822,7 @@ const chapterSettings = (stateManager) => {
                             id: 'show_title',
                             label: 'Show Chapter Title',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('show_title') ?? false,
+                                get: () => showTitle(stateManager),
                                 set: async (newValue) => await stateManager.store('show_title', newValue)
                             })
                         })
@@ -9793,7 +9850,7 @@ const languageSettings = (stateManager) => {
                             options: ComicKHelper_1.CMLanguages.getCMCodeList(),
                             labelResolver: async (option) => ComicKHelper_1.CMLanguages.getName(option),
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('languages') ?? ComicKHelper_1.CMLanguages.getDefault(),
+                                get: () => (0, exports.getLanguages)(stateManager),
                                 set: async (newValue) => await stateManager.store('languages', newValue)
                             }),
                             allowsMultiselect: true
@@ -9802,7 +9859,7 @@ const languageSettings = (stateManager) => {
                             id: 'language_home_filter',
                             label: 'Filter Homepage Language',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('language_home_filter') ?? false,
+                                get: () => (0, exports.getLanguageHomeFilter)(stateManager),
                                 set: async (newValue) => await stateManager.store('language_home_filter', newValue)
                             })
                         })
@@ -9813,62 +9870,98 @@ const languageSettings = (stateManager) => {
     });
 };
 exports.languageSettings = languageSettings;
-const getUploaders = async (stateManager) => {
-    return (await stateManager.retrieve('uploaders') ?? []);
-};
-const getSelectedUploaders = async (stateManager) => {
-    return (await getUploaders(stateManager) ?? []).filter((uploader) => uploader.selected).map((uploader) => uploader.value);
-};
 const uploadersSettings = (stateManager) => {
+    const uploaderInputBinding = App.createDUIBinding({
+        get: () => (0, exports.getUploaderInput)(stateManager),
+        set: async (newValue) => await stateManager.store('uploader', newValue)
+    });
     return App.createDUINavigationButton({
         id: 'uploaders_settings',
         label: 'Uploaders Settings',
         form: App.createDUIForm({
             sections: async () => [
                 App.createDUISection({
+                    id: 'modify_uploaders',
+                    header: 'Uploaders',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISelect({
+                            id: 'uploaders',
+                            label: 'Select Uploaders',
+                            options: await getUploaders(stateManager),
+                            value: App.createDUIBinding({
+                                get: () => getSelectedUploaders(stateManager),
+                                set: async (newValue) => { await stateManager.store('uploaders_selected', newValue); }
+                            }),
+                            labelResolver: async (value) => value,
+                            allowsMultiselect: true
+                        }),
+                        App.createDUIInputField({
+                            id: 'uploader',
+                            label: 'Uploader Name',
+                            value: uploaderInputBinding
+                        }),
+                        App.createDUIButton({
+                            id: 'add_uploader',
+                            label: 'Add Uploader',
+                            onTap: async () => {
+                                const targetUploader = await (0, exports.getUploaderInput)(stateManager);
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!');
+                                }
+                                const uploaders = await getUploaders(stateManager);
+                                const uploadersSet = new Set(uploaders);
+                                if (uploadersSet.has(targetUploader)) {
+                                    throw new Error(`Uploader ${targetUploader} already exists!`);
+                                }
+                                else {
+                                    uploaders.push(targetUploader);
+                                    await stateManager.store('uploaders', uploaders);
+                                }
+                                await uploaderInputBinding.set('');
+                            }
+                        }),
+                        App.createDUIButton({
+                            id: 'remove_uploader',
+                            label: 'Remove Uploader',
+                            onTap: async () => {
+                                const targetUploader = await (0, exports.getUploaderInput)(stateManager);
+                                if (targetUploader === '') {
+                                    throw new Error('Uploader cannot be empty!');
+                                }
+                                const uploaders = await getUploaders(stateManager);
+                                const uploadersSet = new Set(uploaders);
+                                if (uploadersSet.has(targetUploader)) {
+                                    uploaders.splice(uploaders.indexOf(targetUploader), 1);
+                                    await stateManager.store('uploaders', uploaders);
+                                }
+                                else {
+                                    throw new Error(`Uploader ${targetUploader} does not exists!`);
+                                }
+                                await uploaderInputBinding.set('');
+                            }
+                        })
+                    ]
+                }),
+                App.createDUISection({
                     id: 'select_uploaders',
-                    footer: 'Select which uploaders you want or not want to see when browsing.\nBy default, this feature is disabled, but when enabled and an uploader is selected, it will be excluded from the chapter lists.\nYou can change this behavior by toggling the corresponding switch above.',
+                    header: 'Filtering Settings',
+                    footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering',
-                            label: 'Toggle uploaders filtering',
+                            label: 'Enable Uploader filtering',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('uploaders_toggled') ?? false,
+                                get: () => getUploadersFiltering(stateManager),
                                 set: async (newValue) => await stateManager.store('uploaders_toggled', newValue)
                             })
                         }),
-                        App.createDUISelect({
-                            id: 'uploaders',
-                            label: 'Uploaders',
-                            options: (await getUploaders(stateManager)).map((uploader) => uploader.value),
-                            labelResolver: async (option) => {
-                                return option;
-                            },
-                            value: App.createDUIBinding({
-                                get: async () => await getSelectedUploaders(stateManager),
-                                set: async (selectedUploaders) => {
-                                    const uploaders = await getUploaders(stateManager);
-                                    uploaders.forEach((uploader) => {
-                                        uploader.selected = false;
-                                    });
-                                    selectedUploaders.forEach((selectedUploader) => {
-                                        uploaders.forEach((uploader) => {
-                                            if (uploader.value === selectedUploader) {
-                                                uploader.selected = true;
-                                            }
-                                        });
-                                    });
-                                    await stateManager.store('uploaders', uploaders);
-                                }
-                            }),
-                            allowsMultiselect: true
-                        }),
                         App.createDUISwitch({
                             id: 'uploaders_switch',
-                            label: 'Blacklist / Whitelist Uploaders',
+                            label: 'Enable whitelist mode',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('uploaders_whitelisted') ?? false,
+                                get: () => getUploadersWhitelisted(stateManager),
                                 set: async (newValue) => await stateManager.store('uploaders_whitelisted', newValue)
                             })
                         }),
@@ -9877,13 +9970,7 @@ const uploadersSettings = (stateManager) => {
                             label: 'Toggle aggressive filtering',
                             value: App.createDUIBinding({
                                 // default to true if no value is set
-                                get: async () => {
-                                    const value = await stateManager.retrieve('aggressive_uploaders_filtering');
-                                    if (value !== false) {
-                                        return true;
-                                    }
-                                    return false;
-                                },
+                                get: () => getAggresiveUploadersFiltering(stateManager),
                                 set: async (newValue) => await stateManager.store('aggressive_uploaders_filtering', newValue)
                             })
                         }),
@@ -9891,66 +9978,9 @@ const uploadersSettings = (stateManager) => {
                             id: 'strict_name_matching',
                             label: 'Strict uploader name matching',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('strict_name_matching') ?? false,
+                                get: () => getStrictNameMatching(stateManager),
                                 set: async (newValue) => await stateManager.store('strict_name_matching', newValue)
                             })
-                        })
-                    ]
-                }),
-                App.createDUISection({
-                    id: 'modify_uploaders',
-                    footer: 'Edit list of uploaders.',
-                    isHidden: false,
-                    rows: async () => [
-                        App.createDUIInputField({
-                            id: 'uploader',
-                            label: 'Uploader',
-                            value: App.createDUIBinding({
-                                get: async () => '',
-                                set: async (newValue) => await stateManager.store('uploader', newValue)
-                            })
-                        }),
-                        App.createDUIButton({
-                            id: 'add_uploader',
-                            label: 'Add Uploader',
-                            onTap: async () => {
-                                const targetUploader = await stateManager.retrieve('uploader') ?? '';
-                                if (targetUploader === '') {
-                                    throw new Error('Uploader cannot be empty!');
-                                }
-                                const uploaders = await getUploaders(stateManager);
-                                if (uploaders.filter((uploader) => uploader.value === targetUploader).length > 0) {
-                                    console.log(`Uploader '${targetUploader}' already exists in list. (${uploaders.map((uploader) => uploader.value).join(', ')})`);
-                                    throw new Error('Uploader already exists in your list!');
-                                }
-                                else {
-                                    uploaders.push({
-                                        selected: false,
-                                        value: targetUploader
-                                    });
-                                    await stateManager.store('uploaders', uploaders);
-                                }
-                            }
-                        }),
-                        App.createDUIButton({
-                            id: 'remove_uploader',
-                            label: 'Remove Uploader',
-                            onTap: async () => {
-                                const targetUploader = await stateManager.retrieve('uploader') ?? '';
-                                if (targetUploader === '') {
-                                    throw new Error('Uploader cannot be empty!');
-                                }
-                                const uploaders = await getUploaders(stateManager);
-                                uploaders.forEach((uploader) => {
-                                    if (uploader.value === targetUploader) {
-                                        const index = uploaders.indexOf(uploader);
-                                        if (index > -1) {
-                                            uploaders.splice(index, 1);
-                                        }
-                                    }
-                                });
-                                await stateManager.store('uploaders', uploaders);
-                            }
                         })
                     ]
                 })
@@ -9964,7 +9994,8 @@ const resetSettings = (stateManager) => {
         id: 'reset',
         label: 'Reset to Default',
         onTap: async () => {
-            stateManager.store('show_volume_number', null),
+            await Promise.all([
+                stateManager.store('show_volume_number', null),
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
                 stateManager.store('language_home_filter', null),
@@ -9973,7 +10004,8 @@ const resetSettings = (stateManager) => {
                 stateManager.store('aggressive_uploaders_filtering', null),
                 stateManager.store('uploaders_toggled', null),
                 stateManager.store('uploader', null),
-                stateManager.store('strict_name_matching', null);
+                stateManager.store('strict_name_matching', null)
+            ]);
         }
     });
 };

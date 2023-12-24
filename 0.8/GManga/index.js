@@ -9021,7 +9021,7 @@ class GManga {
         }
         data = data['iv'] ? GMangaUtils_1.GMangaUtil.haqiqa(data.data) : data;
         data = data['isCompact'] ? GMangaUtils_1.GMangaUtil.unpack(data) : data;
-        return (0, GMangaParser_1.parseChapters)(data, mangaId);
+        return (0, GMangaParser_1.parseChapters)(data);
     }
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
@@ -9076,7 +9076,7 @@ const parseMangaDetails = (data, mangaId) => {
     const image = cover ? `https://media.gmanga.me/uploads/manga/cover/${mangaId}/medium_${cover}.webp` : '';
     const authors = [];
     if (details?.authors) {
-        for (const author of details?.authors) {
+        for (const author of details.authors) {
             const name = author?.name;
             if (!name)
                 continue;
@@ -9085,7 +9085,7 @@ const parseMangaDetails = (data, mangaId) => {
     }
     const artists = [];
     if (details?.artists) {
-        for (const artist of details?.artists) {
+        for (const artist of details.artists) {
             const name = artist?.name;
             if (!name)
                 continue;
@@ -9104,7 +9104,7 @@ const parseMangaDetails = (data, mangaId) => {
         }
     }
     if (details?.categories) {
-        for (const category of details?.categories) {
+        for (const category of details.categories) {
             const id = category.id ?? '';
             const label = category?.name ?? '';
             if (!id || !label)
@@ -9117,9 +9117,9 @@ const parseMangaDetails = (data, mangaId) => {
     }
     let status = 'مستمرة';
     if (details?.story_status) {
-        if (details?.story_status === 2)
+        if (details.story_status === 2)
             status = 'مستمرة';
-        if (details?.story_status === 3)
+        if (details.story_status === 3)
             status = 'منتهية';
     }
     return App.createSourceManga({
@@ -9598,15 +9598,11 @@ const parseMetadata = (query, metadata) => {
             'exclude': []
         },
         'chapters': {
-            // @ts-ignore
             'min': query?.parameters?.['min_chapter_count'] ?? '',
-            // @ts-ignore
             'max': query?.parameters?.['max_chapter_count'] ?? ''
         },
         'dates': {
-            // @ts-ignore
             'start': query?.parameters?.['start_date'] ?? null,
-            // @ts-ignore
             'end': query?.parameters?.['end_date'] ?? null
         }
     };

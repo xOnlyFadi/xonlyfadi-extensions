@@ -8949,7 +8949,7 @@ class VoyceME {
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.HomePageQuery)(0, this)
+            data: (0, VoyceMEGraphQL_1.HomePageQuery)(0, this.popularPerPage)
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -8966,7 +8966,7 @@ class VoyceME {
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.HomePageQuery)(page, this)
+            data: (0, VoyceMEGraphQL_1.HomePageQuery)(page, this.popularPerPage)
         });
         const response = await this.requestManager.schedule(request, 1);
         let data;
@@ -9042,7 +9042,7 @@ class VoyceME {
         const request = App.createRequest({
             url: this.graphqlURL,
             method: 'POST',
-            data: (0, VoyceMEGraphQL_1.SearchQuery)(query, metadata, this)
+            data: (0, VoyceMEGraphQL_1.SearchQuery)(query, page, this.popularPerPage)
         });
         const response = await this.requestManager.schedule(request, 2);
         let data;
@@ -9092,7 +9092,7 @@ exports.VoyceME = VoyceME;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FiltersQuery = exports.ChapterDetailsQuery = exports.ChaptersQuery = exports.MangaDetailQuery = exports.SearchQuery = exports.HomePageQuery = void 0;
 require("../scopes");
-const HomePageQuery = (page, source) => ({
+const HomePageQuery = (page, popularPerPage) => ({
     query: `query ($offset: Int, $limit: Int) {
       featured: voyce_series(
         where: {
@@ -9174,11 +9174,10 @@ const HomePageQuery = (page, source) => ({
       title
       chapter_count
     }`,
-    variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
+    variables: { 'offset': page * popularPerPage, 'limit': popularPerPage }
 });
 exports.HomePageQuery = HomePageQuery;
-const SearchQuery = (query, metadata, source) => {
-    const page = metadata?.page ?? 0;
+const SearchQuery = (query, page, popularPerPage) => {
     const Genres = [];
     const Types = [];
     const Status = [];
@@ -9227,7 +9226,7 @@ const SearchQuery = (query, metadata, source) => {
                 title
             }
         }`,
-        variables: { 'offset': page * source.popularPerPage, 'limit': source.popularPerPage }
+        variables: { 'offset': page * popularPerPage, 'limit': popularPerPage }
     };
 };
 exports.SearchQuery = SearchQuery;
@@ -9320,14 +9319,9 @@ class Parser {
     constructor() {
         this.staticURL = 'https://dlkfxmdtxtzpb.cloudfront.net';
     }
-    decodeHTMLEntity(str) {
-        return str.replace(/&#(\d+)/g, (_match, dec) => {
-            return String.fromCharCode(dec);
-        });
-    }
     parseSearch(VoyceD) {
         const items = [];
-        for (const data of VoyceD?.data?.voyce_series) {
+        for (const data of VoyceD.data.voyce_series) {
             const id = data?.id ?? '';
             const title = data?.title?.trim() ?? '';
             const image = data?.thumbnail ? encodeURI(`${this.staticURL}/${data?.thumbnail}`) : '';
@@ -9483,10 +9477,10 @@ class Parser {
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
-                titles: [this.decodeHTMLEntity(title)],
+                titles: [(0, entities_1.decodeHTML)(title)],
                 image,
                 status: this.parseStatus(status),
-                author: this.decodeHTMLEntity(author),
+                author: (0, entities_1.decodeHTML)(author),
                 tags: [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map((x) => App.createTag(x)) })],
                 desc: (0, html_to_text_1.convert)((0, entities_1.decodeHTML)(desc), { wordwrap: 130 })
             })
@@ -9537,7 +9531,7 @@ class Parser {
     }
     parseTags(data) {
         const Genres = [];
-        for (const genre of data?.data?.genres) {
+        for (const genre of data.data.genres) {
             const id = genre?.id ?? '';
             const label = genre?.title ?? '';
             if (!id || !label)
@@ -9548,7 +9542,7 @@ class Parser {
             });
         }
         const Types = [];
-        for (const type of data?.data?.types) {
+        for (const type of data.data.types) {
             const id = type?.id ?? '';
             const label = type?.title ?? '';
             if (!id || !label)
