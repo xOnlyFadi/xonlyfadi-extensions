@@ -1445,7 +1445,7 @@ exports.MangaFreakInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.1',
+    version: '2.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: types_1.ContentRating.EVERYONE,
@@ -1844,7 +1844,7 @@ class Parser {
         return chapters;
     }
     parseMangaDetails($, mangaId, cdnUrl) {
-        const title = $('div.manga_series_data h5').first().text().trim() ?? '';
+        const title = $('div.manga_series_data h1').first().text().trim() ?? '';
         const image = `${cdnUrl}/manga_images/${mangaId.toLowerCase()}.jpg`;
         const author = $('div.manga_series_data > div').eq(2).text().trim() ?? '';
         const artist = $('div.manga_series_data > div').eq(3).text().trim() ?? '';

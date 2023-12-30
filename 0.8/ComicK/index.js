@@ -9609,12 +9609,11 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
             continue;
         pages.push(url);
     }
-    const chapterDetails = App.createChapterDetails({
+    return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
         pages: pages
     });
-    return chapterDetails;
 };
 exports.parseChapterDetails = parseChapterDetails;
 const parseTags = (data) => {
