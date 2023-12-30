@@ -211,7 +211,7 @@ export class Parser {
     }
 
     parseMangaDetails($: cheerio.Root, mangaId: string, cdnUrl: string): SourceManga {
-        const title = $('div.manga_series_data h5').first().text().trim() ?? ''
+        const title = $('div.manga_series_data h1').first().text().trim() ?? ''
         const image = `${cdnUrl}/manga_images/${mangaId.toLowerCase()}.jpg`
 
 

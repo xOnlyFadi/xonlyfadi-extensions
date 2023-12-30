@@ -182,13 +182,11 @@ export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: 
         pages.push(url)
     }
 
-    const chapterDetails = App.createChapterDetails({
+    return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
         pages: pages
     })
-
-    return chapterDetails
 }
 
 export const parseTags = (data: GenresDa[]): TagSection[] => {
