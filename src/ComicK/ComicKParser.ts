@@ -11,6 +11,7 @@ import {
 
 import {
     ChapterList,
+    ChapterData,
     GenresDa,
     MangaDetails,
     PageList,
@@ -110,65 +111,94 @@ export const parseChapters = (
     data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
+    uploadersAutoFiltering: boolean,
     uploadersToggled: boolean,
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    for (const chapter of data.chapters) {
-        const id = chapter?.hid ?? ''
-        const chap = chapter?.chap
-        const vol = chapter?.vol
-
-        const chapNum = Number(chap)
-        const volume = Number(vol)
-
-        const groups = []
-        if (chapter?.group_name) {
-            for (const group of chapter.group_name) {
-                groups.push(group)
-            }
-        }
-
-        if (uploadersToggled && uploaders.length > 0) {
-            if (aggressiveUploadersFilter) {
-                if (uploadersWhitelisted) {
-                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
-                } else {
-                    // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
-                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
+    if (uploadersAutoFiltering) {
+        const _chapters = new Map<number, { score: number, chapter: ChapterData }>()
+        for (const chapter of data.chapters) {
+            const chapNum = Number(chapter?.chap)
+            const chapterScore = chapter.up_count - chapter.down_count
+            if (_chapters.has(chapNum)) {
+                if (chapterScore > _chapters.get(chapNum)!.score) {
+                    _chapters.set(chapNum, { score: chapterScore, chapter: chapter })
                 }
             } else {
-                if (uploadersWhitelisted) {
-                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
+                _chapters.set(chapNum, { score: chapterScore, chapter: chapter })
+            }
+        }
+        for (const value of _chapters.values()) {
+            chapters.push(bridgeChapterData(value.chapter, showTitle, showVol))
+        }
+    } else {
+        for (const chapter of data.chapters) {
+            const groups = []
+            if (chapter?.group_name) {
+                for (const group of chapter.group_name) {
+                    groups.push(group)
+                }
+            }
+
+            if (uploadersToggled && uploaders.length > 0) {
+                if (aggressiveUploadersFilter) {
+                    if (uploadersWhitelisted) {
+                        // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                        if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                            continue
+                        }
+                    } else {
+                        // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
+                        if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                            continue
+                        }
                     }
                 } else {
-                    // Only if all the uploaders are in the blacklist, we don't push the chapter
-                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
+                    if (uploadersWhitelisted) {
+                        // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                        if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                            continue
+                        }
+                    } else {
+                        // Only if all the uploaders are in the blacklist, we don't push the chapter
+                        if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
+                            continue
+                        }
                     }
                 }
             }
+            chapters.push(bridgeChapterData(chapter, showTitle, showVol))
         }
-
-        chapters.push(App.createChapter({
-            id,
-            name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
-            chapNum: chapNum,
-            volume: showVol ? !isNaN(volume) ? volume : undefined : undefined,
-            time: new Date(chapter?.created_at),
-            group: groups?.length !== 0 ? groups?.join(',') : '',
-            langCode: CMLanguages?.getEmoji(chapter?.lang)
-        }))
     }
+}
+
+export const bridgeChapterData = (chapter: ChapterData, showTitle: boolean, showVol: boolean): Chapter => {
+    const id = chapter?.hid ?? ''
+    const chap = chapter?.chap
+    const vol = chapter?.vol
+
+    const chapNum = Number(chap)
+    const volume = Number(vol)
+
+    const groups = []
+    if (chapter?.group_name) {
+        for (const group of chapter.group_name) {
+            groups.push(group)
+        }
+    }
+
+    return App.createChapter({
+        id,
+        name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
+        chapNum: chapNum,
+        volume: showVol ? !isNaN(volume) ? volume : undefined : undefined,
+        time: new Date(chapter?.created_at),
+        group: groups?.length !== 0 ? groups?.join(',') : '',
+        langCode: CMLanguages?.getEmoji(chapter?.lang)
+    })
 }
 
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {

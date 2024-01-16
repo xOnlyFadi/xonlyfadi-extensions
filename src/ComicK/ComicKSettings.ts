@@ -52,6 +52,10 @@ const showVolumeNumber = async (stateManager: SourceStateManager): Promise<boole
     return (await stateManager.retrieve('show_volume_number') ?? false)
 }
 
+const getUploadersAutoFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('uploaders_auto_filtering') ?? false)
+}
+
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
@@ -135,6 +139,22 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
         label: 'Uploaders Settings',
         form: App.createDUIForm({
             sections: async () => [
+                App.createDUISection({
+                    id: 'uploaders_autofiltering',
+                    header: 'Automatic Uploader Filtering',
+                    footer: 'If enabled, automatically filter uploaders for each chapter\nFor each chapter number, only the uploader with the most upvotes will be displayed.\nIf this is enabled, the below settings will be completely ignored.',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISwitch({
+                            id: 'toggle_uploaders_auto_filtering',
+                            label: 'Enable Uploader auto-filtering',
+                            value: App.createDUIBinding({
+                                get: () => getUploadersAutoFiltering(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('uploaders_auto_filtering', newValue)
+                            })
+                        })
+                    ]
+                }),
                 App.createDUISection({
                     id: 'modify_uploaders',
                     header: 'Uploaders',
@@ -260,6 +280,7 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
                 stateManager.store('language_home_filter', null),
+                stateManager.store('uploaders_auto_filtering', null),
                 stateManager.store('uploaders', null),
                 stateManager.store('uploaders_whitelisted', null),
                 stateManager.store('aggressive_uploaders_filtering', null),
