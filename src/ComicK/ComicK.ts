@@ -45,7 +45,7 @@ const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.3',
+    version: '2.2.0',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
