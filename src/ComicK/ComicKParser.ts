@@ -118,7 +118,7 @@ export const parseChapters = (
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    var filteredChapters = data.chapters
+    let filteredChapters = data.chapters
     if (uploadersAutoFiltering) {
         filteredChapters = filterUploadersByScore(data.chapters)
     } else if (uploadersToggled && uploaders.length > 0) {
