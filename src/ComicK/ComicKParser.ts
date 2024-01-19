@@ -111,20 +111,29 @@ export const parseChapters = (
     data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
-    uploadersAutoFiltering: boolean,
+    autofilterChaptersByScore: boolean,
     uploadersToggled: boolean,
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    let filteredChapters = data.chapters
-    if (uploadersAutoFiltering) {
-        filteredChapters = filterUploadersByScore(data.chapters)
+    const chaptersData: ChapterData[] = []
+    if (autofilterChaptersByScore) {
+        filterChaptersByScore(data.chapters, chaptersData)
     } else if (uploadersToggled && uploaders.length > 0) {
-        filteredChapters = filterUploadersByList(data.chapters, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders)
+        filterChaptersByUploaderList(
+            data.chapters,
+            chaptersData,
+            uploadersWhitelisted,
+            aggressiveUploadersFilter,
+            strictNameMatching,
+            uploaders
+        )
+    } else {
+        chaptersData.push(...data.chapters)
     }
-    for (const chapter of filteredChapters) {
+    for (const chapter of chaptersData) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
         const vol = chapter?.vol
@@ -151,30 +160,31 @@ export const parseChapters = (
     }
 }
 
-const filterUploadersByScore = (chapters: ChapterData[]): ChapterData[] => {
+const filterChaptersByScore = (unfilteredChapters: ChapterData[], chapters: ChapterData[]): void => {
     const chapterMap = new Map<number, { score: number, chapter: ChapterData }>()
-        for (const chapter of chapters) {
-            const chapNum = Number(chapter?.chap)
-            const chapterScore = chapter.up_count - chapter.down_count
-            if (chapterMap.has(chapNum)) {
-                if (chapterScore > chapterMap.get(chapNum)!.score) {
-                    chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
-                }
-            } else {
+    for (const chapter of unfilteredChapters) {
+        const chapNum = Number(chapter?.chap)
+        const chapterScore = chapter.up_count - chapter.down_count
+        if (chapterMap.has(chapNum)) {
+            if (chapterScore > chapterMap.get(chapNum)!.score) {
                 chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
             }
+        } else {
+            chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
         }
-        return Array.from(chapterMap.values(), ((mapValue) => mapValue.chapter))
+    }
+    chapters.push(...Array.from(chapterMap.values(), ((mapValue) => mapValue.chapter)))
 }
 
-const filterUploadersByList = (
+const filterChaptersByUploaderList = (
+    unfilteredChapters: ChapterData[],
     chapters: ChapterData[],
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: string[]
-): ChapterData[] => {
-    return chapters.filter((chapter) => {
+): void => {
+    chapters.push(...unfilteredChapters.filter((chapter) => {
         const groups = []
         if (chapter?.group_name) {
             for (const group of chapter.group_name) {
@@ -208,7 +218,7 @@ const filterUploadersByList = (
             }
         }
         return true
-    })
+    }))
 }
 
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
