@@ -52,8 +52,8 @@ const showVolumeNumber = async (stateManager: SourceStateManager): Promise<boole
     return (await stateManager.retrieve('show_volume_number') ?? false)
 }
 
-const getFilterChaptersByScore = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('filter_chapters_by_score') ?? false)
+const getChapterScoreFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('chapter_score_filtering') ?? false)
 }
 
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -140,25 +140,25 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
         form: App.createDUIForm({
             sections: async () => [
                 App.createDUISection({
-                    id: 'uploaders_autofiltering',
-                    header: 'Autofilter uploaders by score',
-                    footer: 'If enabled, automatically filter uploaders for each chapter\nFor each chapter number, only the uploader with the most upvotes will be displayed.\nIf this is enabled, the below settings will be disabled.\nDisable this setting to manually manage uploader filtering.',
+                    id: 'chapter_score_filtering',
+                    header: 'Filter Chapters by Score',
+                    footer: 'Show only the uploader with the most upvotes for each chapter.\nDisable to manually manage uploader filtering.',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
-                            id: 'toggle_filter_chapters_by_score',
-                            label: 'Enable score-based auto-filtering',
+                            id: 'toggle_chapter_score_filtering',
+                            label: 'Enable Chapter Score Filtering',
                             value: App.createDUIBinding({
-                                get: () => getFilterChaptersByScore(stateManager),
-                                set: async (newValue: boolean) => await stateManager.store('filter_chapters_by_score', newValue)
+                                get: () => getChapterScoreFiltering(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('chapter_score_filtering', newValue)
                             })
                         })
                     ]
-                }),
+                }),                
                 App.createDUISection({
                     id: 'modify_uploaders',
                     header: 'Uploaders',
-                    isHidden: await getFilterChaptersByScore(stateManager),
+                    isHidden: await getChapterScoreFiltering(stateManager),
                     rows: async () => [
                         App.createDUISelect({
                             id: 'uploaders',
@@ -228,7 +228,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                     id: 'select_uploaders',
                     header: 'Filtering Settings',
                     footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
-                    isHidden: await getFilterChaptersByScore(stateManager),
+                    isHidden: await getChapterScoreFiltering(stateManager),
                     rows: async () => [
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering',
@@ -280,7 +280,7 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
                 stateManager.store('language_home_filter', null),
-                stateManager.store('filter_chapters_by_score', null),
+                stateManager.store('chapter_score_filtering', null),
                 stateManager.store('uploaders', null),
                 stateManager.store('uploaders_whitelisted', null),
                 stateManager.store('aggressive_uploaders_filtering', null),

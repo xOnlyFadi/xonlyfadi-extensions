@@ -111,7 +111,7 @@ export const parseChapters = (
     data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
-    autofilterChaptersByScore: boolean,
+    chapterScoreFiltering: boolean,
     uploadersToggled: boolean,
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
@@ -119,7 +119,8 @@ export const parseChapters = (
     uploaders: string[]
 ): void => {
     const chaptersData: ChapterData[] = []
-    if (autofilterChaptersByScore) {
+
+    if (chapterScoreFiltering) {
         filterChaptersByScore(data.chapters, chaptersData)
     } else if (uploadersToggled && uploaders.length > 0) {
         filterChaptersByUploaderList(
@@ -133,6 +134,7 @@ export const parseChapters = (
     } else {
         chaptersData.push(...data.chapters)
     }
+
     for (const chapter of chaptersData) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
@@ -160,9 +162,9 @@ export const parseChapters = (
     }
 }
 
-const filterChaptersByScore = (unfilteredChapters: ChapterData[], chapters: ChapterData[]): void => {
+const filterChaptersByScore = (chapterData: ChapterData[], chapters: ChapterData[]): void => {
     const chapterMap = new Map<number, { score: number, chapter: ChapterData }>()
-    for (const chapter of unfilteredChapters) {
+    for (const chapter of chapterData) {
         const chapNum = Number(chapter?.chap)
         const chapterScore = chapter.up_count - chapter.down_count
         if (chapterMap.has(chapNum)) {
@@ -177,14 +179,14 @@ const filterChaptersByScore = (unfilteredChapters: ChapterData[], chapters: Chap
 }
 
 const filterChaptersByUploaderList = (
-    unfilteredChapters: ChapterData[],
+    chapterData: ChapterData[],
     chapters: ChapterData[],
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    chapters.push(...unfilteredChapters.filter((chapter) => {
+    chapters.push(...chapterData.filter((chapter) => {
         const groups = []
         if (chapter?.group_name) {
             for (const group of chapter.group_name) {

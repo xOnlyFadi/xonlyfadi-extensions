@@ -122,7 +122,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const showTitle: boolean = await this.stateManager.retrieve('show_title') ?? false
         const showVol: boolean = await this.stateManager.retrieve('show_volume_number') ?? false
-        const autofilterChaptersByScore: boolean = await this.stateManager.retrieve('filter_chapters_by_score') ?? false
+        const chapterScoreFiltering: boolean = await this.stateManager.retrieve('chapter_score_filtering') ?? false
         const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') ?? false
         const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') ?? false
         const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
@@ -139,7 +139,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             data,
             showTitle,
             showVol,
-            autofilterChaptersByScore,
+            chapterScoreFiltering,
             uploadersToggled,
             uploadersWhitelisted,
             aggressiveUploadersFilter,
@@ -159,7 +159,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 data,
                 showTitle,
                 showVol,
-                autofilterChaptersByScore,
+                chapterScoreFiltering,
                 uploadersToggled,
                 uploadersWhitelisted,
                 aggressiveUploadersFilter,
