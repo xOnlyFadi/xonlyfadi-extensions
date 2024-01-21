@@ -142,7 +142,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                 App.createDUISection({
                     id: 'uploaders_autofiltering',
                     header: 'Autofilter uploaders by score',
-                    footer: 'If enabled, automatically filter uploaders for each chapter\nFor each chapter number, only the uploader with the most upvotes will be displayed.\nIf this is enabled, the below settings will be completely ignored.',
+                    footer: 'If enabled, automatically filter uploaders for each chapter\nFor each chapter number, only the uploader with the most upvotes will be displayed.\nIf this is enabled, the below settings will be disabled.\nDisable this setting to manually manage uploader filtering.',
                     isHidden: false,
                     rows: async () => [
                         App.createDUISwitch({
@@ -158,7 +158,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                 App.createDUISection({
                     id: 'modify_uploaders',
                     header: 'Uploaders',
-                    isHidden: false,
+                    isHidden: await getFilterChaptersByScore(stateManager),
                     rows: async () => [
                         App.createDUISelect({
                             id: 'uploaders',
@@ -228,7 +228,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                     id: 'select_uploaders',
                     header: 'Filtering Settings',
                     footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
-                    isHidden: false,
+                    isHidden: await getFilterChaptersByScore(stateManager),
                     rows: async () => [
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering',
