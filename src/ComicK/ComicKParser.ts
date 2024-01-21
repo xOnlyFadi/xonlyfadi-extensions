@@ -163,19 +163,19 @@ export const parseChapters = (
 }
 
 const filterChaptersByScore = (chapterData: ChapterData[], chapters: ChapterData[]): void => {
-    const chapterMap = new Map<number, { score: number, chapter: ChapterData }>()
-    for (const chapter of chapterData) {
+    const chapterMap = new Map<number, { score: number, chapterIndex: number }>()
+    for (const [index, chapter] of chapterData.entries()) {
         const chapNum = Number(chapter?.chap)
         const chapterScore = chapter.up_count - chapter.down_count
         if (chapterMap.has(chapNum)) {
             if (chapterScore > chapterMap.get(chapNum)!.score) {
-                chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
+                chapterMap.set(chapNum, { score: chapterScore, chapterIndex: index })
             }
         } else {
-            chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
+            chapterMap.set(chapNum, { score: chapterScore, chapterIndex: index })
         }
     }
-    chapters.push(...Array.from(chapterMap.values(), ((mapValue) => mapValue.chapter)))
+    chapters.push(...Array.from(chapterMap.values(), ((mapValue) => chapterData[mapValue.chapterIndex]!)))
 }
 
 const filterChaptersByUploaderList = (
