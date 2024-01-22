@@ -132,7 +132,9 @@ export const parseChapters = (
             uploaders
         )
     } else {
-        chaptersData.push(...data.chapters)
+        data.chapters.forEach(chapter => {
+            chaptersData.push(chapter)
+        })
     }
 
     for (const chapter of chaptersData) {
