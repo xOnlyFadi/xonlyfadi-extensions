@@ -175,7 +175,9 @@ const filterChaptersByScore = (chapterData: ChapterData[], chapters: ChapterData
             chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
         }
     }
-    chapters.push(...Array.from(chapterMap.values(), ((mapValue) => mapValue.chapter)))
+    chapterMap.forEach(mapValue => {
+        chapters.push(mapValue.chapter)
+    })
 }
 
 const filterChaptersByUploaderList = (
@@ -186,7 +188,7 @@ const filterChaptersByUploaderList = (
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    chapters.push(...chapterData.filter((chapter) => {
+    chapterData.filter((chapter) => {
         const groups = []
         if (chapter?.group_name) {
             for (const group of chapter.group_name) {
@@ -220,7 +222,9 @@ const filterChaptersByUploaderList = (
             }
         }
         return true
-    }))
+    }).forEach(chapter => {
+        chapters.push(chapter)
+    })
 }
 
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {
