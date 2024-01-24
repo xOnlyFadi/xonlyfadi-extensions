@@ -52,6 +52,10 @@ const showVolumeNumber = async (stateManager: SourceStateManager): Promise<boole
     return (await stateManager.retrieve('show_volume_number') ?? false)
 }
 
+const getChapterScoreFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('chapter_score_filtering') ?? false)
+}
+
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
@@ -136,9 +140,25 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
         form: App.createDUIForm({
             sections: async () => [
                 App.createDUISection({
+                    id: 'chapter_score_filtering',
+                    header: 'Filter Chapters by Score',
+                    footer: 'Show only the uploader with the most upvotes for each chapter.\nDisable to manually manage uploader filtering.',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISwitch({
+                            id: 'toggle_chapter_score_filtering',
+                            label: 'Enable Chapter Score Filtering',
+                            value: App.createDUIBinding({
+                                get: () => getChapterScoreFiltering(stateManager),
+                                set: async (newValue: boolean) => await stateManager.store('chapter_score_filtering', newValue)
+                            })
+                        })
+                    ]
+                }),                
+                App.createDUISection({
                     id: 'modify_uploaders',
                     header: 'Uploaders',
-                    isHidden: false,
+                    isHidden: await getChapterScoreFiltering(stateManager),
                     rows: async () => [
                         App.createDUISelect({
                             id: 'uploaders',
@@ -208,7 +228,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                     id: 'select_uploaders',
                     header: 'Filtering Settings',
                     footer: 'Filter Uploaders by name.\nBy default, selected uploaders are excluded from chapter lists (blacklist mode).',
-                    isHidden: false,
+                    isHidden: await getChapterScoreFiltering(stateManager),
                     rows: async () => [
                         App.createDUISwitch({
                             id: 'toggle_uploaders_filtering',
@@ -260,6 +280,7 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
                 stateManager.store('show_title', null),
                 stateManager.store('languages', null),
                 stateManager.store('language_home_filter', null),
+                stateManager.store('chapter_score_filtering', null),
                 stateManager.store('uploaders', null),
                 stateManager.store('uploaders_whitelisted', null),
                 stateManager.store('aggressive_uploaders_filtering', null),

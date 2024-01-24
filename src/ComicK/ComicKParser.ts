@@ -11,6 +11,7 @@ import {
 
 import {
     ChapterList,
+    ChapterData,
     GenresDa,
     MangaDetails,
     PageList,
@@ -110,13 +111,33 @@ export const parseChapters = (
     data: ChapterList,
     showTitle: boolean,
     showVol: boolean,
+    chapterScoreFiltering: boolean,
     uploadersToggled: boolean,
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
     uploaders: string[]
 ): void => {
-    for (const chapter of data.chapters) {
+    const chaptersData: ChapterData[] = []
+
+    if (chapterScoreFiltering) {
+        filterChaptersByScore(data.chapters, chaptersData)
+    } else if (uploadersToggled && uploaders.length > 0) {
+        filterChaptersByUploaderList(
+            data.chapters,
+            chaptersData,
+            uploadersWhitelisted,
+            aggressiveUploadersFilter,
+            strictNameMatching,
+            uploaders
+        )
+    } else {
+        data.chapters.forEach(chapter => {
+            chaptersData.push(chapter)
+        })
+    }
+
+    for (const chapter of chaptersData) {
         const id = chapter?.hid ?? ''
         const chap = chapter?.chap
         const vol = chapter?.vol
@@ -131,34 +152,6 @@ export const parseChapters = (
             }
         }
 
-        if (uploadersToggled && uploaders.length > 0) {
-            if (aggressiveUploadersFilter) {
-                if (uploadersWhitelisted) {
-                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
-                } else {
-                    // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
-                    if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
-                }
-            } else {
-                if (uploadersWhitelisted) {
-                    // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
-                    if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
-                } else {
-                    // Only if all the uploaders are in the blacklist, we don't push the chapter
-                    if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && uploader.toLowerCase().includes(group.toLowerCase())))))) {
-                        continue
-                    }
-                }
-            }
-        }
-
         chapters.push(App.createChapter({
             id,
             name: `Chapter ${chap}${showTitle ? chapter?.title ? `: ${chapter?.title}` : '' : ''}`,
@@ -169,6 +162,71 @@ export const parseChapters = (
             langCode: CMLanguages?.getEmoji(chapter?.lang)
         }))
     }
+}
+
+const filterChaptersByScore = (chapterData: ChapterData[], chapters: ChapterData[]): void => {
+    const chapterMap = new Map<number, { score: number, chapter: ChapterData }>()
+    for (const chapter of chapterData) {
+        const chapNum = Number(chapter?.chap)
+        const chapterScore = chapter.up_count - chapter.down_count
+        if (chapterMap.has(chapNum)) {
+            if (chapterScore > chapterMap.get(chapNum)!.score) {
+                chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
+            }
+        } else {
+            chapterMap.set(chapNum, { score: chapterScore, chapter: chapter })
+        }
+    }
+    chapterMap.forEach(mapValue => {
+        chapters.push(mapValue.chapter)
+    })
+}
+
+const filterChaptersByUploaderList = (
+    chapterData: ChapterData[],
+    chapters: ChapterData[],
+    uploadersWhitelisted: boolean,
+    aggressiveUploadersFilter: boolean,
+    strictNameMatching: boolean,
+    uploaders: string[]
+): void => {
+    chapterData.filter((chapter) => {
+        const groups = []
+        if (chapter?.group_name) {
+            for (const group of chapter.group_name) {
+                groups.push(group)
+            }
+        }
+
+        if (aggressiveUploadersFilter) {
+            if (uploadersWhitelisted) {
+                // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                if (!groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && group.toLowerCase().includes(uploader.toLowerCase())))))) {
+                    return false
+                }
+            } else {
+                // We check if that if the chapter has even a single uploader in the list, we don't push it (we only allow chapters that have none of the uploaders in the blacklist)
+                if (groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && group.toLowerCase().includes(uploader.toLowerCase())))))) {
+                    return false
+                }
+            }
+        } else {
+            if (uploadersWhitelisted) {
+                // We check if that if the chapter does not have any of the uploaders in the list, we don't push it (we only allow chapters that have all the uploaders in the whitelist)
+                if (!groups.some(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && group.toLowerCase().includes(uploader.toLowerCase())))))) {
+                    return false
+                }
+            } else {
+                // Only if all the uploaders are in the blacklist, we don't push the chapter
+                if (groups.every(group => uploaders.some(uploader => (strictNameMatching && (uploader === group) || (!strictNameMatching && group.toLowerCase().includes(uploader.toLowerCase())))))) {
+                    return false
+                }
+            }
+        }
+        return true
+    }).forEach(chapter => {
+        chapters.push(chapter)
+    })
 }
 
 export const parseChapterDetails = (data: PageList, mangaId: string, chapterId: string): ChapterDetails => {

@@ -30,7 +30,7 @@ interface MDGroups {
     title: string;
 }
 
-interface ChapterData {
+export interface ChapterData {
     id: number;
     chap: string;
     title: null | string;

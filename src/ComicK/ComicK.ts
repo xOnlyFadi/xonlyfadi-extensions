@@ -45,7 +45,7 @@ const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.1.3',
+    version: '2.2.0',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -122,6 +122,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const showTitle: boolean = await this.stateManager.retrieve('show_title') ?? false
         const showVol: boolean = await this.stateManager.retrieve('show_volume_number') ?? false
+        const chapterScoreFiltering: boolean = await this.stateManager.retrieve('chapter_score_filtering') ?? false
         const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') ?? false
         const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') ?? false
         const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
@@ -138,6 +139,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             data,
             showTitle,
             showVol,
+            chapterScoreFiltering,
             uploadersToggled,
             uploadersWhitelisted,
             aggressiveUploadersFilter,
@@ -157,6 +159,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 data,
                 showTitle,
                 showVol,
+                chapterScoreFiltering,
                 uploadersToggled,
                 uploadersWhitelisted,
                 aggressiveUploadersFilter,
