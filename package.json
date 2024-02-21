@@ -13,25 +13,25 @@
   "author": "xOnlyFadi",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.4.1",
-    "@tsconfig/recommended": "^1.0.1",
+    "@stylistic/eslint-plugin": "^1.6.2",
+    "@tsconfig/recommended": "^1.0.3",
     "@types/cheerio": "^0.22.35",
-    "@types/crypto-js": "^4.2.1",
+    "@types/crypto-js": "^4.2.2",
     "@types/html-to-text": "^9.0.4",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-modules-newline": "^0.0.6",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@paperback/toolchain": "^0.8.0-alpha.47",
     "@paperback/types": "^0.8.0-alpha.47",
     "cheerio": "^1.0.0-rc.12",
     "crypto-js": "^4.2.0",
-    "entities": "^4.4.0",
+    "entities": "^4.5.0",
     "html-to-text": "^9.0.5",
-    "nodemon": "^3.0.2",
-    "ts-node": "^10.2.1"
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2"
   }
 }
