@@ -40,17 +40,17 @@ import {
     CMLanguages
 } from './ComicKHelper'
 
-const COMICK_DOMAIN = 'https://comick.cc'
+const COMICK_DOMAIN = 'https://comick.io'
 const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.2.0',
+    version: '2.2.1',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
-    description: 'Extension that pulls manga from comick.cc.',
+    description: 'Extension that pulls manga from comick.io.',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: COMICK_DOMAIN,
     intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.SETTINGS_UI | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
