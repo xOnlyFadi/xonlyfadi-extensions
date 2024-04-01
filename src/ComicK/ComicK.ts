@@ -40,12 +40,12 @@ import {
     CMLanguages
 } from './ComicKHelper'
 
-const COMICK_DOMAIN = 'https://comick.cc'
+const COMICK_DOMAIN = 'https://comick.io'
 const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.2.0',
+    version: '2.2.1',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
