@@ -8902,11 +8902,11 @@ const types_1 = require("@paperback/types");
 const ComicKParser_1 = require("./ComicKParser");
 const ComicKSettings_1 = require("./ComicKSettings");
 const ComicKHelper_1 = require("./ComicKHelper");
-const COMICK_DOMAIN = 'https://comick.cc';
+const COMICK_DOMAIN = 'https://comick.io';
 const COMICK_API = 'https://api.comick.fun';
 const LIMIT = 300;
 exports.ComicKInfo = {
-    version: '2.2.0',
+    version: '2.2.1',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
