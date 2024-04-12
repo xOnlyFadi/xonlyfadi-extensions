@@ -20,14 +20,14 @@ import {
 
 import { Parser } from './MangaFreakParser'
 
-const MangaFreak_BASE = 'https://w15.mangafreak.net'
+const MangaFreak_BASE = 'https://ww1.mangafreak.me/'
 const MangaFreak_CDN = 'https://images.mangafreak.net'
 export const MangaFreakInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.2',
+    version: '2.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,

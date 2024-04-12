@@ -14,13 +14,13 @@ import {
 
 import { Parser } from './TCBScansParser'
 
-const TCBScans_Base = 'https://onepiecechapters.com'
+const TCBScans_Base = 'https://tcb-backup.bihar-mirchi.com'
 export const TCBScansInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.1',
+    version: '2.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
