@@ -1438,13 +1438,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TCBScans = exports.TCBScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const TCBScansParser_1 = require("./TCBScansParser");
-const TCBScans_Base = 'https://onepiecechapters.com';
+const TCBScans_Base = 'https://tcb-backup.bihar-mirchi.com';
 exports.TCBScansInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.1',
+    version: '2.0.2',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: types_1.ContentRating.EVERYONE,
