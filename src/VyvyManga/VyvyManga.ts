@@ -16,7 +16,8 @@ import {
     SourceIntents,
     SourceManga,
     Tag,
-    TagSection
+    TagSection,
+    DUISection
 } from '@paperback/types'
 
 import {
@@ -31,10 +32,15 @@ import {
     parseViewMore
 } from './VyvyMangaParser'
 
+import {
+    userAgentSettings,
+    UserAgentStore
+} from './VyvyMangaSettings'
+
 const VYVY_DOMAIN = 'https://vyvymanga.net'
 
 export const VyvyMangaInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.1.0',
     name: 'VyvyManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -51,7 +57,8 @@ export const VyvyMangaInfo: SourceInfo = {
     intents:
     SourceIntents.MANGA_CHAPTERS |
     SourceIntents.HOMEPAGE_SECTIONS |
-    SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+    SourceIntents.CLOUDFLARE_BYPASS_REQUIRED |
+    SourceIntents.SETTINGS_UI
 }
 
 export class VyvyManga
@@ -63,6 +70,16 @@ implements
 {
     constructor(private cheerio: cheerio.CheerioAPI) {}
 
+    getUserAgent = async (): Promise<string> => {
+        if (this.stateManager === null || this.requestManager === null) throw new Error('State Manager or Request Manager is null')
+
+        const userAgent = await UserAgentStore.get(this.stateManager)
+        if (userAgent !== null && userAgent !== '') {
+            return userAgent
+        }
+        return await this.requestManager.getDefaultUserAgent()
+    }
+
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
         requestTimeout: 15000,
@@ -72,7 +89,7 @@ implements
                     ...(request.headers ?? {}),
                     ...{
                         referer: `${VYVY_DOMAIN}/`,
-                        'user-agent': await this.requestManager.getDefaultUserAgent()
+                        'user-agent': await this.getUserAgent()
                     }
                 }
                 return request
@@ -82,6 +99,12 @@ implements
             }
         }
     })
+
+    stateManager = App.createSourceStateManager()
+
+    async getSourceMenu(): Promise<DUISection> {
+        return Promise.resolve(userAgentSettings(this.stateManager))
+    }
 
     getMangaShareUrl(mangaId: string): string {
         return `${VYVY_DOMAIN}/manga/${mangaId}`
@@ -255,7 +278,7 @@ implements
             method: 'GET',
             headers: {
                 referer: `${VYVY_DOMAIN}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent()
+                'user-agent': await this.getUserAgent()
             }
         })
     }

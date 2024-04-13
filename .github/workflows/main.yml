@@ -8,6 +8,8 @@ jobs:
   build:
     name: Bundle and Publish Sources
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       matrix:
@@ -33,7 +35,6 @@ jobs:
         with:
           ref: gh-pages
           path: bundles
-
       - run: npm install
       - run: npm run bundle -- --folder=${{ steps.extract_branch.outputs.branch }}
 
