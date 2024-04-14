@@ -31,10 +31,10 @@ import {
     parseViewMore
 } from './VyvyMangaParser'
 
-const VYVY_DOMAIN = 'https://vyvymanga.net'
+const VYVY_DOMAIN = 'https://vymanga.net'
 
 export const VyvyMangaInfo: SourceInfo = {
-    version: '2.0.0',
+    version: '2.0.1',
     name: 'VyvyManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
