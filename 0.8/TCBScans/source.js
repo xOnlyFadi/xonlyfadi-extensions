@@ -1438,18 +1438,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TCBScans = exports.TCBScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const TCBScansParser_1 = require("./TCBScansParser");
-const TCBScans_Base = 'https://tcb-backup.bihar-mirchi.com';
+const TCBScans_Base = 'https://tcbscans.me';
 exports.TCBScansInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.2',
+    version: '2.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: types_1.ContentRating.EVERYONE,
     language: 'ENGLISH',
-    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS
+    intents: types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 };
 class TCBScans {
     constructor(cheerio) {
@@ -1463,7 +1463,8 @@ class TCBScans {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
-                            'referer': TCBScans_Base
+                            'referer': TCBScans_Base,
+                            'user-agent': await this.requestManager.getDefaultUserAgent()
                         }
                     };
                     return request;
@@ -1512,6 +1513,16 @@ class TCBScans {
         const response = await this.requestManager.schedule(options, 1);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterDetails($, mangaId, chapterId);
+    }
+    async getCloudflareBypassRequestAsync() {
+        return App.createRequest({
+            url: TCBScans_Base,
+            method: 'GET',
+            headers: {
+                referer: `${TCBScans_Base}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        });
     }
 }
 exports.TCBScans = TCBScans;
