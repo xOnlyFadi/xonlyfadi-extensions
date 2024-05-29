@@ -14,18 +14,18 @@ import {
 
 import { Parser } from './TCBScansParser'
 
-const TCBScans_Base = 'https://tcb-backup.bihar-mirchi.com'
+const TCBScans_Base = 'https://tcbscans.me'
 export const TCBScansInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.2',
+    version: '2.0.3',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
     language: 'ENGLISH',
-    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class TCBScans implements ChapterProviding {
@@ -40,7 +40,8 @@ export class TCBScans implements ChapterProviding {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'referer': TCBScans_Base
+                        'referer': TCBScans_Base,
+                        'user-agent': await this.requestManager.getDefaultUserAgent()
                     }
                 }
                 return request
@@ -97,5 +98,16 @@ export class TCBScans implements ChapterProviding {
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: TCBScans_Base,
+            method: 'GET',
+            headers: {
+                referer: `${TCBScans_Base}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        })
     }
 }
