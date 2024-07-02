@@ -3460,7 +3460,7 @@ const types_1 = require("@paperback/types");
 const ReadComicOnlineParser_1 = require("./ReadComicOnlineParser");
 const RCO_DOMAIN = 'https://readcomiconline.li';
 exports.ReadComicOnlineInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -3703,7 +3703,7 @@ const parseChapterDetails = (data, mangaId, chapterId) => {
     for (const match of imageMatches) {
         if (!match[1])
             continue;
-        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g');
+        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g').replace(/pw_.g28x/g, 'b').replace(/d2pr.x_27/g, 'h');
         if (url.startsWith('https')) {
             pages.push(url);
         }
