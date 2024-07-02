@@ -85,7 +85,7 @@ export const parseChapterDetails = (data: string, mangaId: string, chapterId: st
     for (const match of imageMatches) {
         if (!match[1]) continue
 
-        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g')
+        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g').replace(/pw_.g28x/g, 'b').replace(/d2pr.x_27/g, 'h')
 
         if (url.startsWith('https')) {
             pages.push(url)
