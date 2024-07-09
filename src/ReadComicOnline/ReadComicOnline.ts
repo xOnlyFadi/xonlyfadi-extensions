@@ -31,7 +31,7 @@ import {
 
 const RCO_DOMAIN = 'https://readcomiconline.li'
 export const ReadComicOnlineInfo: SourceInfo = {
-    version: '2.0.2',
+    version: '2.0.3',
     name: 'ReadComicOnline',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -113,8 +113,11 @@ export class ReadComicOnline implements MangaProviding, ChapterProviding, Search
             param: '?readType=1&quality=hq'
         })
         const response = await this.requestManager.schedule(request, 1)
+        const $ = this.cheerio.load(response.data as string)
 
-        return parseChapterDetails(response.data as string, mangaId, chapterId)
+        const rguardUrl = $('script[src*=\'rguard.min.js\']').attr('src') ?? ''
+
+        return await parseChapterDetails(response.data as string, rguardUrl,mangaId, chapterId, this)
     }
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Chapter,
     ChapterDetails,
     Tag,
@@ -79,33 +81,85 @@ export const parseChapters = ($: cheerio.Root): Chapter[] => {
     return chapters
 }
 
-export const parseChapterDetails = (data: string, mangaId: string, chapterId: string): ChapterDetails => {
-    const pages: string[] = []
-    const imageMatches = data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi)
-    for (const match of imageMatches) {
-        if (!match[1]) continue
+export const trimIndent = (str: string): string => {
+    const lines = str.split('\n')
+    const minIndent = lines
+        .filter(line => line.trim().length > 0)
+        .reduce((min, line) => Math.min(min, line.match(/^\s*/)![0].length), Infinity)
 
-        let url = match[1].replace(/_x236/g, 'd').replace(/_x945/g, 'g').replace(/pw_.g28x/g, 'b').replace(/d2pr.x_27/g, 'h')
+    const trimmedLines = lines.map(line => (minIndent < Infinity ? line.slice(minIndent) : line))
+    return trimmedLines.join('\n').trim()
+}
 
-        if (url.startsWith('https')) {
-            pages.push(url)
-        } else {
-            const sliced = url.slice(url.indexOf('?'))
-            const containsS0 = url.includes('=s0')
-            url = url.slice(0, containsS0 ? url.indexOf('=s0?') : url.indexOf('=s1600?'))
-            url = url.slice(4, 22) + url.slice(25)
-            url = url.slice(0, -6) + url.slice(-2)
-            url = Buffer.from(url, 'base64').toString('utf-8')
-            url = url.slice(0, 13) + url.slice(17)
-            url = url.slice(0, -2) +  (containsS0 ? '=s0' : '=s1600')
-            pages.push(`https://2.bp.blogspot.com/${url+sliced}`)
+const DISABLE_JS_SCRIPT = trimIndent(`
+    const handler = {
+        get: function(target, _) {
+            return function() {
+                return target;
+            };
+        },
+        apply: function(_, __, ___) {
+            return new Proxy({}, handler);
         }
-    }
+    };
+    
+    globalThis.window = new Proxy({}, handler);
+    globalThis.document = new Proxy({}, handler);
+    globalThis.$ = new Proxy(function() {}, handler);
+`)
+
+const ATOB_SCRIPT = trimIndent(`
+    var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+        b64re = /^(?:[A-Za-z\\d+\\/]{4})*?(?:[A-Za-z\\d+\\/]{2}(?:==)?|[A-Za-z\\d+\\/]{3}=?)?$/;
+
+    const atob = function(string) {
+        // atob can work with strings with whitespaces, even inside the encoded part,
+        // but only \\t, \\n, \\f, \\r and ' ', which can be stripped.
+        string = String(string).replace(/[\\t\\n\\f\\r ]+/g, "");
+        if (!b64re.test(string))
+            throw new TypeError("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
+
+        // Adding the padding if missing, for simplicity
+        string += "==".slice(2 - (string.length & 3));
+        var bitmap, result = "", r1, r2, i = 0;
+        for (; i < string.length;) {
+            bitmap = b64.indexOf(string.charAt(i++)) << 18 | b64.indexOf(string.charAt(i++)) << 12
+                    | (r1 = b64.indexOf(string.charAt(i++))) << 6 | (r2 = b64.indexOf(string.charAt(i++)));
+
+            result += r1 === 64 ? String.fromCharCode(bitmap >> 16 & 255)
+                    : r2 === 64 ? String.fromCharCode(bitmap >> 16 & 255, bitmap >> 8 & 255)
+                    : String.fromCharCode(bitmap >> 16 & 255, bitmap >> 8 & 255, bitmap & 255);
+        }
+        return result;
+    };
+`)
+
+export const urlDecode = (urls: any[], rguardScript: string):any[] =>{
+    const script = eval(DISABLE_JS_SCRIPT + ATOB_SCRIPT + rguardScript + `
+        var images = ${JSON.stringify(urls)};
+        beau(images);
+        images;
+    `)
+
+    return script.map((item: any) => String(item))
+}
+
+export const parseChapterDetails = async (data: string, rguardUrl: string, mangaId: string, chapterId: string, source: any): Promise<ChapterDetails> => {
+    const imageMatches = [...data.matchAll(/lstImages\.push\(['"](.*)['"]\)/gi)]
+    const urls = imageMatches.map(match => match[1])
+
+    const request = App.createRequest({
+        url: `${RCO_DOMAIN}${rguardUrl}`,
+        method: 'GET'
+    })
+    const response = await source.requestManager.schedule(request, 1)
+
+    const decodedUrls = urlDecode(urls, response?.data as string)
 
     return App.createChapterDetails({
         id: chapterId,
         mangaId: mangaId,
-        pages: pages
+        pages: decodedUrls
     })
 }
 
