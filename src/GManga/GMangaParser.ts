@@ -115,7 +115,7 @@ export const parseChapters = (data: ChapterData): Chapter[] => {
 
         const id = release?.id ?? ''
         const chapNum = chapter?.chapter ?? 0
-        const time = release?.time_stamp * 1000 ?? 0
+        const time = release?.time_stamp ? release?.time_stamp * 1000 : 0
         const group = team?.name ?? ''
         const name = chapter?.title ? chapter?.title : ''
 
