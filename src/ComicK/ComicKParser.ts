@@ -116,7 +116,8 @@ export const parseChapters = (
     uploadersWhitelisted: boolean,
     aggressiveUploadersFilter: boolean,
     strictNameMatching: boolean,
-    uploaders: string[]
+    uploaders: string[],
+    hideUnreleasedChapters: boolean
 ): void => {
     const chaptersData: ChapterData[] = []
 
@@ -149,6 +150,16 @@ export const parseChapters = (
         if (chapter?.group_name) {
             for (const group of chapter.group_name) {
                 groups.push(group)
+            }
+        }
+
+        // Skip unreleased chapters if setting is enabled
+        if (hideUnreleasedChapters) {
+            const publishAt = new Date(chapter?.publish_at)
+            const currentDate = new Date()
+
+            if (publishAt > currentDate) {
+                continue
             }
         }
 
