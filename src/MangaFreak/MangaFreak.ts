@@ -23,13 +23,13 @@ import * as cheerio from 'cheerio'
 import { Parser } from './MangaFreakParser'
 
 const MangaFreak_BASE = 'https://ww1.mangafreak.me/'
-const MangaFreak_CDN = 'https://images.mangafreak.net'
+const MangaFreak_CDN = 'https://images.mangafreak.me'
 export const MangaFreakInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.3',
+    version: '2.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
