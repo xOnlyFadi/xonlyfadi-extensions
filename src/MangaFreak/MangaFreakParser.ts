@@ -9,12 +9,14 @@ import {
     TagSection
 } from '@paperback/types'
 
+import { Cheerio, CheerioAPI } from 'cheerio'
+import { Element } from 'domhandler'
 import { decodeHTML } from 'entities'
 
 export class Parser {
     private readonly chapterTitleRegex = /Chapter ([\d.]+)/i
 
-    async parseHomeSections($: cheerio.Root, sectionCallback: (section: HomeSection) => void, cdnUrl: string): Promise<void> {
+    async parseHomeSections($: CheerioAPI, sectionCallback: (section: HomeSection) => void, cdnUrl: string): Promise<void> {
         const top5Section = App.createHomeSection({ id: 'top5', title: 'Top 5', containsMoreItems: false, type: HomeSectionType.featured })
         const popularSection = App.createHomeSection({ id: 'popular', title: 'Popular', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
         const TodayMangaSection = App.createHomeSection({ id: 'today_manga', title: 'Today\'s Manga', containsMoreItems: true, type: HomeSectionType.singleRowNormal })
@@ -121,7 +123,7 @@ export class Parser {
         sectionCallback(OlderMangaSection)
     }
 
-    ViewMoreParse($: cheerio.Selector, cdnUrl: string, isPopular: boolean): PartialSourceManga[] {
+    ViewMoreParse($: CheerioAPI, cdnUrl: string, isPopular: boolean): PartialSourceManga[] {
         const results: PartialSourceManga[] = []
 
         for (const obj of $(isPopular ? '.ranking_list .ranking_item' : '.latest_releases_list .latest_releases_item').toArray()) {
@@ -143,7 +145,7 @@ export class Parser {
         return results
     }
 
-    parseSearchResults($: cheerio.Selector, cdnUrl: string, UsesDeatils: boolean): PartialSourceManga[] {
+    parseSearchResults($: CheerioAPI, cdnUrl: string, UsesDeatils: boolean): PartialSourceManga[] {
         const results: PartialSourceManga[] = []
 
         for (const obj of $(UsesDeatils ? '.ranking_list .ranking_item' :'div.manga_search_item, div.mangaka_search_item').toArray()) {
@@ -164,7 +166,7 @@ export class Parser {
 
         return results
     }
-    parseChapterDetails($: cheerio.Selector, mangaId: string, chapterId: string): ChapterDetails {
+    parseChapterDetails($: CheerioAPI, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
 
         for (const obj of $('img#gohere').toArray()) {
@@ -183,7 +185,7 @@ export class Parser {
         })
     }
 
-    parseChapters($: cheerio.Root): Chapter[] {
+    parseChapters($: CheerioAPI): Chapter[] {
         const chapters: Chapter[] = []
         const arrChapters = $('div.manga_series_list tr:has(a)').toArray()
 
@@ -210,7 +212,7 @@ export class Parser {
         return chapters
     }
 
-    parseMangaDetails($: cheerio.Root, mangaId: string, cdnUrl: string): SourceManga {
+    parseMangaDetails($: CheerioAPI, mangaId: string, cdnUrl: string): SourceManga {
         const title = $('div.manga_series_data h1').first().text().trim() ?? ''
         const image = `${cdnUrl}/manga_images/${mangaId.toLowerCase()}.jpg`
 
@@ -252,7 +254,7 @@ export class Parser {
         })
     }
 
-    parseTags($: cheerio.Root): TagSection[] {
+    parseTags($: CheerioAPI): TagSection[] {
 
         const genres: Tag[] = []
         for (const obj of $('.main .select_genre div[id="genrebox"] div').toArray()) {
@@ -306,7 +308,7 @@ export class Parser {
         ]
     }
 
-    NextPage($: cheerio.Selector): boolean {
+    NextPage($: CheerioAPI): boolean {
         const nextPage = $('a.next_p')
         if (nextPage.contents().length !== 0) {
             return true
@@ -323,7 +325,7 @@ export class Parser {
         })
     }
 
-    getImageSrc(imageObj: cheerio.Cheerio | undefined): string {
+    getImageSrc(imageObj: Cheerio<Element> | undefined): string {
         let image
 
         if (typeof imageObj?.attr('data-src') != 'undefined') {

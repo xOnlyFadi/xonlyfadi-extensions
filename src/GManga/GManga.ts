@@ -20,6 +20,8 @@ import {
     SearchResultsProviding
 } from '@paperback/types'
 
+import * as cheerio from 'cheerio'
+
 import {
     parseChapterDetails,
     parseChapters,
@@ -61,7 +63,6 @@ export const GMangaInfo: SourceInfo = {
 }
 
 export class GManga implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -320,7 +321,7 @@ export class GManga implements MangaProviding, ChapterProviding, SearchResultsPr
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return parseChapterDetails($, mangaId, chapterId)
     }

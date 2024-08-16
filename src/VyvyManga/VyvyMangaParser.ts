@@ -9,10 +9,12 @@ import {
     TagSection
 } from '@paperback/types'
 
-import entities = require('entities');
+import entities = require('entities')
+import { CheerioAPI } from 'cheerio'
+import { Element } from 'domhandler'
 
 export const parseMangaDetails = (
-    $: cheerio.Root,
+    $: CheerioAPI,
     mangaId: string
 ): SourceManga => {
     const titles: string[] = []
@@ -31,7 +33,7 @@ export const parseMangaDetails = (
     const author = authorElement.length
         ? authorElement
             .children()
-            .map((_: number, e: cheerio.Element) => {
+            .map((_: number, e: Element) => {
                 return $(e).text().trim()
             })
             .toArray()
@@ -42,7 +44,7 @@ export const parseMangaDetails = (
     const artist = artistElement.length
         ? artistElement
             .children()
-            .map((_: number, e: cheerio.Element) => {
+            .map((_: number, e: Element) => {
                 return $(e).text().trim()
             })
             .toArray()
@@ -88,7 +90,7 @@ export const parseMangaDetails = (
 }
 
 export const parseChapterList = (
-    $: cheerio.Root,
+    $: CheerioAPI,
     mangaId: string
 ): Chapter[] => {
     const chapters: Chapter[] = []
@@ -97,7 +99,7 @@ export const parseChapterList = (
     for (const chapter of $('.list-group > a').toArray()) {
         const title: string = $('span', chapter).text().trim()
 
-        const chapterAttr = (chapter as cheerio.TagElement).attribs
+        const chapterAttr = chapter.attribs
         const chapterId: string = chapterAttr.id ?? ''
 
         if (!chapterId) continue
@@ -136,13 +138,13 @@ export const parseChapterList = (
 }
 
 export const parseChapterURL = (
-    $: cheerio.Root,
+    $: CheerioAPI,
     chapterId: string
 ): string => {
     let chapterUrl = ''
 
     for (const chapter of $('.list-group > a').toArray()) {
-        const chapterAttr = (chapter as cheerio.TagElement).attribs
+        const chapterAttr = chapter.attribs
 
         if (chapterAttr.id == chapterId) {
             chapterUrl = chapterAttr.href ?? ''
@@ -156,7 +158,7 @@ export const parseChapterURL = (
 }
 
 export const parseChapterDetails = (
-    $: cheerio.Root,
+    $: CheerioAPI,
     mangaId: string,
     chapterId: string
 ): ChapterDetails => {
@@ -177,7 +179,7 @@ export const parseChapterDetails = (
 }
 
 export const parseHomeSections = (
-    $: cheerio.Root,
+    $: CheerioAPI,
     sectionCallback: (section: HomeSection) => void
 ): void => {
     const popularSection = App.createHomeSection({
@@ -270,7 +272,7 @@ export const parseHomeSections = (
     sectionCallback(newSection)
 }
 
-export const parseViewMore = ($: cheerio.Root): PartialSourceManga[] => {
+export const parseViewMore = ($: CheerioAPI): PartialSourceManga[] => {
     const manga: PartialSourceManga[] = []
     const collectedIds: string[] = []
 
@@ -295,7 +297,7 @@ export const parseViewMore = ($: cheerio.Root): PartialSourceManga[] => {
     return manga
 }
 
-export const parseSearch = ($: cheerio.Root): PartialSourceManga[] => {
+export const parseSearch = ($: CheerioAPI): PartialSourceManga[] => {
     const mangas: PartialSourceManga[] = []
     for (const obj of $('.book-list .col-4 > .comic-item').toArray()) {
         const image: string = $('.comic-image', obj).attr('data-background-image') ?? ''
@@ -345,7 +347,7 @@ export const parseDate = (date: string): Date => {
     return time
 }
 
-export const parseTags = ($: cheerio.Root): TagSection[] => {
+export const parseTags = ($: CheerioAPI): TagSection[] => {
     const arrayTags: Tag[] = []
     for (const tag of $('.dropdown-genre ul li > a').toArray()) {
         const label = $(tag).text().trim() ?? ''
@@ -358,7 +360,7 @@ export const parseTags = ($: cheerio.Root): TagSection[] => {
     return tagSections
 }
 
-export const isLastPage = ($: cheerio.Root): boolean => {
+export const isLastPage = ($: CheerioAPI): boolean => {
     let isLast = false
 
     const lastPageLink = $('ul.pagination li.page-item a.page-link').last().attr('href')

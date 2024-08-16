@@ -15,19 +15,18 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.8.1",
     "@tsconfig/recommended": "^1.0.7",
-    "@types/cheerio": "^0.22.35",
     "@types/crypto-js": "^4.2.2",
     "@types/html-to-text": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
     "eslint-plugin-modules-newline": "^0.0.6",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "@paperback/toolchain": "^0.8.7",
     "@paperback/types": "^0.8.7",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "^1.0.0",
     "crypto-js": "^4.2.0",
     "entities": "^4.5.0",
     "html-to-text": "^9.0.5",
