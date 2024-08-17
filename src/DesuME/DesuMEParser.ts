@@ -105,7 +105,7 @@ export const parseChapters = (data: MangaDetails): Chapter[] => {
         const id = chapter?.id ?? ''
         const chapNum = chapter?.ch ? Number(chapter.ch) : 0
         const chapVol = chapter?.ch ? Number(chapter.vol) : 0
-        const time = chapter?.date ? new Date(chapter?.date * 1000) ?? new Date() : new Date()
+        const time = chapter?.date ? new Date(chapter?.date * 1000) : new Date()
         const name = chapter?.title ? chapter?.title : ''
 
         if (!id) continue

@@ -107,7 +107,7 @@ export const parseChapterList = (
         const chapNumRegex = chapterAttr.id?.match(/(\d+)(?:[-.]\d+)?/)
 
         let chapNum =
-            chapNumRegex && chapNumRegex[1]
+            chapNumRegex?.[1]
                 ? Number(chapNumRegex[1].replace('-', '.'))
                 : 0
         if (isNaN(chapNum)) chapNum = 0
@@ -366,8 +366,8 @@ export const isLastPage = ($: CheerioAPI): boolean => {
     const lastPageLink = $('ul.pagination li.page-item a.page-link').last().attr('href')
     let lastPage = 1
     if (lastPageLink) {
-        const match = lastPageLink.match(/page=(\d+)/)
-        if (match && match[1]) {
+        const match = /page=(\d+)/.exec(lastPageLink)
+        if (match?.[1]) {
             lastPage = parseInt(match[1], 10)
         }
     }

@@ -53,7 +53,7 @@ export const parseMangaDetails = (data: MangaDetails, mangaId: string): SourceMa
     const description = comic?.desc ? convert(decodeHTML(comic?.desc), { wordwrap: 130 }) : ''
     const arrayTags: Tag[] = []
 
-    const countryConvert: { [key: string]: string; } = {
+    const countryConvert: Record<string, string> = {
         kr: 'Manhwa',
         jp: 'Manga',
         cn: 'Manhua'

@@ -78,6 +78,10 @@ export interface SearchData {
     md_comics: MDComics;
 }
 
+export interface Metadata {
+    page?: number
+}
+
 interface Language {
     name: string;
     CMCode: string;
@@ -343,17 +347,12 @@ class LanguagesClass {
     }
 
     getName(CMCode: string): string {
-        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.name ?? 'Unknown'
+        return this.Languages.find(Language => Language.CMCode == CMCode)?.name ?? 'Unknown'
     }
 
     getEmoji(CMCode: string): string {
-        return this.Languages.filter(Language => Language.CMCode == CMCode)[0]?.emoji ?? '⍰'
+        return this.Languages.find(Language => Language.CMCode == CMCode)?.emoji ?? '⍰'
     }
-
-    getDefault(): string[] {
-        return this.Languages.filter(Language => Language.default).map(Language => Language.CMCode)
-    }
-
 }
 
 export const CMLanguages = new LanguagesClass

@@ -28,10 +28,13 @@ import {
 } from './VoyceMEGraphQL'
 
 import {
+    HomePageData,
     SearchType,
     VoyceChapterData,
     VoyceChapterDetailsData,
-    VoyceMangaData
+    VoyceMangaData,
+    SearchData,
+    Metadata
 } from './VoyceMEHelper'
 import { Parser } from './VoyceMEParser'
 
@@ -88,18 +91,18 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         })
         const response = await this.requestManager.schedule(request, 1)
 
-        let data
+        let data: HomePageData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as HomePageData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         this.parser.parseHomeSections(data, sectionCallback)
     }
 
-    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    async getViewMoreItems(homepageSectionId: string, metadata?: Metadata): Promise<PagedResults> {
         const page: number = metadata?.page ?? 0
         const request = App.createRequest({
             url: this.graphqlURL,
@@ -108,12 +111,12 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         })
         const response = await this.requestManager.schedule(request, 1)
 
-        let data
+        let data: HomePageData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as HomePageData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
         const manga = this.parser.parseViewMore(homepageSectionId, data)
 
@@ -135,10 +138,10 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
 
         let data: VoyceMangaData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as VoyceMangaData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         if (data.data.series == undefined) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
@@ -156,10 +159,10 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
 
         let data: VoyceChapterData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as VoyceChapterData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         if (data.data?.series == undefined) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
@@ -178,16 +181,16 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
 
         let data: VoyceChapterDetailsData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as VoyceChapterDetailsData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         return this.parser.parseChapterDetails(data, mangaId, chapterId)
     }
 
-    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata?: Metadata): Promise<PagedResults> {
         const page: number = metadata?.page ?? 0
         const request = App.createRequest({
             url: this.graphqlURL,
@@ -196,12 +199,12 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
         })
         const response = await this.requestManager.schedule(request, 2)
 
-        let data
+        let data: SearchData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as SearchData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
         const manga = this.parser.parseSearch(data)
 
@@ -223,10 +226,10 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
 
         let data: SearchType
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as SearchType
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         return this.parser.parseTags(data)

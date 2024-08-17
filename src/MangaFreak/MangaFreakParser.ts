@@ -320,7 +320,7 @@ export class Parser {
 
     encodeText(str: string): string {
         return str.replace(/&#([0-9]{1,4})/gi, (_, numStr) => {
-            const num = parseInt(numStr, 10)
+            const num = parseInt(numStr as string, 10)
             return String.fromCharCode(num)
         })
     }

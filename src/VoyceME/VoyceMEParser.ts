@@ -218,7 +218,7 @@ export class Parser {
             const id = obj.id ?? ''
             const name = obj.title ?? 'No Chpater Name'
             const release_date = obj.created_at
-            const chapNum = Number(name.match(/\d+/)?.pop()?.replace(/-/g, '.'))
+            const chapNum = Number((/\d+/.exec(name))?.pop()?.replace(/-/g, '.'))
 
             if (!id) continue
 

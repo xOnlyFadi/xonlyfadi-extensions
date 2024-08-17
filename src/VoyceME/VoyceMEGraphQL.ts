@@ -118,8 +118,8 @@ export const SearchQuery = (query: SearchRequest, page: number, popularPerPage: 
     })
 
     const title = query?.title ?? ''
-    const description = query?.parameters?.['description'] ?? ''
-    const author = query?.parameters?.['author'] ?? ''
+    const description = query?.parameters.description as string
+    const author = query?.parameters?.author as string
 
     return {
         query: `query($limit: Int, $offset: Int) {

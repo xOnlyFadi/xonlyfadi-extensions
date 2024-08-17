@@ -6,13 +6,18 @@
   "scripts": {
     "bundle": "npx paperback bundle",
     "serve": "npx paperback serve",
-    "test": "npx paperback test"
+    "test": "npx paperback test",
+    "lint": "npx eslint ./src"
   },
   "author": "xOnlyFadi",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/html-to-text": "^9.0.4",
-    "typescript": "^5.5.4"
+    "eslint": "^9.9.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.1.0"
   },
   "dependencies": {
     "@paperback/toolchain": "^0.8.7",

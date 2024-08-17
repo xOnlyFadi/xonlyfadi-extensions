@@ -33,6 +33,10 @@ import {
     parseViewMore
 } from './VyvyMangaParser'
 
+interface Metadata {
+    page?: number
+}
+
 const VYVY_DOMAIN = 'https://vymanga.net'
 
 export const VyvyMangaInfo: SourceInfo = {
@@ -96,7 +100,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         return parseMangaDetails($, mangaId)
     }
 
@@ -108,7 +112,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         return parseChapterList($, mangaId)
     }
 
@@ -127,7 +131,7 @@ implements
         })
         response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        $ = cheerio.load(response.data as string)
+        $ = cheerio.load(response.data!)
 
         const chapterUrl = parseChapterURL($, chapterId)
 
@@ -138,7 +142,7 @@ implements
         })
         response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        $ = cheerio.load(response.data as string)
+        $ = cheerio.load(response.data!)
 
         return parseChapterDetails($, mangaId, chapterId)
     }
@@ -153,13 +157,13 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         parseHomeSections($, sectionCallback)
     }
 
     async getViewMoreItems(
         homepageSectionId: string,
-        metadata: any
+        metadata?: Metadata
     ): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let param = ''
@@ -187,7 +191,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         const manga = parseViewMore($)
 
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
@@ -199,7 +203,7 @@ implements
 
     async getSearchResults(
         query: SearchRequest,
-        metadata: any
+        metadata?: Metadata
     ): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let request
@@ -221,7 +225,7 @@ implements
         }
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         const manga = parseSearch($)
 
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
@@ -238,7 +242,7 @@ implements
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         return parseTags($)
     }
 

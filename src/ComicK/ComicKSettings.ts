@@ -9,11 +9,11 @@ import {
 } from './ComicKHelper'
 
 export const getLanguages = async (stateManager: SourceStateManager): Promise<string[]> => {
-    return (await stateManager.retrieve('languages') ?? CMLanguages.getDefault())
+    return (await stateManager.retrieve('languages') as string[]) ?? []
 }
 
 export const getLanguageHomeFilter = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('language_home_filter') ?? false)
+    return (await stateManager.retrieve('language_home_filter') as boolean) ?? false
 }
 
 export const getUploaderInput = async (stateManager: SourceStateManager): Promise<string> => {
@@ -21,43 +21,43 @@ export const getUploaderInput = async (stateManager: SourceStateManager): Promis
 }
 
 const getUploaders = async (stateManager: SourceStateManager): Promise<string[]> => {
-    return (await stateManager.retrieve('uploaders') ?? [])
+    return (await stateManager.retrieve('uploaders') as string[]) ?? []
 }
 
 const getUploadersWhitelisted = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('uploaders_whitelisted') ?? false)
+    return (await stateManager.retrieve('uploaders_whitelisted') as boolean) ?? false
 }
 
 const getSelectedUploaders = async (stateManager: SourceStateManager): Promise<string[]> => {
-    return (await stateManager.retrieve('uploaders_selected') ?? [])
+    return (await stateManager.retrieve('uploaders_selected') as string[]) ?? []
 }
 
 const getUploadersFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('uploaders_toggled') ?? false)
+    return (await stateManager.retrieve('uploaders_toggled') as boolean) ?? false
 }
 
 const getAggresiveUploadersFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('aggressive_uploaders_filtering') ?? false)
+    return (await stateManager.retrieve('aggressive_uploaders_filtering') as boolean) ?? false
 }
 
 const getStrictNameMatching = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('strict_name_matching') ?? false)
+    return (await stateManager.retrieve('strict_name_matching') as boolean) ?? false
 }
 
 const showTitle = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('show_title') ?? false)
+    return (await stateManager.retrieve('show_title') as boolean) ?? false
 }
 
 const showVolumeNumber = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('show_volume_number') ?? false)
+    return (await stateManager.retrieve('show_volume_number') as boolean) ?? false
 }
 
 const getChapterScoreFiltering = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('chapter_score_filtering') ?? false)
+    return (await stateManager.retrieve('chapter_score_filtering') as boolean) ?? false
 }
 
 const hideUnreleasedChapters = async(stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('hide_unreleased_chapters') ?? true)
+    return (await stateManager.retrieve('hide_unreleased_chapters') as boolean) ?? true
 }
 
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -304,7 +304,8 @@ export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
                 stateManager.store('aggressive_uploaders_filtering', null),
                 stateManager.store('uploaders_toggled', null),
                 stateManager.store('uploader', null),
-                stateManager.store('strict_name_matching', null)
+                stateManager.store('strict_name_matching', null),
+                stateManager.store('hide_unreleased_chapters', null)
             ])
         }
     })
