@@ -1,5 +1,4 @@
 import {
-
     SourceManga,
     Chapter,
     ChapterDetails,
@@ -11,6 +10,8 @@ import {
     SourceIntents,
     ChapterProviding
 } from '@paperback/types'
+
+import * as cheerio from 'cheerio'
 
 import { Parser } from './TCBScansParser'
 
@@ -29,7 +30,6 @@ export const TCBScansInfo: SourceInfo = {
 }
 
 export class TCBScans implements ChapterProviding {
-    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     private readonly parser: Parser = new Parser()
     readonly requestManager = App.createRequestManager({
@@ -62,7 +62,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseHomeSections($, sectionCallback)
     }
@@ -73,7 +73,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId)
     }
@@ -84,7 +84,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapters($)
     }
@@ -95,7 +95,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }

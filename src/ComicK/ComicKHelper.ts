@@ -39,6 +39,7 @@ export interface ChapterData {
     lang: string;
     created_at: Date;
     updated_at: Date;
+    publish_at: Date;
     up_count: number;
     down_count: number;
     group_name: string[];

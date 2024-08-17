@@ -56,12 +56,31 @@ const getChapterScoreFiltering = async (stateManager: SourceStateManager): Promi
     return (await stateManager.retrieve('chapter_score_filtering') ?? false)
 }
 
+const hideUnreleasedChapters = async(stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('hide_unreleased_chapters') ?? true)
+}
+
 export const chapterSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'chapter_settings',
         label: 'Chapter Settings',
         form: App.createDUIForm({
             sections: async () => [
+                App.createDUISection({
+                    id: 'hideunreleasedchapter',
+                    footer: 'Hide chapters that are not yet released.',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISwitch({
+                            id: 'hide_unreleased_chapters',
+                            label: 'Hide Unreleased Chapters',
+                            value: App.createDUIBinding({
+                                get: () => hideUnreleasedChapters(stateManager),
+                                set: async (newValue) => await stateManager.store('hide_unreleased_chapters', newValue)
+                            })
+                        })
+                    ]
+                }),
                 App.createDUISection({
                     id: 'contentchapter',
                     footer: 'When both enabled, chapter title and volume will be shown or one of them is enabled is gonna show what is enabled.',
@@ -85,7 +104,6 @@ export const chapterSettings = (stateManager: SourceStateManager): DUINavigation
                         })
                     ]
                 })
-
             ]
         })
     })
@@ -154,7 +172,7 @@ export const uploadersSettings = (stateManager: SourceStateManager): DUINavigati
                             })
                         })
                     ]
-                }),                
+                }),
                 App.createDUISection({
                     id: 'modify_uploaders',
                     header: 'Uploaders',

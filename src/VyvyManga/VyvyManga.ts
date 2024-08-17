@@ -19,6 +19,8 @@ import {
     TagSection
 } from '@paperback/types'
 
+import * as cheerio from 'cheerio'
+
 import {
     isLastPage,
     parseChapterDetails,
@@ -61,7 +63,6 @@ implements
     ChapterProviding,
     HomePageSectionsProviding
 {
-    constructor(private cheerio: cheerio.CheerioAPI) {}
 
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -95,7 +96,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         return parseMangaDetails($, mangaId)
     }
 
@@ -107,7 +108,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         return parseChapterList($, mangaId)
     }
 
@@ -117,7 +118,7 @@ implements
     ): Promise<ChapterDetails> {
         let request: Request
         let response: Response
-        let $: cheerio.Root
+        let $: cheerio.CheerioAPI
 
         // Find chapterUrl
         request = App.createRequest({
@@ -126,7 +127,7 @@ implements
         })
         response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        $ = this.cheerio.load(response.data as string)
+        $ = cheerio.load(response.data as string)
 
         const chapterUrl = parseChapterURL($, chapterId)
 
@@ -137,7 +138,7 @@ implements
         })
         response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        $ = this.cheerio.load(response.data as string)
+        $ = cheerio.load(response.data as string)
 
         return parseChapterDetails($, mangaId, chapterId)
     }
@@ -152,7 +153,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         parseHomeSections($, sectionCallback)
     }
 
@@ -186,7 +187,7 @@ implements
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         const manga = parseViewMore($)
 
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
@@ -220,7 +221,7 @@ implements
         }
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         const manga = parseSearch($)
 
         metadata = !isLastPage($) ? { page: page + 1 } : undefined
@@ -237,7 +238,7 @@ implements
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         return parseTags($)
     }
 

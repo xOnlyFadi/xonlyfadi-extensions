@@ -18,16 +18,18 @@ import {
     SourceIntents
 } from '@paperback/types'
 
+import * as cheerio from 'cheerio'
+
 import { Parser } from './MangaFreakParser'
 
 const MangaFreak_BASE = 'https://ww1.mangafreak.me/'
-const MangaFreak_CDN = 'https://images.mangafreak.net'
+const MangaFreak_CDN = 'https://images.mangafreak.me'
 export const MangaFreakInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.3',
+    version: '2.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -42,7 +44,6 @@ export const MangaFreakInfo: SourceInfo = {
 }
 
 export class MangaFreak implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: cheerio.CheerioAPI) { }
 
     private readonly parser: Parser = new Parser()
     baseUrl = MangaFreak_BASE
@@ -89,7 +90,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
 
         return this.parser.parseHomeSections($, sectionCallback, MangaFreak_CDN)
@@ -117,7 +118,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         this.CloudFlareError(response.status)
         const manga = this.parser.ViewMoreParse($, MangaFreak_CDN, isPopular)
 
@@ -136,7 +137,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseTags($)
     }
@@ -148,7 +149,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId, MangaFreak_CDN)
     }
@@ -160,7 +161,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapters($)
     }
@@ -172,7 +173,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
@@ -259,7 +260,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
 
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
-        const $ = this.cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data as string)
         const manga = this.parser.parseSearchResults($, MangaFreak_CDN, UsesDeatils)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined

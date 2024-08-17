@@ -19,6 +19,8 @@ import {
     SourceIntents
 } from '@paperback/types'
 
+import * as cheerio from 'cheerio'
+
 import { Parser } from './TuMangaOnlineParser'
 import {
     contentSettings,
@@ -46,8 +48,6 @@ export const TuMangaOnlineInfo: SourceInfo = {
     ]
 }
 export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchResultsProviding, HomePageSectionsProviding {
-    constructor(public cheerio: cheerio.CheerioAPI) { }
-
     userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'
 
     private readonly parser: Parser = new Parser()
@@ -134,7 +134,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             sectionCallback(section.section)
             promises.push(this.requestManager.schedule(section.request, 1).then(response => {
                 this.CloudFlareError(response.status)
-                const $ = this.cheerio.load(response.data as string)
+                const $ = cheerio.load(response.data as string)
                 section.section.items = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
                 sectionCallback(section.section)
             }))
@@ -164,7 +164,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         const manga = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
@@ -183,7 +183,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseTags($, getNSFWOption)
     }
@@ -195,7 +195,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId)
     }
@@ -207,7 +207,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapters($, mangaId, TUMANGA_DOMAIN)
     }
@@ -219,7 +219,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
@@ -234,7 +234,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
-        const $ = this.cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data as string)
 
         const button = $('.flex-row button.btn-social').attr('onclick')?.match(/copyToClipboard\(['"`](.*)['"`]\)/i)
         let url
@@ -332,7 +332,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         }
         const data = await this.requestManager.schedule(request, 2)
         this.CloudFlareError(data.status)
-        const $ = this.cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data as string)
         const manga = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined

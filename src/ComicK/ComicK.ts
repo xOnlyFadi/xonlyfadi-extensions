@@ -45,7 +45,7 @@ const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.2.1',
+    version: '2.2.2',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -128,6 +128,7 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') ?? false
         const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') ?? false
         const uploaders: string[] = await this.stateManager.retrieve('uploaders_selected') ?? []
+        const hideUnreleasedChapters: boolean = await this.stateManager.retrieve('hide_unreleased_chapters') ?? true
 
         const chapters: Chapter[] = []
 
@@ -144,7 +145,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
             uploadersWhitelisted,
             aggressiveUploadersFilter,
             strictNameMatching,
-            uploaders
+            uploaders,
+            hideUnreleasedChapters
         )
 
         // Try next page if number of chapters is same as limit
@@ -164,7 +166,8 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 uploadersWhitelisted,
                 aggressiveUploadersFilter,
                 strictNameMatching,
-                uploaders
+                uploaders,
+                hideUnreleasedChapters
             )
         }
 
