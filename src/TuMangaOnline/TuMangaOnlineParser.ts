@@ -1,11 +1,11 @@
-import { Chapter,
+import {
+    Chapter,
     ChapterDetails,
     SourceManga,
     PartialSourceManga,
     Tag,
-    TagSection } from '@paperback/types'
-
-import '../scopes'
+    TagSection
+} from '@paperback/types'
 
 import { CheerioAPI } from 'cheerio'
 import { decodeHTML } from 'entities'
@@ -18,7 +18,7 @@ export class Parser {
             const info = $('div.element > a',obj)
             const id = this.idCleaner(info.attr('href')?.trim() ?? '', baseUrl) ?? ''
             const title = decodeHTML($('h4.text-truncate',info).text().trim()) ?? decodeHTML($('h4.text-truncate',info)?.attr('title')?.trim() ?? '') ?? ''
-            const image = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')') ?? ''
+            const image = $(obj).find('style').toString().split('(\'')[1]?.split('\')')[0] ?? ''
 
             if(!id || !title) continue
 
@@ -129,8 +129,8 @@ export class Parser {
         const desc = decodeHTML($('p.element-description').text().trim()) ?? ''
 
         const infoAuth = $('h5.card-title')
-        const author = decodeHTML(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
-        const artist = decodeHTML(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
+        const author = decodeHTML(infoAuth.first().text().trim().split(', ')[1] ?? '')
+        const artist = decodeHTML(infoAuth.last().text().trim().split(', ')[1] ?? '')
 
         const status = decodeHTML($('span.book-status').text().trim()) ?? ''
 

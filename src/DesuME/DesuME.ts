@@ -32,8 +32,6 @@ import {
     SearchData
 } from './DesuMEHelper'
 
-import '../scopes'
-
 const DOMAIN = 'https://desu.me'
 const API = `${DOMAIN}/manga/api`
 export const DesuMEInfo: SourceInfo = {
@@ -195,15 +193,15 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
             url += `&search=${query?.title.replace(/ /g, '+').replace(/%20/g, '+')}`
         }
 
-        if (Genres.isNotEmpty()) {
+        if (Genres?.length > 0) {
             url += `&genres=${Genres.join(',')}`
         }
 
-        if (Types.isNotEmpty()) {
+        if (Types?.length > 0) {
             url += `&kinds=${Types.join(',')}`
         }
 
-        if (Order.isNotEmpty()) {
+        if (Order?.length > 0) {
             url += `&order=${Order[0]}`
         }
 

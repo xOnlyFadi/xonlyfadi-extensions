@@ -141,7 +141,7 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
             throw new Error(`${e}`)
         }
 
-        if (data.data.series?.isEmpty()) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
+        if (data.data.series == undefined) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
 
         return this.parser.parseMangaDetails(data, mangaId)
     }
@@ -162,8 +162,8 @@ export class VoyceME implements MangaProviding, ChapterProviding, SearchResultsP
             throw new Error(`${e}`)
         }
 
-        if (data.data?.series?.isEmpty()) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
-        if (data.data?.series?.first()?.chapters?.isEmpty()) throw new Error(`Failed to parse chapters property from manga object mangaId: ${mangaId}`)
+        if (data.data?.series == undefined) throw new Error(`Failed to parse manga property from data object mangaId: ${mangaId}`)
+        if (data.data?.series[0]?.chapters == undefined) throw new Error(`Failed to parse chapters property from manga object mangaId: ${mangaId}`)
 
         return this.parser.parseChapters(data)
     }

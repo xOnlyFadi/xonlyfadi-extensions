@@ -39,7 +39,7 @@ export interface VoyceMangaData {
 
 
 export interface VoyceChapterData {
-    data: {
+    data?: {
         series: [
             {
                 chapters: [

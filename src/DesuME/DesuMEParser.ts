@@ -15,8 +15,6 @@ import {
 
 import { decodeHTML } from 'entities'
 
-import '../scopes'
-
 export const parseSearch = (data: SearchData): PartialSourceManga[] => {
     const results: PartialSourceManga[] = []
 
