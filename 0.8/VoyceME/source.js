@@ -833,14 +833,6 @@ var _Sources = (() => {
   var import_types2 = __toESM(require_lib());
 
   // src/scopes.ts
-  String.prototype.substringAfterLast = function(substring) {
-    const lastIndexOfCharacter = this?.lastIndexOf(substring);
-    return this?.substring(lastIndexOfCharacter + 1, this?.length + 1);
-  };
-  String.prototype.substringBeforeLast = function(substring) {
-    const lastIndexOfCharacter = this?.lastIndexOf(substring);
-    return this?.substring(0, lastIndexOfCharacter);
-  };
   String.prototype.substringAfterFirst = function(substring) {
     const startingIndexOfSubstring = this?.indexOf(substring);
     const endIndexOfSubstring = startingIndexOfSubstring + substring?.length - 1;
@@ -849,24 +841,6 @@ var _Sources = (() => {
   String.prototype.substringBeforeFirst = function(substring) {
     const startingIndexOfSubstring = this?.indexOf(substring);
     return this?.substring(0, startingIndexOfSubstring);
-  };
-  String.prototype.removePrefix = function(prefix) {
-    if (this?.startsWith(prefix)) {
-      return this?.substring(prefix?.length, this?.length);
-    }
-    return this?.substring(0, this?.length);
-  };
-  String.prototype.removeSuffix = function(suffix) {
-    if (this?.endsWith(suffix)) {
-      return this?.substring(0, this?.length - suffix?.length);
-    }
-    return this?.substring(0, this?.length);
-  };
-  String.prototype.removeSurrounding = function(prefix, suffix) {
-    if (this?.length >= prefix?.length + suffix?.length && this?.startsWith(prefix) && this?.endsWith(suffix)) {
-      return this?.substring(prefix?.length, this?.length - suffix?.length);
-    }
-    return this?.substring(0, this?.length);
   };
   String.prototype.isEmpty = function() {
     return this?.length == 0;
@@ -2974,7 +2948,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     return (el, next, ...tail) => continuation(next, ...tail);
   }
 
-  // node_modules/htmlparser2/lib/esm/Tokenizer.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/Tokenizer.js
   var CharCodes2;
   (function(CharCodes3) {
     CharCodes3[CharCodes3["Tab"] = 9] = "Tab";
@@ -3769,7 +3743,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     }
   };
 
-  // node_modules/htmlparser2/lib/esm/Parser.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/Parser.js
   var formTags = /* @__PURE__ */ new Set([
     "input",
     "option",
@@ -4468,7 +4442,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     DocumentPosition2[DocumentPosition2["CONTAINED_BY"] = 16] = "CONTAINED_BY";
   })(DocumentPosition || (DocumentPosition = {}));
 
-  // node_modules/htmlparser2/lib/esm/index.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/index.js
   function parseDocument(data, options) {
     const handler = new DomHandler(void 0, options);
     new Parser(handler, options).end(data);

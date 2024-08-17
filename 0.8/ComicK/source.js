@@ -2978,7 +2978,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     return (el, next, ...tail) => continuation(next, ...tail);
   }
 
-  // node_modules/htmlparser2/lib/esm/Tokenizer.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/Tokenizer.js
   var CharCodes2;
   (function(CharCodes3) {
     CharCodes3[CharCodes3["Tab"] = 9] = "Tab";
@@ -3773,7 +3773,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     }
   };
 
-  // node_modules/htmlparser2/lib/esm/Parser.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/Parser.js
   var formTags = /* @__PURE__ */ new Set([
     "input",
     "option",
@@ -4472,7 +4472,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
     DocumentPosition2[DocumentPosition2["CONTAINED_BY"] = 16] = "CONTAINED_BY";
   })(DocumentPosition || (DocumentPosition = {}));
 
-  // node_modules/htmlparser2/lib/esm/index.js
+  // node_modules/html-to-text/node_modules/htmlparser2/lib/esm/index.js
   function parseDocument(data, options) {
     const handler = new DomHandler(void 0, options);
     new Parser(handler, options).end(data);
@@ -6114,7 +6114,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
       })
     });
   };
-  var parseChapters = (chapters, data, showTitle2, showVol, chapterScoreFiltering, uploadersToggled, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders) => {
+  var parseChapters = (chapters, data, showTitle2, showVol, chapterScoreFiltering, uploadersToggled, uploadersWhitelisted, aggressiveUploadersFilter, strictNameMatching, uploaders, hideUnreleasedChapters2) => {
     const chaptersData = [];
     if (chapterScoreFiltering) {
       filterChaptersByScore(data.chapters, chaptersData);
@@ -6142,6 +6142,13 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
       if (chapter?.group_name) {
         for (const group of chapter.group_name) {
           groups.push(group);
+        }
+      }
+      if (hideUnreleasedChapters2) {
+        const publishAt = new Date(chapter?.publish_at);
+        const currentDate = /* @__PURE__ */ new Date();
+        if (publishAt > currentDate) {
+          continue;
         }
       }
       chapters.push(App.createChapter({
@@ -6393,12 +6400,30 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
   var getChapterScoreFiltering = async (stateManager) => {
     return await stateManager.retrieve("chapter_score_filtering") ?? false;
   };
+  var hideUnreleasedChapters = async (stateManager) => {
+    return await stateManager.retrieve("hide_unreleased_chapters") ?? true;
+  };
   var chapterSettings = (stateManager) => {
     return App.createDUINavigationButton({
       id: "chapter_settings",
       label: "Chapter Settings",
       form: App.createDUIForm({
         sections: async () => [
+          App.createDUISection({
+            id: "hideunreleasedchapter",
+            footer: "Hide chapters that are not yet released.",
+            isHidden: false,
+            rows: async () => [
+              App.createDUISwitch({
+                id: "hide_unreleased_chapters",
+                label: "Hide Unreleased Chapters",
+                value: App.createDUIBinding({
+                  get: () => hideUnreleasedChapters(stateManager),
+                  set: async (newValue) => await stateManager.store("hide_unreleased_chapters", newValue)
+                })
+              })
+            ]
+          }),
           App.createDUISection({
             id: "contentchapter",
             footer: "When both enabled, chapter title and volume will be shown or one of them is enabled is gonna show what is enabled.",
@@ -6623,7 +6648,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
   var COMICK_API = "https://api.comick.fun";
   var LIMIT = 300;
   var ComicKInfo = {
-    version: "2.2.1",
+    version: "2.2.2",
     name: "ComicK",
     icon: "icon.png",
     author: "xOnlyFadi",
@@ -6702,6 +6727,7 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
       const aggressiveUploadersFilter = await this.stateManager.retrieve("aggressive_uploaders_filtering") ?? false;
       const strictNameMatching = await this.stateManager.retrieve("strict_name_matching") ?? false;
       const uploaders = await this.stateManager.retrieve("uploaders_selected") ?? [];
+      const hideUnreleasedChapters2 = await this.stateManager.retrieve("hide_unreleased_chapters") ?? true;
       const chapters = [];
       let page = 1;
       let data = await this.createChapterRequest(mangaId, page++);
@@ -6715,7 +6741,8 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
         uploadersWhitelisted,
         aggressiveUploadersFilter,
         strictNameMatching,
-        uploaders
+        uploaders,
+        hideUnreleasedChapters2
       );
       while (data.chapters.length === LIMIT) {
         data = await this.createChapterRequest(mangaId, page++);
@@ -6730,7 +6757,8 @@ ${"".padEnd(offset)}${"^".repeat(len)}`;
           uploadersWhitelisted,
           aggressiveUploadersFilter,
           strictNameMatching,
-          uploaders
+          uploaders,
+          hideUnreleasedChapters2
         );
       }
       return chapters;
