@@ -229,7 +229,7 @@ export const parseHomeSections = (
     const latestSection_Array: PartialSourceManga[] = []
     const latestSectionElem = $('.home-title:contains("Latest Update")').closest('.latest-update')
     for (const manga of latestSectionElem.find('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', manga).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', manga).attr('data-src') ?? ''
         const title: string = $('.comic-title', manga).text().trim() ?? ''
         const subtitle: string = $('.tray-item', manga).text().trim() ?? ''
 
@@ -252,7 +252,7 @@ export const parseHomeSections = (
     const newSection_Array: PartialSourceManga[] = []
     const newSectionElem = $('.home-title:contains("New Release")').closest('.latest-update')
     for (const manga of newSectionElem.find('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', manga).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', manga).attr('data-src') ?? ''
         const title: string = $('.comic-title', manga).text().trim() ?? ''
         const subtitle: string = $('.tray-item', manga).text().trim() ?? ''
 
@@ -277,7 +277,7 @@ export const parseViewMore = ($: CheerioAPI): PartialSourceManga[] => {
     const collectedIds: string[] = []
 
     for (const obj of $('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', obj).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', obj).attr('data-src') ?? ''
         const title: string = $('.comic-title', obj).text().trim() ?? ''
         const subtitle: string = $('.tray-item', obj).text().trim() ?? ''
         const id = $('a', obj).attr('href')?.split('/manga/').pop() ?? ''

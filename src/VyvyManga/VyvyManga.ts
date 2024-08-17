@@ -36,7 +36,7 @@ import {
 const VYVY_DOMAIN = 'https://vymanga.net'
 
 export const VyvyMangaInfo: SourceInfo = {
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'VyvyManga',
     icon: 'icon.png',
     author: 'xOnlyFadi',
