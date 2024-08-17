@@ -3,23 +3,15 @@
   "version": "0.8.0",
   "repositoryName": "xOnlyFadi's Extensions (0.8)",
   "description": "xOnlyFadi's Extensions for 0.8!",
-  "main": "index.js",
   "scripts": {
     "bundle": "npx paperback bundle",
     "serve": "npx paperback serve",
-    "test": "npx paperback test",
-    "nodemon": "nodemon"
+    "test": "npx paperback test"
   },
   "author": "xOnlyFadi",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.8.1",
-    "@tsconfig/recommended": "^1.0.7",
     "@types/html-to-text": "^9.0.4",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-modules-newline": "^0.0.6",
     "typescript": "^5.5.4"
   },
   "dependencies": {
@@ -27,8 +19,6 @@
     "@paperback/types": "^0.8.7",
     "cheerio": "^1.0.0",
     "entities": "^5.0.0",
-    "html-to-text": "^9.0.5",
-    "nodemon": "^3.1.4",
-    "ts-node": "^10.9.2"
+    "html-to-text": "^9.0.5"
   }
 }
