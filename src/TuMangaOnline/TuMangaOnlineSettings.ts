@@ -22,7 +22,7 @@ export const contentSettings = (stateManager: SourceStateManager): DUINavigation
                             id: 'nsfw',
                             label: 'NSFW',
                             value: App.createDUIBinding({
-                                get: async () => await stateManager.retrieve('nsfw') ?? false,
+                                get: async () => await stateManager.retrieve('nsfw') as boolean ?? false,
                                 set: async (newValue) => await stateManager.store('nsfw', newValue)
                             })
                         })

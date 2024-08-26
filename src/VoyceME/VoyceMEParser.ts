@@ -20,7 +20,6 @@ import {
 
 import { decodeHTML } from 'entities'
 import { convert } from 'html-to-text'
-import '../scopes'
 
 export class Parser {
     private readonly staticURL: string = 'https://dlkfxmdtxtzpb.cloudfront.net'
@@ -173,7 +172,7 @@ export class Parser {
     }
 
     parseMangaDetails(VoyceD: VoyceMangaData, mangaId: string): SourceManga {
-        const details = VoyceD.data.series.first()
+        const details = VoyceD.data.series[0]
 
         const title = details?.title.trim() ?? ''
         const image = details?.thumbnail ? encodeURI(`${this.staticURL}/${details?.thumbnail}`) : ''
@@ -212,14 +211,14 @@ export class Parser {
 
     parseChapters(VoyceD: VoyceChapterData): Chapter[] {
         const chapters: Chapter[] = []
-        const data = VoyceD?.data?.series?.first()
+        const data = VoyceD?.data?.series[0]
         let sortingIndex = 0
 
         for (const obj of data?.chapters ?? []) {
             const id = obj.id ?? ''
             const name = obj.title ?? 'No Chpater Name'
             const release_date = obj.created_at
-            const chapNum = Number(name.match(/\d+/)?.pop()?.replace(/-/g, '.'))
+            const chapNum = Number((/\d+/.exec(name))?.pop()?.replace(/-/g, '.'))
 
             if (!id) continue
 

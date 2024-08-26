@@ -11,6 +11,10 @@ export interface SearchData {
     }
 }
 
+export interface Metadata {
+    page?: number
+}
+
 export interface VoyceMangaData {
     data: {
         series: [
@@ -39,7 +43,7 @@ export interface VoyceMangaData {
 
 
 export interface VoyceChapterData {
-    data: {
+    data?: {
         series: [
             {
                 chapters: [

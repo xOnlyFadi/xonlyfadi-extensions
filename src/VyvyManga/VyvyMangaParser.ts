@@ -9,7 +9,7 @@ import {
     TagSection
 } from '@paperback/types'
 
-import entities = require('entities')
+import { decodeHTML } from 'entities'
 import { CheerioAPI } from 'cheerio'
 import { Element } from 'domhandler'
 
@@ -19,13 +19,13 @@ export const parseMangaDetails = (
 ): SourceManga => {
     const titles: string[] = []
 
-    titles.push(decodeHTMLEntity($('.col-md-7 .title').text().trim() ?? ''))
+    titles.push(decodeHTML($('.col-md-7 .title').text().trim() ?? ''))
     const altTitles = $('.col-md-7 .title + p:not(.text-info)').text().trim().split('/')
     for (const title of altTitles) {
-        titles.push(decodeHTMLEntity(title))
+        titles.push(decodeHTML(title))
     }
 
-    const description = decodeHTMLEntity(
+    const description = decodeHTML(
         $('.summary .content').text().trim() ?? ''
     )
 
@@ -107,7 +107,7 @@ export const parseChapterList = (
         const chapNumRegex = chapterAttr.id?.match(/(\d+)(?:[-.]\d+)?/)
 
         let chapNum =
-            chapNumRegex && chapNumRegex[1]
+            chapNumRegex?.[1]
                 ? Number(chapNumRegex[1].replace('-', '.'))
                 : 0
         if (isNaN(chapNum)) chapNum = 0
@@ -216,9 +216,9 @@ export const parseHomeSections = (
         popularSection_Array.push(
             App.createPartialSourceManga({
                 image: image,
-                title: decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             })
         )
     }
@@ -229,7 +229,7 @@ export const parseHomeSections = (
     const latestSection_Array: PartialSourceManga[] = []
     const latestSectionElem = $('.home-title:contains("Latest Update")').closest('.latest-update')
     for (const manga of latestSectionElem.find('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', manga).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', manga).attr('data-src') ?? ''
         const title: string = $('.comic-title', manga).text().trim() ?? ''
         const subtitle: string = $('.tray-item', manga).text().trim() ?? ''
 
@@ -239,9 +239,9 @@ export const parseHomeSections = (
         latestSection_Array.push(
             App.createPartialSourceManga({
                 image: image,
-                title: decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             })
         )
     }
@@ -252,7 +252,7 @@ export const parseHomeSections = (
     const newSection_Array: PartialSourceManga[] = []
     const newSectionElem = $('.home-title:contains("New Release")').closest('.latest-update')
     for (const manga of newSectionElem.find('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', manga).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', manga).attr('data-src') ?? ''
         const title: string = $('.comic-title', manga).text().trim() ?? ''
         const subtitle: string = $('.tray-item', manga).text().trim() ?? ''
 
@@ -262,9 +262,9 @@ export const parseHomeSections = (
         newSection_Array.push(
             App.createPartialSourceManga({
                 image: image,
-                title: decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             })
         )
     }
@@ -277,7 +277,7 @@ export const parseViewMore = ($: CheerioAPI): PartialSourceManga[] => {
     const collectedIds: string[] = []
 
     for (const obj of $('.book-list .col-4 > .comic-item').toArray()) {
-        const image: string = $('.comic-image', obj).attr('data-background-image') ?? ''
+        const image: string = $('.comic-image > img', obj).attr('data-src') ?? ''
         const title: string = $('.comic-title', obj).text().trim() ?? ''
         const subtitle: string = $('.tray-item', obj).text().trim() ?? ''
         const id = $('a', obj).attr('href')?.split('/manga/').pop() ?? ''
@@ -286,9 +286,9 @@ export const parseViewMore = ($: CheerioAPI): PartialSourceManga[] => {
         manga.push(
             App.createPartialSourceManga({
                 image: image,
-                title: decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
-                subtitle: decodeHTMLEntity(subtitle)
+                subtitle: decodeHTML(subtitle)
             })
         )
         collectedIds.push(id)
@@ -310,7 +310,7 @@ export const parseSearch = ($: CheerioAPI): PartialSourceManga[] => {
         mangas.push(
             App.createPartialSourceManga({
                 image: image,
-                title: decodeHTMLEntity(title),
+                title: decodeHTML(title),
                 mangaId: id,
                 subtitle: subtitle
             })
@@ -366,8 +366,8 @@ export const isLastPage = ($: CheerioAPI): boolean => {
     const lastPageLink = $('ul.pagination li.page-item a.page-link').last().attr('href')
     let lastPage = 1
     if (lastPageLink) {
-        const match = lastPageLink.match(/page=(\d+)/)
-        if (match && match[1]) {
+        const match = /page=(\d+)/.exec(lastPageLink)
+        if (match?.[1]) {
             lastPage = parseInt(match[1], 10)
         }
     }
@@ -379,8 +379,4 @@ export const isLastPage = ($: CheerioAPI): boolean => {
     }
 
     return isLast
-}
-
-const decodeHTMLEntity = (str: string): string => {
-    return entities.decodeHTML(str)
 }

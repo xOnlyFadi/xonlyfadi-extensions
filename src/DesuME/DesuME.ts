@@ -29,15 +29,14 @@ import {
 import {
     ChapterDetailsImages,
     MangaDetails,
+    Metadata,
     SearchData
 } from './DesuMEHelper'
-
-import '../scopes'
 
 const DOMAIN = 'https://desu.me'
 const API = `${DOMAIN}/manga/api`
 export const DesuMEInfo: SourceInfo = {
-    version: '2.0.2',
+    version: '2.0.3',
     name: 'Desu',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -128,10 +127,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
                 this.CloudFlareError(response.status)
                 let data: SearchData
                 try {
-                    data = JSON.parse(response.data as string)
+                    data = JSON.parse(response.data!) as SearchData
                 }
                 catch (e) {
-                    throw new Error(`${e}`)
+                    throw new Error(JSON.stringify(e))
                 }
                 section.section.items = parseSearch(data)
                 sectionCallback(section.section)
@@ -141,7 +140,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         await Promise.all(promises)
     }
 
-    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    async getViewMoreItems(homepageSectionId: string, metadata?: Metadata): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         const request = App.createRequest({
             url: `${API}/?limit=${this.limit}&order=${homepageSectionId}&page=${page}`,
@@ -152,10 +151,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
 
         let data: SearchData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as SearchData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
         const manga = parseSearch(data)
 
@@ -167,7 +166,7 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
         })
     }
 
-    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata?: Metadata): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let url = `${API}/?limit=${this.limit}&page=${page}`
 
@@ -195,15 +194,15 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
             url += `&search=${query?.title.replace(/ /g, '+').replace(/%20/g, '+')}`
         }
 
-        if (Genres.isNotEmpty()) {
+        if (Genres?.length > 0) {
             url += `&genres=${Genres.join(',')}`
         }
 
-        if (Types.isNotEmpty()) {
+        if (Types?.length > 0) {
             url += `&kinds=${Types.join(',')}`
         }
 
-        if (Order.isNotEmpty()) {
+        if (Order?.length > 0) {
             url += `&order=${Order[0]}`
         }
 
@@ -216,10 +215,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
 
         let data: SearchData
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as SearchData
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
         const manga = parseSearch(data)
 
@@ -241,10 +240,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
 
         let data: MangaDetails
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as MangaDetails
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         return parseMangaDetails(data, mangaId)
@@ -260,10 +259,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
 
         let data: MangaDetails
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as MangaDetails
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         return parseChapters(data)
@@ -279,10 +278,10 @@ export class DesuME implements MangaProviding, ChapterProviding, SearchResultsPr
 
         let data: ChapterDetailsImages
         try {
-            data = JSON.parse(response.data as string)
+            data = JSON.parse(response.data!) as ChapterDetailsImages
         }
         catch (e) {
-            throw new Error(`${e}`)
+            throw new Error(JSON.stringify(e))
         }
 
         return parseChapterDetails(data, mangaId, chapterId)

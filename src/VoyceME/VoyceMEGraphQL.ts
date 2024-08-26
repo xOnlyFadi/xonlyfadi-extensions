@@ -1,5 +1,5 @@
 import { SearchRequest } from '@paperback/types'
-import '../scopes'
+
 export interface GraphQLQuery {
     query: string;
     variables?: unknown;
@@ -118,8 +118,8 @@ export const SearchQuery = (query: SearchRequest, page: number, popularPerPage: 
     })
 
     const title = query?.title ?? ''
-    const description = query?.parameters?.['description'] ?? ''
-    const author = query?.parameters?.['author'] ?? ''
+    const description = query?.parameters.description as string
+    const author = query?.parameters?.author as string
 
     return {
         query: `query($limit: Int, $offset: Int) {
@@ -132,9 +132,9 @@ export const SearchQuery = (query: SearchRequest, page: number, popularPerPage: 
                         ]` : ''}
                     publish: { _eq: 1 },
                     ${Category ? 'is_original: {_eq: 1}' : ''}
-                    type: { id: { _in: ${Types.isNotEmpty() ? `${JSON.stringify(Types)}` : '[2, 4]'} } }
-                    ${Status.isNotEmpty() ? `status: { _in: ${JSON.stringify(Status)} }` : ''}
-                    ${Genres.isNotEmpty() ? `genres: { genre_id: { _in: ${JSON.stringify(Genres)} } }` : ''}
+                    type: { id: { _in: ${Types?.length > 0 ? `${JSON.stringify(Types)}` : '[2, 4]'} } }
+                    ${Status?.length > 0 ? `status: { _in: ${JSON.stringify(Status)} }` : ''}
+                    ${Genres?.length > 0 ? `genres: { genre_id: { _in: ${JSON.stringify(Genres)} } }` : ''}
                 },
                 order_by: [{ views_counts: { count: desc_nulls_last } }],
                 limit: $limit,

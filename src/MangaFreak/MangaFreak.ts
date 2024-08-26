@@ -22,6 +22,10 @@ import * as cheerio from 'cheerio'
 
 import { Parser } from './MangaFreakParser'
 
+interface Metadata {
+    page?: number
+}
+
 const MangaFreak_BASE = 'https://ww1.mangafreak.me/'
 const MangaFreak_CDN = 'https://images.mangafreak.me'
 export const MangaFreakInfo: SourceInfo = {
@@ -29,7 +33,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.4',
+    version: '2.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -90,13 +94,13 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         this.CloudFlareError(response.status)
 
         return this.parser.parseHomeSections($, sectionCallback, MangaFreak_CDN)
     }
 
-    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    async getViewMoreItems(homepageSectionId: string, metadata?: Metadata): Promise<PagedResults> {
         const page = metadata?.page ?? 1
 
         let param = ''
@@ -118,7 +122,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         this.CloudFlareError(response.status)
         const manga = this.parser.ViewMoreParse($, MangaFreak_CDN, isPopular)
 
@@ -137,7 +141,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseTags($)
     }
@@ -149,7 +153,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseMangaDetails($, mangaId, MangaFreak_CDN)
     }
@@ -161,7 +165,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapters($)
     }
@@ -173,12 +177,12 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
         })
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
-    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata?: Metadata): Promise<PagedResults> {
         const page = metadata?.page ?? 1
 
         let UsesDeatils = false
@@ -260,7 +264,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
 
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
-        const $ = cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data!)
         const manga = this.parser.parseSearchResults($, MangaFreak_CDN, UsesDeatils)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined

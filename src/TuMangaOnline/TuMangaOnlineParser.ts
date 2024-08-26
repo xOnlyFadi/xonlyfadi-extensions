@@ -1,11 +1,11 @@
-import { Chapter,
+import {
+    Chapter,
     ChapterDetails,
     SourceManga,
     PartialSourceManga,
     Tag,
-    TagSection } from '@paperback/types'
-
-import '../scopes'
+    TagSection
+} from '@paperback/types'
 
 import { CheerioAPI } from 'cheerio'
 import { decodeHTML } from 'entities'
@@ -18,7 +18,7 @@ export class Parser {
             const info = $('div.element > a',obj)
             const id = this.idCleaner(info.attr('href')?.trim() ?? '', baseUrl) ?? ''
             const title = decodeHTML($('h4.text-truncate',info).text().trim()) ?? decodeHTML($('h4.text-truncate',info)?.attr('title')?.trim() ?? '') ?? ''
-            const image = $(obj).find('style').toString().substringAfterFirst('(\'').substringBeforeFirst('\')') ?? ''
+            const image = $(obj).find('style').toString().split('(\'')[1]?.split('\')')[0] ?? ''
 
             if(!id || !title) continue
 
@@ -83,7 +83,7 @@ export class Parser {
             for(const obj of $('div.chapters > ul.list-group li.p-0.list-group-item').toArray()){
                 const chapStyle = $('a.btn-collapse',obj).text().trim()
 
-                const chapStyleRegex = chapStyle.match(ChapterNumRegex)
+                const chapStyleRegex = ChapterNumRegex.exec(chapStyle)
                 let chapNum
 
                 if(chapStyleRegex && !isNaN(Number(chapStyleRegex[1]))) chapNum = Number(chapStyleRegex[1])
@@ -129,8 +129,8 @@ export class Parser {
         const desc = decodeHTML($('p.element-description').text().trim()) ?? ''
 
         const infoAuth = $('h5.card-title')
-        const author = decodeHTML(infoAuth.first().text().trim().substringAfterFirst(', ')) ?? ''
-        const artist = decodeHTML(infoAuth.last().text().trim().substringAfterFirst(', ')) ?? ''
+        const author = decodeHTML(infoAuth.first().text().trim().split(', ')[1] ?? '')
+        const artist = decodeHTML(infoAuth.last().text().trim().split(', ')[1] ?? '')
 
         const status = decodeHTML($('span.book-status').text().trim()) ?? ''
 
@@ -139,9 +139,9 @@ export class Parser {
 
         for (const obj of $('a.py-2').toArray()) {
             const link = $(obj)?.attr('href') ?? ''
-            const idRegex = link.match(genreregex)
+            const idRegex = genreregex.exec(link)
             let id
-            if (idRegex && idRegex[1]) id = idRegex[1]
+            if (idRegex?.[1]) id = idRegex[1]
             const label = $(obj).text() ?? ''
             if (!id || !label) continue
             arrayTags.push({
@@ -329,7 +329,7 @@ export class Parser {
 
         const NSFWids = []
 
-        isNSFW ? NSFWids.push() : NSFWids.push('6', '17', '18', '19')
+        if (!isNSFW) NSFWids.push('6', '17', '18', '19')
         for (const tag of $('#books-genders .col-auto .custom-control').toArray()) {
             const label = $('label', tag).text().trim()
             const id = $('input', tag).attr('value') ?? '0'

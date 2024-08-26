@@ -27,6 +27,10 @@ import {
     getNSFW
 } from './TuMangaOnlineSettings'
 
+interface Metadata {
+    page?: number
+}
+
 const TUMANGA_DOMAIN = 'https://visortmo.com'
 
 export const TuMangaOnlineInfo: SourceInfo = {
@@ -34,7 +38,7 @@ export const TuMangaOnlineInfo: SourceInfo = {
     description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '2.0.3',
+    version: '2.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TUMANGA_DOMAIN,
     contentRating: ContentRating.ADULT,
@@ -134,7 +138,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             sectionCallback(section.section)
             promises.push(this.requestManager.schedule(section.request, 1).then(response => {
                 this.CloudFlareError(response.status)
-                const $ = cheerio.load(response.data as string)
+                const $ = cheerio.load(response.data!)
                 section.section.items = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
                 sectionCallback(section.section)
             }))
@@ -143,7 +147,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         await Promise.all(promises)
     }
 
-    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+    async getViewMoreItems(homepageSectionId: string, metadata?: Metadata): Promise<PagedResults> {
         const getNSFWOption = await getNSFW(this.stateManager)
         const page = metadata?.page ?? 1
 
@@ -164,7 +168,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
         const manga = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined
@@ -183,7 +187,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseTags($, getNSFWOption)
     }
@@ -195,7 +199,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseMangaDetails($, mangaId)
     }
@@ -207,7 +211,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapters($, mangaId, TUMANGA_DOMAIN)
     }
@@ -219,7 +223,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const response = await this.requestManager.schedule(options, 1)
         this.CloudFlareError(response.status)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
@@ -234,11 +238,11 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         })
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
-        const $ = cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data!)
 
         const button = $('.flex-row button.btn-social').attr('onclick')?.match(/copyToClipboard\(['"`](.*)['"`]\)/i)
         let url
-        if (button && button[1]) {
+        if (button?.[1]) {
             const chapurl = button[1]
             if(chapurl.includes('paginated')){
                 url = chapurl.replace('paginated','') + 'cascade'
@@ -252,7 +256,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         return url
     }
 
-    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata?: Metadata): Promise<PagedResults> {
         const getNSFWOption = await getNSFW(this.stateManager)
         const page = metadata?.page ?? 1
         const search = {
@@ -272,7 +276,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         const tags = query.includedTags?.map(tag => tag.id) ?? []
         const genres: string[] = []
         tags.map((value) => {
-            if (value.indexOf('.') === -1) {
+            if (!value.includes('.')) {
                 genres.push(`&genders[]=${value}`)
             } else {
                 switch (value.split('.')[0]) {
@@ -332,7 +336,7 @@ export class TuMangaOnline implements MangaProviding, ChapterProviding, SearchRe
         }
         const data = await this.requestManager.schedule(request, 2)
         this.CloudFlareError(data.status)
-        const $ = cheerio.load(data.data as string)
+        const $ = cheerio.load(data.data!)
         const manga = this.parser.parseHomeSection($, TUMANGA_DOMAIN)
 
         metadata = this.parser.NextPage($) ? { page: page + 1 } : undefined

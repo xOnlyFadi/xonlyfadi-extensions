@@ -21,6 +21,10 @@ export interface SearchData {
     ]
 }
 
+export interface Metadata {
+    page?: number
+}
+
 export interface MangaDetails {
     response: {
         id:             number

@@ -21,7 +21,7 @@ export const TCBScansInfo: SourceInfo = {
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.3',
+    version: '2.0.4',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
@@ -62,7 +62,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseHomeSections($, sectionCallback)
     }
@@ -73,7 +73,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseMangaDetails($, mangaId)
     }
@@ -84,7 +84,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapters($)
     }
@@ -95,7 +95,7 @@ export class TCBScans implements ChapterProviding {
             method: 'GET'
         })
         const response = await this.requestManager.schedule(options, 1)
-        const $ = cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data!)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
