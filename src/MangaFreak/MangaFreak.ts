@@ -33,7 +33,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.5',
+    version: '2.0.6',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -79,7 +79,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
 
     async getCloudflareBypassRequestAsync(): Promise<Request> {
         return App.createRequest({
-            url: `${MangaFreak_BASE}/Genre`,
+            url: `${MangaFreak_BASE}/Mangalist`,
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
