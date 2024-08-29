@@ -16251,7 +16251,7 @@ var _Sources = (() => {
     description: "Extension that pulls manga from mangafreak.net",
     icon: "icon.png",
     name: "MangaFreak",
-    version: "2.0.5",
+    version: "2.0.6",
     authorWebsite: "https://github.com/xOnlyFadi",
     websiteBaseURL: MangaFreak_BASE,
     contentRating: import_types3.ContentRating.EVERYONE,
@@ -16294,7 +16294,7 @@ var _Sources = (() => {
     }
     async getCloudflareBypassRequestAsync() {
       return App.createRequest({
-        url: `${MangaFreak_BASE}/Genre`,
+        url: `${MangaFreak_BASE}/Mangalist`,
         method: "GET",
         headers: {
           "referer": `${this.baseUrl}/`,
