@@ -16251,7 +16251,7 @@ var _Sources = (() => {
     description: "Extension that pulls manga from mangafreak.net",
     icon: "icon.png",
     name: "MangaFreak",
-    version: "2.0.6",
+    version: "2.0.7",
     authorWebsite: "https://github.com/xOnlyFadi",
     websiteBaseURL: MangaFreak_BASE,
     contentRating: import_types3.ContentRating.EVERYONE,
@@ -16264,7 +16264,7 @@ var _Sources = (() => {
       }
     ]
   };
-  var MangaFreak = class {
+  var MangaFreak = class _MangaFreak {
     constructor() {
       this.parser = new Parser3();
       this.baseUrl = MangaFreak_BASE;
@@ -16465,7 +16465,7 @@ var _Sources = (() => {
     CloudFlareError(status) {
       if (status == 503 || status == 403) {
         throw new Error(`CLOUDFLARE BYPASS ERROR:
-Please go to Settings > Sources > ${MangaFreakInfo.name} and press Cloudflare Bypass`);
+Please go to the homepage of <${_MangaFreak.name}> and press the cloud icon.`);
       }
     }
   };
