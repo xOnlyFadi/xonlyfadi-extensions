@@ -33,7 +33,7 @@ export const MangaFreakInfo: SourceInfo = {
     description: 'Extension that pulls manga from mangafreak.net',
     icon: 'icon.png',
     name: 'MangaFreak',
-    version: '2.0.6',
+    version: '2.0.7',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: MangaFreak_BASE,
     contentRating: ContentRating.EVERYONE,
@@ -281,7 +281,7 @@ export class MangaFreak implements MangaProviding, ChapterProviding, SearchResul
 
     CloudFlareError(status: number): void {
         if (status == 503 || status == 403) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${MangaFreakInfo.name} and press Cloudflare Bypass`)
+            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${MangaFreak.name}> and press the cloud icon.`)        
         }
     }
 }
