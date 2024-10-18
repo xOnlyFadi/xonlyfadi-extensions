@@ -16307,13 +16307,13 @@ var _Sources = (() => {
   };
 
   // src/TuMangaOnline/TuMangaOnline.ts
-  var TUMANGA_DOMAIN = "https://visortmo.com";
+  var TUMANGA_DOMAIN = "https://zonatmo.com";
   var TuMangaOnlineInfo = {
     author: "xOnlyFadi",
-    description: "Extensi\xF3n que extrae el manga de visortmo.com",
+    description: "Extensi\xF3n que extrae el manga de zonatmo.com",
     icon: "icon.png",
     name: "TuMangaOnline",
-    version: "2.0.4",
+    version: "2.0.5",
     authorWebsite: "https://github.com/xOnlyFadi",
     websiteBaseURL: TUMANGA_DOMAIN,
     contentRating: import_types2.ContentRating.ADULT,
