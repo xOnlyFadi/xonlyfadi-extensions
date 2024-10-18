@@ -31,14 +31,14 @@ interface Metadata {
     page?: number
 }
 
-const TUMANGA_DOMAIN = 'https://visortmo.com'
+const TUMANGA_DOMAIN = 'https://zonatmo.com'
 
 export const TuMangaOnlineInfo: SourceInfo = {
     author: 'xOnlyFadi',
-    description: 'Extensi\u00F3n que extrae el manga de visortmo.com',
+    description: 'Extensi\u00F3n que extrae el manga de zonatmo.com',
     icon: 'icon.png',
     name: 'TuMangaOnline',
-    version: '2.0.4',
+    version: '2.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TUMANGA_DOMAIN,
     contentRating: ContentRating.ADULT,
