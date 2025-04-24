@@ -16043,13 +16043,13 @@ var _Sources = (() => {
   };
 
   // src/TCBScans/TCBScans.ts
-  var TCBScans_Base = "https://tcbscans.me";
+  var TCBScans_Base = "https://tcbonepiecechapters.com";
   var TCBScansInfo = {
     author: "xOnlyFadi",
     description: "Extension that pulls manga from onepiecechapters.com",
     icon: "icon.png",
     name: "TCB Scans",
-    version: "2.0.4",
+    version: "2.0.5",
     authorWebsite: "https://github.com/xOnlyFadi",
     websiteBaseURL: TCBScans_Base,
     contentRating: import_types2.ContentRating.EVERYONE,
