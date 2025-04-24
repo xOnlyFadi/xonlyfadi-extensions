@@ -15,13 +15,13 @@ import * as cheerio from 'cheerio'
 
 import { Parser } from './TCBScansParser'
 
-const TCBScans_Base = 'https://tcbscans.me'
+const TCBScans_Base = 'https://tcbonepiecechapters.com'
 export const TCBScansInfo: SourceInfo = {
     author: 'xOnlyFadi',
     description: 'Extension that pulls manga from onepiecechapters.com',
     icon: 'icon.png',
     name: 'TCB Scans',
-    version: '2.0.4',
+    version: '2.0.5',
     authorWebsite: 'https://github.com/xOnlyFadi',
     websiteBaseURL: TCBScans_Base,
     contentRating: ContentRating.EVERYONE,
