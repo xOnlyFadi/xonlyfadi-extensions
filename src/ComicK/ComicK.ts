@@ -49,7 +49,7 @@ const COMICK_API = 'https://api.comick.fun'
 const LIMIT = 300
 
 export const ComicKInfo: SourceInfo = {
-    version: '2.2.2',
+    version: '2.2.3',
     name: 'ComicK',
     icon: 'icon.png',
     author: 'xOnlyFadi',
@@ -124,41 +124,21 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
-        const showTitle: boolean = await this.stateManager.retrieve('show_title') as boolean ?? false
-        const showVol: boolean = await this.stateManager.retrieve('show_volume_number') as boolean ?? false
-        const chapterScoreFiltering: boolean = await this.stateManager.retrieve('chapter_score_filtering') as boolean ?? false
-        const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') as boolean ?? false
-        const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') as boolean ?? false
-        const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') as boolean ?? false
-        const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') as boolean ?? false
-        const uploaders: string[] = await this.stateManager.retrieve('uploaders_selected') as string[] ?? []
-        const hideUnreleasedChapters: boolean = await this.stateManager.retrieve('hide_unreleased_chapters') as boolean ?? true
+        try {
+            const showTitle: boolean = await this.stateManager.retrieve('show_title') as boolean ?? false
+            const showVol: boolean = await this.stateManager.retrieve('show_volume_number') as boolean ?? false
+            const chapterScoreFiltering: boolean = await this.stateManager.retrieve('chapter_score_filtering') as boolean ?? false
+            const uploadersToggled: boolean = await this.stateManager.retrieve('uploaders_toggled') as boolean ?? false
+            const uploadersWhitelisted: boolean = await this.stateManager.retrieve('uploaders_whitelisted') as boolean ?? false
+            const aggressiveUploadersFilter: boolean = await this.stateManager.retrieve('aggressive_uploaders_filtering') as boolean ?? false
+            const strictNameMatching: boolean = await this.stateManager.retrieve('strict_name_matching') as boolean ?? false
+            const uploaders: string[] = await this.stateManager.retrieve('uploaders_selected') as string[] ?? []
+            const hideUnreleasedChapters: boolean = await this.stateManager.retrieve('hide_unreleased_chapters') as boolean ?? true
 
-        const chapters: Chapter[] = []
+            const chapters: Chapter[] = []
 
-        let page = 1
-        let data = await this.createChapterRequest(mangaId, page++)
-
-        parseChapters(
-            chapters,
-            data,
-            showTitle,
-            showVol,
-            chapterScoreFiltering,
-            uploadersToggled,
-            uploadersWhitelisted,
-            aggressiveUploadersFilter,
-            strictNameMatching,
-            uploaders,
-            hideUnreleasedChapters
-        )
-
-        // Try next page if number of chapters is same as limit
-        while (data.chapters.length === LIMIT) {
-            data = await this.createChapterRequest(mangaId, page++)
-
-            // Break if there are no more chapters
-            if (data.chapters.length === 0) break
+            let page = 1
+            let data = await this.createChapterRequest(mangaId, page++)
 
             parseChapters(
                 chapters,
@@ -173,12 +153,37 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
                 uploaders,
                 hideUnreleasedChapters
             )
-        }
 
-        return chapters
+            // Try next page if number of chapters is same as limit
+            while (data.chapters.length === LIMIT) {
+                data = await this.createChapterRequest(mangaId, page++)
+
+                // Break if there are no more chapters
+                if (data.chapters.length === 0) break
+
+                parseChapters(
+                    chapters,
+                    data,
+                    showTitle,
+                    showVol,
+                    chapterScoreFiltering,
+                    uploadersToggled,
+                    uploadersWhitelisted,
+                    aggressiveUploadersFilter,
+                    strictNameMatching,
+                    uploaders,
+                    hideUnreleasedChapters
+                )
+            }
+
+            return chapters
+        } catch (e) {
+            console.log(`Failed to fetch chapters for ${mangaId}: ${String(e)}`);
+            throw e;
+        }
     }
 
-    async createChapterRequest(mangaId: string, page: number): Promise<ChapterList> {
+    async createChapterRequest(mangaId: string, page: number, attempt = 0): Promise<ChapterList> {
         const LIMIT = 100000
         const Languages = await this.stateManager.retrieve('languages') as string[] ?? []
         const request = App.createRequest({
@@ -188,12 +193,27 @@ export class ComicK implements MangaProviding, ChapterProviding, SearchResultsPr
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
 
+        if (response.status === 429) {
+            if (attempt > 2) {
+                throw new Error(`Failed to get chapters for ${mangaId} due to cloudflare rate limit.`);
+            }
+            console.log(`Cloudflare rate limit error for ${mangaId} (attempt ${attempt + 1}), waiting to retry...`);
+
+            // setTimeout doesn't exist for us, so this is about the most we can avoid locking up the thread... :/
+            const endTime = new Date().getTime() + 2 ** attempt * 1000 + Math.floor(Math.random() * 500);
+            while (new Date().getTime() < endTime) {
+                await Promise.resolve();
+            }
+
+            return this.createChapterRequest(mangaId, page, attempt + 1);
+        }
+
         let data: ChapterList
         try {
             data = JSON.parse(response.data ?? '') as ChapterList
         }
         catch (e) {
-            throw new Error(JSON.stringify(e))
+            throw new Error(`Recieved non-JSON response (HTTP ${response.status}): ${String(e)}`);
         }
 
         return data
